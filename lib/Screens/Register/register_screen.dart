@@ -64,6 +64,8 @@ class MobileRegisterScreen extends StatelessWidget {
   TextEditingController _nameTextController = TextEditingController();
   TextEditingController _ExpTextController = TextEditingController();
   TextEditingController _nbiTextController = TextEditingController();
+  final items = ['Hair', 'Makeup', 'Spa', 'Nails', 'Lashes'];
+  String? value;
 
   MobileRegisterScreen({Key? key}) : super(key: key);
 
@@ -103,6 +105,23 @@ class MobileRegisterScreen extends StatelessWidget {
                       ),
                       textField("Confirm Password", Icons.check, true,
                           _passwordTextController),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      Text("Service Type"),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          items: items.map(buildMenuItem).toList(),
+                          onChanged: (value) => this.value = value,
+                          isExpanded: true,
+                          value: value,
+                          iconSize: 36,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                      ),
                       nextButton(context, () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: ((context) {
@@ -120,4 +139,12 @@ class MobileRegisterScreen extends StatelessWidget {
       ],
     );
   }
+
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+        value: item,
+        child: Text(
+          item,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+      );
 }

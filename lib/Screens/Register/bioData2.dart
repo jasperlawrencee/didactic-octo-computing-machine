@@ -1,7 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/Register/requirements.dart';
+import 'package:flutter_auth/Screens/Register/bioData2-1.dart';
+import 'package:flutter_auth/Screens/Register/requirements4.dart';
+import 'package:flutter_auth/Screens/Register/service_screen3.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -57,6 +59,7 @@ class BioData extends StatelessWidget {
 
 class MobileBioData extends StatelessWidget {
   final items = ['item 1', 'item 2', 'item 3'];
+  final gender = ['Male', 'Female', 'Non-binary'];
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
   TextEditingController _nameTextController = TextEditingController();
@@ -89,81 +92,54 @@ class MobileBioData extends StatelessWidget {
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Full Name", Icons.person, false,
+                      textField("First Name", Icons.person, false,
                           _nameTextController),
                       const SizedBox(
                         height: defaultPadding,
+                      ),
+                      textField("Middle Name", Icons.person, false,
+                          _nameTextController),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      textField("Last Name", Icons.person, false,
+                          _nameTextController),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      Text("Gender"),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          items: gender.map(buildMenuItem).toList(),
+                          onChanged: (value) => this.value = value,
+                          isExpanded: true,
+                          value: value,
+                          iconSize: 36,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: kPrimaryColor,
+                          ),
+                        ),
                       ),
                       textField("Phone Number", Icons.phone, false,
                           _passwordTextController),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Address", Icons.location_city, false,
-                          _emailTextController),
+                      textField("Phone Number 2", Icons.phone, false,
+                          _passwordTextController),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      Text("Region"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
-                          ),
-                        ),
-                      ),
-                      Text("Provice"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
-                          ),
-                        ),
-                      ),
-                      Text("City"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
-                          ),
-                        ),
-                      ),
-                      Text("Barangay"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
-                          ),
-                        ),
+                      textField("Phone Number 3", Icons.phone, false,
+                          _passwordTextController),
+                      const SizedBox(
+                        height: defaultPadding,
                       ),
                       nextButton(context, () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                          return Requirements();
+                          return Address();
                         }));
                       }, "Next")
                     ],

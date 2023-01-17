@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
+import 'package:flutter_auth/Screens/Register/confirm.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -84,25 +85,45 @@ class MobileRequirements extends StatelessWidget {
                     children: <Widget>[
                       const Text("REQUIREMENTS NEEDED"),
                       TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: kPrimaryColor,
+                            padding: const EdgeInsets.all(defaultPadding),
+                          ),
                           onPressed: () {},
                           child: Text(
                             "Attach Government ID",
                             style: TextStyle(color: Colors.black),
                           )),
                       TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: kPrimaryColor,
+                            padding: const EdgeInsets.all(defaultPadding),
+                          ),
                           onPressed: () {},
                           child: Text(
                             "Attach Vaccination Certificate",
                             style: TextStyle(color: Colors.black),
                           )),
                       TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: kPrimaryColor,
+                            padding: const EdgeInsets.all(defaultPadding),
+                          ),
                           onPressed: () {},
                           child: Text(
                             "Attach NBI Clearance",
                             style: TextStyle(color: Colors.black),
                           )),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
                       textField("TIN", Icons.pin, false, _emailTextController),
-                      nextButton(context, () {}, "Submit")
+                      nextButton(context, () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return ConfirmScreen();
+                        }));
+                      }, "Submit")
                     ],
                   ),
                 )

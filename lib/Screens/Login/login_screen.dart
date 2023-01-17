@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/Home/home_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
@@ -106,7 +107,12 @@ class MobileLoginScreen extends StatelessWidget {
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    SignInSignUp(context, true, () {}),
+                    SignInSignUp(context, true, () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return HomeScreen();
+                      }));
+                    }),
                     AlreadyHaveAnAccountCheck(
                       login: true,
                       press: () {

@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Home/home_screen.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/Register/register_screen.dart';
+import 'package:flutter_auth/Screens/Register/register_screen1.dart';
 import 'package:flutter_auth/Screens/Register/toRegister.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/widgets.dart';

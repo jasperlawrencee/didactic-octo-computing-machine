@@ -1,12 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Register/bioData.dart';
+import 'package:flutter_auth/Screens/Login/login_screen.dart';
+import 'package:flutter_auth/Screens/Register/requirements4.dart';
+import 'package:flutter_auth/Screens/Register/service_screen3.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
 
-class RegisterScreen extends StatelessWidget {
+class Address extends StatelessWidget {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
   TextEditingController _nameTextController = TextEditingController();
@@ -18,33 +21,28 @@ class RegisterScreen extends StatelessWidget {
     return Background(
       child: SingleChildScrollView(
         child: Responsive(
-          mobile: MobileRegisterScreen(),
+          mobile: MobileAddress(),
           desktop: Row(
             children: [
               SizedBox(
                 width: 450,
                 child: Column(
                   children: [
-                    const Text("ACCOUNT INFORMATION"),
+                    const Text("BIO DATA INFORMATION"),
                     const SizedBox(
                       height: defaultPadding,
                     ),
                     textField(
-                        "Username", Icons.person, false, _nameTextController),
+                        "Full Name", Icons.person, false, _nameTextController),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField(
-                        "Email", Icons.email, false, _emailTextController),
+                    textField("Address", Icons.location_city, false,
+                        _emailTextController),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField(
-                        "Password", Icons.lock, true, _passwordTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField("Confirm Password", Icons.check, true,
+                    textField("Phone Number", Icons.phone, false,
                         _passwordTextController),
                     nextButton(context, () {}, "Next")
                   ],
@@ -58,17 +56,22 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class MobileRegisterScreen extends StatelessWidget {
+class MobileAddress extends StatelessWidget {
+  final items = ['item 1', 'item 2', 'item 3'];
+  final gender = ['Male', 'Female', 'Non-binary'];
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
   TextEditingController _nameTextController = TextEditingController();
   TextEditingController _ExpTextController = TextEditingController();
   TextEditingController _nbiTextController = TextEditingController();
-  final items = ['Hair', 'Makeup', 'Spa', 'Nails', 'Lashes'];
+  FilePickerResult? result;
+  String? _fileName;
+  PlatformFile? pickedfile;
+  bool isLoading = false;
   String? value;
+  // File? fileToDisplay;
 
-  MobileRegisterScreen({Key? key}) : super(key: key);
-
+  MobileAddress({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,31 +87,7 @@ class MobileRegisterScreen extends StatelessWidget {
                   width: 450,
                   child: Column(
                     children: <Widget>[
-                      const Text("ACCOUNT INFORMATION"),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField(
-                          "Username", Icons.person, false, _nameTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField(
-                          "Email", Icons.email, false, _emailTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField("Password", Icons.lock, true,
-                          _passwordTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField("Confirm Password", Icons.check, true,
-                          _passwordTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      Text("Service Type"),
+                      Text("City"),
                       DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           items: items.map(buildMenuItem).toList(),
@@ -122,11 +101,35 @@ class MobileRegisterScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                      Text("Barangay"),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          items: items.map(buildMenuItem).toList(),
+                          onChanged: (value) => this.value = value,
+                          isExpanded: true,
+                          value: value,
+                          iconSize: 36,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                      ),
+                      const Text("ADDRESS"),
+                      textField("Street Address", Icons.location_city, false,
+                          _emailTextController),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      textField("Extended Address", Icons.location_city, false,
+                          _emailTextController),
+                      textField("ZIP Code", Icons.mail_outline, false,
+                          _emailTextController),
                       nextButton(context, () {
                         Navigator.push(context,
-                            MaterialPageRoute(builder: ((context) {
-                          return BioData();
-                        })));
+                            MaterialPageRoute(builder: (context) {
+                          return ServiceScreen();
+                        }));
                       }, "Next")
                     ],
                   ),

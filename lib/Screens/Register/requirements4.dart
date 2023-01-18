@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
@@ -55,7 +57,12 @@ class Requirements extends StatelessWidget {
   }
 }
 
-class MobileRequirements extends StatelessWidget {
+class MobileRequirements extends StatefulWidget {
+  @override
+  _MobileRequirementsState createState() => _MobileRequirementsState();
+}
+
+class _MobileRequirementsState extends State<MobileRequirements> {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
   TextEditingController _nameTextController = TextEditingController();
@@ -65,9 +72,34 @@ class MobileRequirements extends StatelessWidget {
   String? _fileName;
   PlatformFile? pickedfile;
   bool isLoading = false;
-  // File? fileToDisplay;
+  File? fileToDisplay;
 
-  MobileRequirements({Key? key}) : super(key: key);
+  void pickFile() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+
+      if (result != null) {
+        _fileName = result!.files.first.name;
+        pickedfile = result!.files.first;
+        fileToDisplay = File(pickedfile!.path.toString());
+        print(_fileName);
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,40 +116,25 @@ class MobileRequirements extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       const Text("REQUIREMENTS NEEDED"),
-                      TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.all(defaultPadding),
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            "Attach Government ID",
-                            style: TextStyle(color: Colors.black),
-                          )),
-                      TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.all(defaultPadding),
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            "Attach Vaccination Certificate",
-                            style: TextStyle(color: Colors.black),
-                          )),
-                      TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.all(defaultPadding),
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            "Attach NBI Clearance",
-                            style: TextStyle(color: Colors.black),
-                          )),
+                      addImage(context, "Attach Government ID"),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("TIN", Icons.pin, false, _emailTextController),
+                      addImage(context, "Attach Vaccination Certificate"),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      addImage(context, "Attach NBI Clearance"),
+                      // if (pickedfile != null)
+                      //   SizedBox(
+                      //       height: 30,
+                      //       width: 30,
+                      //       child: Image.file(fileToDisplay!)),
+                      const SizedBox(
+                        height: defaultPadding,
+                      ),
+                      textField(
+                          "TIN ID", Icons.pin, false, _emailTextController),
                       nextButton(context, () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {

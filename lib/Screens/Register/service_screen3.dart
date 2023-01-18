@@ -43,8 +43,19 @@ class MobileServiceScreen extends StatelessWidget {
                           SizedBox(height: defaultPadding),
                           checkBox(context, () {}, "Lashes"),
                           SizedBox(height: defaultPadding),
-                          const Text("OTHER SERVICE TYPE"),
-                          textField("Other", Icons.room_service_rounded, false,
+                          const Text("OPTIONAL"),
+                          textField(
+                              "Additional Experiences",
+                              Icons.room_service_rounded,
+                              false,
+                              _serviceTextController),
+                          SizedBox(
+                            height: defaultPadding,
+                          ),
+                          textField(
+                              "Period of Experiences",
+                              Icons.room_service_rounded,
+                              false,
                               _serviceTextController),
                           nextButton(context, () {
                             Navigator.push(context,

@@ -57,22 +57,21 @@ class BioData extends StatelessWidget {
   }
 }
 
-class MobileBioData extends StatelessWidget {
+class MobileBioData extends StatefulWidget {
+  @override
+  _MobileBioDataState createState() => _MobileBioDataState();
+}
+
+class _MobileBioDataState extends State<MobileBioData> {
   final items = ['item 1', 'item 2', 'item 3'];
   final gender = ['Male', 'Female', 'Non-binary'];
   TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
   TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
   FilePickerResult? result;
   String? _fileName;
   PlatformFile? pickedfile;
   bool isLoading = false;
   String? value;
-  // File? fileToDisplay;
-
-  MobileBioData({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -107,19 +106,30 @@ class MobileBioData extends StatelessWidget {
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      Text("Gender"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: gender.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
+                      // Text("Gender"),
+                      Container(
+                        decoration: BoxDecoration(
+                            // border: Border.all(color: kPrimaryColor),
+                            borderRadius: BorderRadius.circular(90),
+                            color: kPrimaryLightColor),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            hint: Text("  Gender"),
+                            value: value,
+                            items: gender.map(buildMenuItem).toList(),
+                            onChanged: (value) =>
+                                setState(() => this.value = value),
+                            isExpanded: true,
+                            iconSize: 36,
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: kPrimaryColor,
+                            ),
                           ),
                         ),
+                      ),
+                      const SizedBox(
+                        height: defaultPadding,
                       ),
                       textField("Phone Number", Icons.phone, false,
                           _passwordTextController),

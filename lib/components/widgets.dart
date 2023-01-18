@@ -78,3 +78,23 @@ Container checkBox(BuildContext context, Function onTap, String label) {
     ),
   );
 }
+
+Container addImage(BuildContext context, String label) {
+  return Container(
+    width: MediaQuery.of(context).size.width,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(90),
+      color: kPrimaryLightColor,
+    ),
+    child: TextButton(
+        style: TextButton.styleFrom(
+          foregroundColor: kPrimaryColor,
+          padding: const EdgeInsets.all(defaultPadding),
+        ),
+        onPressed: () {},
+        child: Text(
+          label,
+          style: TextStyle(color: Colors.black),
+        )),
+  );
+}

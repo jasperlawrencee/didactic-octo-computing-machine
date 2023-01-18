@@ -56,7 +56,12 @@ class Address extends StatelessWidget {
   }
 }
 
-class MobileAddress extends StatelessWidget {
+class MobileAddress extends StatefulWidget {
+  @override
+  _MobileAddressState createState() => _MobileAddressState();
+}
+
+class _MobileAddressState extends State<MobileAddress> {
   final items = ['item 1', 'item 2', 'item 3'];
   final gender = ['Male', 'Female', 'Non-binary'];
   TextEditingController _passwordTextController = TextEditingController();
@@ -66,12 +71,13 @@ class MobileAddress extends StatelessWidget {
   TextEditingController _nbiTextController = TextEditingController();
   FilePickerResult? result;
   String? _fileName;
+  String? city;
+  String? barangay;
+  String? value;
   PlatformFile? pickedfile;
   bool isLoading = false;
-  String? value;
   // File? fileToDisplay;
 
-  MobileAddress({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -88,30 +94,46 @@ class MobileAddress extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       Text("City"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
+                      Container(
+                        decoration: BoxDecoration(
+                            // border: Border.all(color: kPrimaryColor),
+                            borderRadius: BorderRadius.circular(90),
+                            color: kPrimaryLightColor),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            hint: Text("  City"),
+                            value: city,
+                            items: items.map(buildMenuItem).toList(),
+                            onChanged: (value) =>
+                                setState(() => this.city = value),
+                            isExpanded: true,
+                            iconSize: 36,
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: kPrimaryColor,
+                            ),
                           ),
                         ),
                       ),
                       Text("Barangay"),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          items: items.map(buildMenuItem).toList(),
-                          onChanged: (value) => this.value = value,
-                          isExpanded: true,
-                          value: value,
-                          iconSize: 36,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: kPrimaryColor,
+                      Container(
+                        decoration: BoxDecoration(
+                            // border: Border.all(color: kPrimaryColor),
+                            borderRadius: BorderRadius.circular(90),
+                            color: kPrimaryLightColor),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            hint: Text("  Barangay"),
+                            value: barangay,
+                            items: items.map(buildMenuItem).toList(),
+                            onChanged: (value) =>
+                                setState(() => this.barangay = value),
+                            isExpanded: true,
+                            iconSize: 36,
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: kPrimaryColor,
+                            ),
                           ),
                         ),
                       ),
@@ -122,8 +144,6 @@ class MobileAddress extends StatelessWidget {
                         height: defaultPadding,
                       ),
                       textField("Extended Address", Icons.location_city, false,
-                          _emailTextController),
-                      textField("ZIP Code", Icons.mail_outline, false,
                           _emailTextController),
                       nextButton(context, () {
                         Navigator.push(context,
@@ -145,9 +165,7 @@ class MobileAddress extends StatelessWidget {
 
   DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
         value: item,
-        child: Text(
-          item,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
+        child: Text(item,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
       );
 }

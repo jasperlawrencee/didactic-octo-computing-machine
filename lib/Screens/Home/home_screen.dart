@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Home/components/area.dart';
+import 'package:flutter_auth/Screens/Home/components/navbar.dart';
 import 'package:flutter_auth/Screens/Home/components/services.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -26,6 +27,7 @@ class MobileHomeScreen extends StatefulWidget {
 class _MobileHomeScreenState extends State<MobileHomeScreen> {
   int navbarIndex = 0;
   final services = ['Hair', 'Makeup', 'Spa', 'Nails', 'Lashes', 'Wax'];
+  // final screens [];
 
   @override
   Widget build(BuildContext context) {
@@ -74,25 +76,9 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
               Expanded(child: Services(svcType: services[i]))
           ]),
           Spacer(),
-          BottomNavigationBar(
-              selectedItemColor: kPrimaryColor,
-              currentIndex: navbarIndex,
-              onTap: (value) => setState(() => navbarIndex = value),
-              backgroundColor: kPrimaryLightColor,
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                    backgroundColor: kPrimaryLightColor),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.chat),
-                    label: 'Chat',
-                    backgroundColor: kPrimaryLightColor),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Me',
-                    backgroundColor: kPrimaryLightColor),
-              ])
+          Container(
+            child: NavBar(),
+          )
         ],
       ),
     );

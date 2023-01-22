@@ -16,8 +16,7 @@ class Services extends StatelessWidget {
         child: Align(
           alignment: AlignmentDirectional.centerStart,
           child: Container(
-            width: 70,
-            height: 70,
+            constraints: BoxConstraints(maxWidth: 70, maxHeight: 70),
             // padding: const EdgeInsets.all(20),
             color: kPrimaryColor,
             child: Center(

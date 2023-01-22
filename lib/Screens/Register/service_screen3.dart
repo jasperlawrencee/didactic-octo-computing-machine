@@ -43,6 +43,8 @@ class MobileServiceScreen extends StatelessWidget {
                           SizedBox(height: defaultPadding),
                           checkBox(context, () {}, "Lashes"),
                           SizedBox(height: defaultPadding),
+                          checkBox(context, () {}, "Wax"),
+                          SizedBox(height: defaultPadding),
                           const Text("OPTIONAL"),
                           textField(
                               "Additional Experiences",

@@ -6,8 +6,8 @@ import 'package:flutter_auth/responsive.dart';
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Background(
-        child: SingleChildScrollView(
+    return Scaffold(
+        body: SingleChildScrollView(
       child: Responsive(mobile: MobileProfileScreen(), desktop: Row()),
     ));
   }

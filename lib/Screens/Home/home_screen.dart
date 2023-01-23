@@ -12,8 +12,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Background(
-        child: SingleChildScrollView(
+    return Scaffold(
+        body: SingleChildScrollView(
       child: Responsive(mobile: MobileHomeScreen(), desktop: Row()),
     ));
   }
@@ -31,56 +31,66 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.navigation)),
-              SizedBox(width: defaultPadding),
-              Area(
-                  city: "Damosa, Davao City",
-                  area: "#789, Venus St., Victoria Heights, Damosa, Davao"),
-              SizedBox(height: defaultPadding)
-            ],
-          ),
-          Row(
-            children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
-              Container(
-                height: 50,
-                width: MediaQuery.of(context).size.width - 48,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(90),
-                    color: kPrimaryLightColor),
-                child: Row(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Row(
+          children: [
+            Expanded(
+                child: Column(
+              children: <Widget>[
+                Row(
                   children: [
-                    IconButton(
-                        onPressed: () {
-                          showSearch(
-                            context: context,
-                            delegate: CustomSearchDelegate(),
-                          );
-                        },
-                        icon: Icon(Icons.search)),
-                    Text("Search")
+                    IconButton(onPressed: () {}, icon: Icon(Icons.navigation)),
+                    SizedBox(width: defaultPadding),
+                    Area(
+                        city: "Damosa, Davao City",
+                        area:
+                            "#789, Venus St., Victoria Heights, Damosa, Davao"),
+                    SizedBox(height: defaultPadding)
                   ],
                 ),
-              )
-            ],
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            for (int i = 0; i < services.length; i++)
-              Expanded(child: Services(svcType: services[i]))
-          ]),
-          Spacer(),
-          Container(
-            child: NavBar(),
-          )
-        ],
-      ),
+                Row(
+                  children: [
+                    IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
+                    Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width - 48,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(90),
+                          color: kPrimaryLightColor),
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                showSearch(
+                                  context: context,
+                                  delegate: CustomSearchDelegate(),
+                                );
+                              },
+                              icon: Icon(Icons.search)),
+                          Text("Search")
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for (int i = 0; i < services.length; i++)
+                        Expanded(child: Services(svcType: services[i]))
+                    ]),
+                Container(
+                  child: Text("data"),
+                ),
+                NavBar()
+              ],
+            ))
+          ],
+        )
+      ],
     );
   }
 }

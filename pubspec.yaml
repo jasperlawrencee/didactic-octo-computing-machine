@@ -21,8 +21,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.5
   flutter_svg: ^1.1.6
-  firebase_core: ^2.4.1
-  firebase_auth: ^4.2.5
   file_picker: ^5.2.5
   google_nav_bar: ^5.0.6
 

@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Home/home_screen.dart';
+import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Register/register_screen1.dart';
 import 'package:flutter_auth/Screens/Register/toRegister.dart';
@@ -96,7 +96,7 @@ class MobileSignupScreen extends StatelessWidget {
                     width: 450,
                     child: Column(
                       children: <Widget>[
-                        textField("Your email", Icons.person, false,
+                        textField("Your username", Icons.person, false,
                             _emailTextController),
                         const SizedBox(
                           height: defaultPadding,
@@ -107,21 +107,21 @@ class MobileSignupScreen extends StatelessWidget {
                           height: defaultPadding,
                         ),
                         SignInSignUp(context, false, () {
-                          FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: _emailTextController.text,
-                                  password: _passwordTextController.text)
-                              .then(
-                            (value) {
-                              print("Created New Account");
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomeScreen()));
-                            },
-                          ).onError(((error, stackTrace) {
-                            print("Error ${error.toString()}");
-                          }));
+                          // FirebaseAuth.instance
+                          //     .createUserWithEmailAndPassword(
+                          //         email: _emailTextController.text,
+                          //         password: _passwordTextController.text)
+                          //     .then(
+                          //   (value) {
+                          //     print("Created New Account");
+                          //     Navigator.push(
+                          //         context,
+                          //         MaterialPageRoute(
+                          //             builder: (context) => HomeScreen()));
+                          //   },
+                          // ).onError(((error, stackTrace) {
+                          //   print("Error ${error.toString()}");
+                          // }));
                         }),
                         AlreadyHaveAnAccountCheck(
                           login: false,

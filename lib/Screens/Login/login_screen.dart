@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Home/home_screen.dart';
+import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
@@ -96,7 +96,7 @@ class MobileLoginScreen extends StatelessWidget {
                   children: <Widget>[
                     SizedBox(
                       width: 450,
-                      child: textField("Your email", Icons.person, false,
+                      child: textField("Your username", Icons.person, false,
                           _emailTextController),
                     ),
                     const SizedBox(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Home/home_screen.dart';
+import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Message/message_screen.dart';
 import 'package:flutter_auth/Screens/Profile/profile_screen.dart';
 import 'package:flutter_auth/constants.dart';

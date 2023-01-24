@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Home/home_screen.dart';
+import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Register/bioData2.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';

@@ -65,20 +65,6 @@ Container nextButton(BuildContext context, Function onTap, String text) {
   );
 }
 
-Container checkBox(BuildContext context, Function onTap, String label) {
-  return Container(
-    color: kPrimaryColor,
-    child: Material(
-      child: CheckboxListTile(
-        tileColor: kPrimaryLightColor,
-        title: Text(label),
-        value: false,
-        onChanged: (bool? value) {},
-      ),
-    ),
-  );
-}
-
 Container addImage(BuildContext context, String label) {
   return Container(
     width: MediaQuery.of(context).size.width,

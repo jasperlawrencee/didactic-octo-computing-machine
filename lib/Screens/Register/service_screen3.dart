@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/Register/bioData2-1.dart';
 import 'package:flutter_auth/Screens/Register/requirements4.dart';
 import 'package:flutter_auth/Screens/Register/service_screen3-1.dart';
 import 'package:flutter_auth/components/background.dart';
@@ -123,7 +124,13 @@ class _MobileServiceScreenState extends State<MobileServiceScreen> {
                                 MaterialPageRoute(builder: (context) {
                               return Experience();
                             }));
-                          }, "Next")
+                          }, "Next"),
+                          backButton(context, () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return Address();
+                            }));
+                          }, "Back")
                         ],
                       ),
                     )

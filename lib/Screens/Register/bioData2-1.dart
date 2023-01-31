@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
+import 'package:flutter_auth/Screens/Register/bioData2.dart';
 import 'package:flutter_auth/Screens/Register/requirements4.dart';
 import 'package:flutter_auth/Screens/Register/service_screen3.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
@@ -150,7 +151,14 @@ class _MobileAddressState extends State<MobileAddress> {
                             MaterialPageRoute(builder: (context) {
                           return ServiceScreen();
                         }));
-                      }, "Next")
+                      }, "Next"),
+                      backButton(context, () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return BioData();
+                          },
+                        ));
+                      }, "Back")
                     ],
                   ),
                 )

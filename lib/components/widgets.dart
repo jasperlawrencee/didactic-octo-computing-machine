@@ -50,6 +50,25 @@ Container nextButton(BuildContext context, Function onTap, String text) {
   return Container(
     width: MediaQuery.of(context).size.width,
     height: 50,
+    margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
+    child: ElevatedButton(
+      onPressed: () {
+        onTap();
+      },
+      child: Text(
+        text,
+        style: const TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+    ),
+  );
+}
+
+Container backButton(BuildContext context, Function onTap, String text) {
+  return Container(
+    width: MediaQuery.of(context).size.width,
+    height: 50,
     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
     decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
     child: ElevatedButton(

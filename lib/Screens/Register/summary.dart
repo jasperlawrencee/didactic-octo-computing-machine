@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Register/confirm.dart';
+import 'package:flutter_auth/Screens/Register/requirements4.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -127,7 +128,13 @@ class _MobileSummaryState extends State<MobileSummary> {
                               MaterialPageRoute(builder: (context) {
                             return ConfirmScreen();
                           }));
-                        }, "Submit")
+                        }, "Submit"),
+                        backButton(context, () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: ((context) {
+                            return Requirements();
+                          })));
+                        }, "Back")
                       ],
                     ),
                   )

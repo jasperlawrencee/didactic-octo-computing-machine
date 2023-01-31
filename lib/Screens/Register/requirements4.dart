@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Register/confirm.dart';
+import 'package:flutter_auth/Screens/Register/service_screen3-1.dart';
 import 'package:flutter_auth/Screens/Register/summary.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
@@ -141,7 +142,13 @@ class _MobileRequirementsState extends State<MobileRequirements> {
                             MaterialPageRoute(builder: (context) {
                           return Summary();
                         }));
-                      }, "Submit")
+                      }, "Submit"),
+                      backButton(context, () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: ((context) {
+                          return Experience();
+                        })));
+                      }, "Back")
                     ],
                   ),
                 )

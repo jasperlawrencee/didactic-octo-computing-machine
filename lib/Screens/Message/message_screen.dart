@@ -24,21 +24,15 @@ class MobileMessageScreen extends StatefulWidget {
 class _MobileMessageScreenState extends State<MobileMessageScreen> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Row(
-          children: [
-            Expanded(
-                flex: 8,
-                child: Column(
-                  children: [
-                    _top(),
-                  ],
-                ))
-          ],
-        )
-      ],
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      color: kPrimaryColor,
+      child: SafeArea(
+        child: Column(
+          children: [_top(), _bottom(context)],
+        ),
+      ),
     );
   }
 }
@@ -89,6 +83,19 @@ Widget _top() {
           ],
         )
       ],
+    ),
+  );
+}
+
+Widget _bottom(BuildContext context) {
+  return Expanded(
+    child: Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(45),
+            topRight: Radius.circular(45),
+          ),
+          color: Colors.white),
     ),
   );
 }

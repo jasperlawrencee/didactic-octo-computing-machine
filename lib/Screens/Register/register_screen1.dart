@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Register/bioData2.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
+import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -110,7 +111,13 @@ class MobileRegisterScreen extends StatelessWidget {
                             MaterialPageRoute(builder: ((context) {
                           return BioData();
                         })));
-                      }, "Next")
+                      }, "Next"),
+                      backButton(context, () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: ((context) {
+                          return SignUpScreen();
+                        })));
+                      }, "Back")
                     ],
                   ),
                 )

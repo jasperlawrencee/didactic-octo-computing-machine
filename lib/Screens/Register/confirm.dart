@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Register/bioData2.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
+import 'package:flutter_auth/Screens/WorkerHome/worker_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -94,7 +95,7 @@ class MobileConfirmScreen extends StatelessWidget {
                     nextButton(context, () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return HomeScreen();
+                        return WorkerScreen();
                       }));
                     }, "Proceed to Home")
                   ],

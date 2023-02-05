@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Register/requirements4.dart';
+import 'package:flutter_auth/Screens/Register/certificates4.dart';
+import 'package:flutter_auth/Screens/Register/requirements5.dart';
 import 'package:flutter_auth/Screens/Register/service_screen3.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -57,7 +58,7 @@ class _MobileExperienceState extends State<MobileExperience> {
                           nextButton(context, () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return Requirements();
+                              return Certificates();
                             }));
                           }, "Next"),
                           backButton(context, () {

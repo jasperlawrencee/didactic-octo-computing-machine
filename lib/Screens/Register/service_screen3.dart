@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Register/bioData2-1.dart';
-import 'package:flutter_auth/Screens/Register/requirements4.dart';
+import 'package:flutter_auth/Screens/Register/requirements5.dart';
 import 'package:flutter_auth/Screens/Register/service_screen3-1.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';

@@ -1,6 +1,10 @@
+// ignore_for_file: must_be_immutable
+
+import 'dart:js';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
+import 'package:flutter_auth/Screens/WorkerHome/worker_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
@@ -10,76 +14,23 @@ import 'components/login_screen_top_image.dart';
 import 'package:flutter_auth/components/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-
-  LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Background(
       child: SingleChildScrollView(
-        child: Responsive(
-          mobile: MobileLoginScreen(),
-          desktop: Row(
-            children: [
-              const Expanded(
-                child: LoginScreenTopImage(),
-              ),
-              Expanded(
-                flex: 8,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                        width: 450,
-                        child: Column(
-                          children: <Widget>[
-                            textField("Your email", Icons.person, false,
-                                _emailTextController),
-                            const SizedBox(
-                              height: defaultPadding,
-                            ),
-                            textField("Your password", Icons.lock, true,
-                                _passwordTextController),
-                            const SizedBox(
-                              height: defaultPadding,
-                            ),
-                            ElevatedButton(
-                              onPressed: () {},
-                              child: Text("Sign Up".toUpperCase()),
-                            ),
-                            const SizedBox(
-                              height: defaultPadding,
-                            ),
-                            AlreadyHaveAnAccountCheck(
-                              login: false,
-                              press: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return SignUpScreen();
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: Responsive(mobile: MobileLoginScreen(), desktop: Container()),
       ),
     );
   }
 }
 
 class MobileLoginScreen extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  MobileLoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -89,29 +40,40 @@ class MobileLoginScreen extends StatelessWidget {
         const LoginScreenTopImage(),
         Row(
           children: [
-            Spacer(),
+            const Spacer(),
             Expanded(
                 flex: 8,
                 child: Column(
                   children: <Widget>[
                     SizedBox(
                       width: 450,
-                      child: textField("Your username", Icons.person, false,
-                          _emailTextController),
+                      child: textField(
+                        "Your Username",
+                        Icons.person,
+                        false,
+                        usernameController,
+                      ),
                     ),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField("Your password", Icons.lock, true,
-                        _passwordTextController),
+                    textField(
+                      "Your Password",
+                      Icons.lock,
+                      true,
+                      passwordController,
+                    ),
                     const SizedBox(
                       height: defaultPadding,
                     ),
                     SignInSignUp(context, true, () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return HomeScreen();
-                      }));
+                      usernameController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty
+                          ? loginUser()
+                          : const AlertDialog(
+                              content:
+                                  Text("Please write username and password"),
+                            );
                     }),
                     AlreadyHaveAnAccountCheck(
                       login: true,
@@ -120,7 +82,7 @@ class MobileLoginScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return SignUpScreen();
+                              return const SignUpScreen();
                             },
                           ),
                         );
@@ -128,10 +90,16 @@ class MobileLoginScreen extends StatelessWidget {
                     ),
                   ],
                 )),
-            Spacer(),
+            const Spacer(),
           ],
         ),
       ],
+    );
+  }
+
+  void loginUser() async {
+    const AlertDialog(
+      content: Text("Authenticating, Please Wait..."),
     );
   }
 }

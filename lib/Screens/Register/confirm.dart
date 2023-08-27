@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
-import 'package:flutter_auth/Screens/Register/bioData2.dart';
-import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/Screens/WorkerHome/worker_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ConfirmScreen extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
-
+  final TextEditingController placeholder = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -32,23 +23,20 @@ class ConfirmScreen extends StatelessWidget {
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField(
-                        "Username", Icons.person, false, _nameTextController),
+                    textField("Username", Icons.person, false, placeholder),
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
+                    textField("Email", Icons.email, false, placeholder),
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
+                    textField("Password", Icons.lock, true, placeholder),
                     const SizedBox(
                       height: defaultPadding,
                     ),
                     textField(
-                        "Email", Icons.email, false, _emailTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField(
-                        "Password", Icons.lock, true, _passwordTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField("Confirm Password", Icons.check, true,
-                        _passwordTextController),
+                        "Confirm Password", Icons.check, true, placeholder),
                     nextButton(context, () {}, "Next")
                   ],
                 ),

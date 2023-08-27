@@ -1,22 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Register/bioData2.dart';
-import 'package:flutter_auth/Screens/Register/requirements5.dart';
 import 'package:flutter_auth/Screens/Register/service_screen3.dart';
-import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
 
 class Address extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
-
+  final TextEditingController placeholder = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -34,17 +26,29 @@ class Address extends StatelessWidget {
                       height: defaultPadding,
                     ),
                     textField(
-                        "Full Name", Icons.person, false, _nameTextController),
+                      "Full Name",
+                      Icons.person,
+                      false,
+                      placeholder,
+                    ),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField("Address", Icons.location_city, false,
-                        _emailTextController),
+                    textField(
+                      "Address",
+                      Icons.location_city,
+                      false,
+                      placeholder,
+                    ),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField("Phone Number", Icons.phone, false,
-                        _passwordTextController),
+                    textField(
+                      "Phone Number",
+                      Icons.phone,
+                      false,
+                      placeholder,
+                    ),
                     nextButton(context, () {}, "Next")
                   ],
                 ),
@@ -65,11 +69,7 @@ class MobileAddress extends StatefulWidget {
 class _MobileAddressState extends State<MobileAddress> {
   final items = ['item 1', 'item 2', 'item 3'];
   final gender = ['Male', 'Female', 'Non-binary'];
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
+  final TextEditingController placeholder = TextEditingController();
   FilePickerResult? result;
   String? _fileName;
   String? city;
@@ -139,13 +139,21 @@ class _MobileAddressState extends State<MobileAddress> {
                         ),
                       ),
                       const Text("ADDRESS"),
-                      textField("Street Address", Icons.location_city, false,
-                          _emailTextController),
+                      textField(
+                        "Street Address",
+                        Icons.location_city,
+                        false,
+                        placeholder,
+                      ),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Extended Address", Icons.location_city, false,
-                          _emailTextController),
+                      textField(
+                        "Extended Address",
+                        Icons.location_city,
+                        false,
+                        placeholder,
+                      ),
                       nextButton(context, () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {

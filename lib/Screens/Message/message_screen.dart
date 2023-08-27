@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/CustomerHome/components/area.dart';
-import 'package:flutter_auth/Screens/CustomerHome/components/navbar.dart';
-import 'package:flutter_auth/Screens/CustomerHome/home_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';

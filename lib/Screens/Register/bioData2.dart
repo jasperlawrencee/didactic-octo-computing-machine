@@ -1,23 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Register/bioData2-1.dart';
 import 'package:flutter_auth/Screens/Register/register_screen1.dart';
-import 'package:flutter_auth/Screens/Register/requirements5.dart';
-import 'package:flutter_auth/Screens/Register/service_screen3.dart';
-import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
 
 class BioData extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
-
+  final TextEditingController placeholder = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -34,18 +25,16 @@ class BioData extends StatelessWidget {
                     const SizedBox(
                       height: defaultPadding,
                     ),
+                    textField("Full Name", Icons.person, false, placeholder),
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
                     textField(
-                        "Full Name", Icons.person, false, _nameTextController),
+                        "Address", Icons.location_city, false, placeholder),
                     const SizedBox(
                       height: defaultPadding,
                     ),
-                    textField("Address", Icons.location_city, false,
-                        _emailTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField("Phone Number", Icons.phone, false,
-                        _passwordTextController),
+                    textField("Phone Number", Icons.phone, false, placeholder),
                     nextButton(context, () {}, "Next")
                   ],
                 ),
@@ -66,8 +55,7 @@ class MobileBioData extends StatefulWidget {
 class _MobileBioDataState extends State<MobileBioData> {
   final items = ['item 1', 'item 2', 'item 3'];
   final gender = ['Male', 'Female', 'Non-binary'];
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
+  final TextEditingController placeholder = TextEditingController();
   FilePickerResult? result;
   String? _fileName;
   PlatformFile? pickedfile;
@@ -92,18 +80,16 @@ class _MobileBioDataState extends State<MobileBioData> {
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("First Name", Icons.person, false,
-                          _nameTextController),
+                      textField("First Name", Icons.person, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Middle Name", Icons.person, false,
-                          _nameTextController),
+                      textField(
+                          "Middle Name", Icons.person, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Last Name", Icons.person, false,
-                          _nameTextController),
+                      textField("Last Name", Icons.person, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),
@@ -132,18 +118,18 @@ class _MobileBioDataState extends State<MobileBioData> {
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Phone Number 1", Icons.phone, false,
-                          _passwordTextController),
+                      textField(
+                          "Phone Number 1", Icons.phone, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Phone Number 2", Icons.phone, false,
-                          _passwordTextController),
+                      textField(
+                          "Phone Number 2", Icons.phone, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),
-                      textField("Phone Number 3", Icons.phone, false,
-                          _passwordTextController),
+                      textField(
+                          "Phone Number 3", Icons.phone, false, placeholder),
                       const SizedBox(
                         height: defaultPadding,
                       ),

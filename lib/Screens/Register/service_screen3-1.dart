@@ -23,7 +23,7 @@ class MobileExperience extends StatefulWidget {
 }
 
 class _MobileExperienceState extends State<MobileExperience> {
-  TextEditingController _serviceTextController = TextEditingController();
+  final TextEditingController placeholder = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,18 +43,20 @@ class _MobileExperienceState extends State<MobileExperience> {
                         children: <Widget>[
                           const Text("Experiences"),
                           textField(
-                              "Additional Experiences",
-                              Icons.room_service_rounded,
-                              false,
-                              _serviceTextController),
+                            "Additional Experiences",
+                            Icons.room_service_rounded,
+                            false,
+                            placeholder,
+                          ),
                           SizedBox(
                             height: defaultPadding,
                           ),
                           textField(
-                              "Period of Experiences",
-                              Icons.room_service_rounded,
-                              false,
-                              _serviceTextController),
+                            "Period of Experiences",
+                            Icons.room_service_rounded,
+                            false,
+                            placeholder,
+                          ),
                           nextButton(context, () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {

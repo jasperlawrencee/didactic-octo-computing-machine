@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 
-Image logoWidget(String imageName) {
-  return Image.asset(
-    imageName,
-    fit: BoxFit.fitWidth,
-    width: 240,
-    height: 240,
-    color: Colors.white,
-  );
-}
-
-TextField textField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
+TextField textField(
+  String text,
+  IconData icon,
+  bool isPasswordType,
+  TextEditingController controller,
+) {
   return TextField(
+    obscureText: isPasswordType,
+    style: const TextStyle(
+      fontSize: 13,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w500,
+    ),
     keyboardType: TextInputType.emailAddress,
     textInputAction: TextInputAction.next,
     cursorColor: kPrimaryColor,
     decoration: InputDecoration(
       hintText: text,
       prefixIcon: Padding(
-        padding: EdgeInsets.all(defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Icon(icon),
       ),
     ),
   );
 }
 
+// ignore: non_constant_identifier_names
 Container SignInSignUp(BuildContext context, bool isLogin, Function onTap) {
   return Container(
     width: MediaQuery.of(context).size.width,
@@ -40,7 +41,11 @@ Container SignInSignUp(BuildContext context, bool isLogin, Function onTap) {
       child: Text(
         isLogin ? 'LOG IN' : 'USER SIGN UP',
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          color: Colors.white,
+          fontSize: 13,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
   );
@@ -59,7 +64,11 @@ Container nextButton(BuildContext context, Function onTap, String text) {
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          color: Colors.white,
+          fontSize: 13,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
   );
@@ -78,7 +87,11 @@ Container backButton(BuildContext context, Function onTap, String text) {
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          color: Colors.white,
+          fontSize: 13,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
   );
@@ -99,7 +112,7 @@ Container addImage(BuildContext context, String label) {
         onPressed: () {},
         child: Text(
           label,
-          style: TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.black),
         )),
   );
 }

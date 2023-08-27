@@ -1,140 +1,80 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Register/bioData2.dart';
-import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
-import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/components/background.dart';
-import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/responsive.dart';
 
-class RegisterScreen extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
 
+class _RegisterScreenState extends State<RegisterScreen> {
+  late String fName;
+  int currentStep = 0;
   @override
   Widget build(BuildContext context) {
     return Background(
-      child: SingleChildScrollView(
-        child: Responsive(
-          mobile: MobileRegisterScreen(),
-          desktop: Row(
-            children: [
-              SizedBox(
-                width: 450,
-                child: Column(
-                  children: [
-                    const Text("ACCOUNT INFORMATION"),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField(
-                        "Username", Icons.person, false, _nameTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField(
-                        "Email", Icons.email, false, _emailTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField(
-                        "Password", Icons.lock, true, _passwordTextController),
-                    const SizedBox(
-                      height: defaultPadding,
-                    ),
-                    textField("Confirm Password", Icons.check, true,
-                        _passwordTextController),
-                    nextButton(context, () {}, "Next")
-                  ],
-                ),
-              )
-            ],
+      child: Theme(
+        data: ThemeData(
+            canvasColor: Colors.white70,
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: kPrimaryColor,
+                  background: Colors.white70,
+                  secondary: kPrimaryLightColor,
+                )),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Stepper(
+            elevation: 0,
+            type: StepperType.vertical,
+            steps: getSteps(),
+            currentStep: currentStep,
+            onStepTapped: (step) => tapped(step),
+            onStepContinue: continued,
+            onStepCancel: cancel,
           ),
         ),
       ),
     );
   }
-}
 
-class MobileRegisterScreen extends StatelessWidget {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _nameTextController = TextEditingController();
-  TextEditingController _ExpTextController = TextEditingController();
-  TextEditingController _nbiTextController = TextEditingController();
-  final items = ['Hair', 'Makeup', 'Spa', 'Nails', 'Lashes'];
-  String? value;
-
-  MobileRegisterScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Row(
-          children: [
-            const Spacer(),
-            Expanded(
-              flex: 8,
-              child: Column(children: <Widget>[
-                SizedBox(
-                  width: 450,
-                  child: Column(
-                    children: <Widget>[
-                      const Text("ACCOUNT INFORMATION"),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField(
-                          "Username", Icons.person, false, _nameTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField(
-                          "Email", Icons.email, false, _emailTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField("Password", Icons.lock, true,
-                          _passwordTextController),
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      textField("Confirm Password", Icons.check, true,
-                          _passwordTextController),
-                      nextButton(context, () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: ((context) {
-                          return BioData();
-                        })));
-                      }, "Next"),
-                      backButton(context, () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: ((context) {
-                          return SignUpScreen();
-                        })));
-                      }, "Back")
-                    ],
-                  ),
-                )
-              ]),
-            ),
-            const Spacer()
-          ],
-        ),
-      ],
-    );
+  tapped(int step) {
+    setState(() => currentStep = step);
   }
 
-  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+  continued() {
+    currentStep < 2 ? setState(() => currentStep += 1) : null;
+  }
+
+  cancel() {
+    currentStep > 0 ? setState(() => currentStep -= 1) : null;
+  }
+
+  List<Step> getSteps() => [
+        Step(
+            isActive: currentStep >= 0,
+            title: Text('Bio Data'),
+            content: Text("data")),
+        Step(
+          isActive: currentStep >= 1,
+          title: Text('Valid ID'),
+          content: Text("data"),
         ),
-      );
+        Step(
+          isActive: currentStep >= 2,
+          title: Text('Service Category'),
+          content: Text("data"),
+        ),
+        Step(
+          isActive: currentStep >= 3,
+          title: Text('Credentials'),
+          content: Text("data"),
+        ),
+        Step(
+          isActive: currentStep >= 4,
+          title: Text('Review'),
+          content: Text("data"),
+        ),
+      ];
 }

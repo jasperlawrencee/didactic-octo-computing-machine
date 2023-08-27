@@ -23,6 +23,7 @@ class MobileSummary extends StatefulWidget {
 
 class _MobileSummaryState extends State<MobileSummary> {
   final gender = ['Male', 'Female', 'Non-binary'];
+  final TextEditingController placeholder = TextEditingController();
   TextEditingController textController = TextEditingController();
   String? value;
   @override
@@ -44,33 +45,61 @@ class _MobileSummaryState extends State<MobileSummary> {
                         const Text("Registration Summary"),
                         Text("Username"),
                         textField(
-                            "Username", Icons.person, false, textController),
+                          "Username",
+                          Icons.person,
+                          false,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
                         Text("Email"),
-                        textField("Email", Icons.person, false, textController),
+                        textField(
+                          "Email",
+                          Icons.person,
+                          false,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
                         Text("Password"),
                         textField(
-                            "Username", Icons.person, true, textController),
+                          "Username",
+                          Icons.person,
+                          true,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
                         Text("First Name"),
-                        textField("", Icons.person, false, textController),
+                        textField(
+                          "",
+                          Icons.person,
+                          false,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
                         Text("Middle Name"),
-                        textField("", Icons.person, false, textController),
+                        textField(
+                          "",
+                          Icons.person,
+                          false,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
                         Text("Last Name"),
-                        textField("", Icons.person, false, textController),
+                        textField(
+                          "",
+                          Icons.person,
+                          false,
+                          placeholder,
+                        ),
                         SizedBox(
                           height: defaultPadding,
                         ),
@@ -100,26 +129,47 @@ class _MobileSummaryState extends State<MobileSummary> {
                           height: defaultPadding,
                         ),
                         textField(
-                            "Phone Number", Icons.phone, false, textController),
-                        const SizedBox(
-                          height: defaultPadding,
+                          "Phone Number",
+                          Icons.phone,
+                          false,
+                          placeholder,
                         ),
-                        textField("City", Icons.home, false, textController),
                         const SizedBox(
                           height: defaultPadding,
                         ),
                         textField(
-                            "Barangay", Icons.home, false, textController),
+                          "City",
+                          Icons.home,
+                          false,
+                          placeholder,
+                        ),
                         const SizedBox(
                           height: defaultPadding,
                         ),
-                        textField("Street Address", Icons.home, false,
-                            textController),
+                        textField(
+                          "Barangay",
+                          Icons.home,
+                          false,
+                          placeholder,
+                        ),
                         const SizedBox(
                           height: defaultPadding,
                         ),
-                        textField("Extended Address", Icons.home, false,
-                            textController),
+                        textField(
+                          "Street Address",
+                          Icons.home,
+                          false,
+                          placeholder,
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        textField(
+                          "Extended Address",
+                          Icons.home,
+                          false,
+                          placeholder,
+                        ),
                         const SizedBox(
                           height: defaultPadding,
                         ),

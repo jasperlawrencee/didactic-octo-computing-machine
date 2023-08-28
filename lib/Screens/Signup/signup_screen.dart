@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/Register/register_screen1.dart';
+import 'package:flutter_auth/Screens/Register/register_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -51,7 +51,7 @@ class MobileSignupScreen extends StatelessWidget {
                         nextButton(context, () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return RegisterScreen();
+                            return const RegisterScreen();
                           }));
                         }, "REGISTER AS WORKER"),
                         nextButton(context, () {}, "REGISTER AS STORE"),

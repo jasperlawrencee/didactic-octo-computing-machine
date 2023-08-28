@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/responsive.dart';
 
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
         body: SingleChildScrollView(
       child: Responsive(mobile: MobileProfileScreen(), desktop: Row()),
     ));
@@ -13,6 +14,8 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class MobileProfileScreen extends StatefulWidget {
+  const MobileProfileScreen({Key? key}) : super(key: key);
+
   @override
   _MobileProfileScreenState createState() => _MobileProfileScreenState();
 }
@@ -22,7 +25,7 @@ class _MobileProfileScreenState extends State<MobileProfileScreen> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(
-      children: [Text("ProfileScreen"), Container()],
+      children: [const Text("ProfileScreen"), Container()],
     ));
   }
 }

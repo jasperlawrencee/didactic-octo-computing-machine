@@ -1,10 +1,7 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:js';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
-import 'package:flutter_auth/Screens/WorkerHome/worker_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
@@ -45,14 +42,11 @@ class MobileLoginScreen extends StatelessWidget {
                 flex: 8,
                 child: Column(
                   children: <Widget>[
-                    SizedBox(
-                      width: 450,
-                      child: textField(
-                        "Your Username",
-                        Icons.person,
-                        false,
-                        usernameController,
-                      ),
+                    textField(
+                      "Your Username",
+                      Icons.person,
+                      false,
+                      usernameController,
                     ),
                     const SizedBox(
                       height: defaultPadding,

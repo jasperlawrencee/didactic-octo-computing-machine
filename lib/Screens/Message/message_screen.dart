@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
 
 class MessageScreen extends StatelessWidget {
+  const MessageScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
         body: SingleChildScrollView(
       child: Responsive(mobile: MobileMessageScreen(), desktop: Row()),
     ));
@@ -14,6 +15,8 @@ class MessageScreen extends StatelessWidget {
 }
 
 class MobileMessageScreen extends StatefulWidget {
+  const MobileMessageScreen({Key? key}) : super(key: key);
+
   @override
   _MobileMessageScreenState createState() => _MobileMessageScreenState();
 }
@@ -36,7 +39,7 @@ class _MobileMessageScreenState extends State<MobileMessageScreen> {
 
 Widget _top() {
   return Container(
-    padding: EdgeInsets.only(top: 30, left: 30),
+    padding: const EdgeInsets.only(top: 30, left: 30),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       // ignore: prefer_const_literals_to_create_immutables
@@ -49,30 +52,30 @@ Widget _top() {
         Row(
           children: [
             Container(
-                padding: EdgeInsets.all(4),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
                     color: kPrimaryLightColor),
                 child: IconButton(
                     onPressed: () {},
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.search,
                       color: kPrimaryColor,
                       size: 25,
                     ))),
-            SizedBox(
+            const SizedBox(
               width: defaultPadding,
             ),
             Expanded(
-                child: Container(
+                child: SizedBox(
               height: 100,
               child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: 8,
                   itemBuilder: ((context, index) {
                     return Avatar(
-                      margin: EdgeInsets.only(right: 15),
+                      margin: const EdgeInsets.only(right: 15),
                       image: 'assets/avatars/${index + 1}.jpg',
                     );
                   })),
@@ -87,7 +90,7 @@ Widget _top() {
 Widget _bottom(BuildContext context) {
   return Expanded(
     child: Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(45),
             topRight: Radius.circular(45),
@@ -102,13 +105,14 @@ class Avatar extends StatelessWidget {
   final image;
   final EdgeInsets margin;
 
-  Avatar(
+  const Avatar(
       {Key? key,
       this.size = 50,
       this.image,
       this.margin = const EdgeInsets.all(0)})
       : super(key: key);
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: margin,

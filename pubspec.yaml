@@ -25,6 +25,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   flutter_native_splash: ^2.3.2
   firebase_auth: ^4.8.0
+  table_calendar: ^3.0.9
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

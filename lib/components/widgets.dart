@@ -27,6 +27,23 @@ TextField textField(
   );
 }
 
+TextField flatTextField(
+  String text,
+  // TextEditingController controller
+) {
+  return TextField(
+    style: const TextStyle(
+      fontSize: 13,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w500,
+    ),
+    cursorColor: kPrimaryColor,
+    decoration: InputDecoration(
+      hintText: text,
+    ),
+  );
+}
+
 // ignore: non_constant_identifier_names
 Container SignInSignUp(BuildContext context, bool isLogin, Function onTap) {
   return Container(

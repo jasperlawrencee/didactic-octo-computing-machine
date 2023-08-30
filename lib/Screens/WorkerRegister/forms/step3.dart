@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:intl/intl.dart';
 
 class thirdStep extends StatefulWidget {
   const thirdStep({Key? key}) : super(key: key);
@@ -12,18 +13,25 @@ class thirdStep extends StatefulWidget {
 }
 
 class _thirdStepState extends State<thirdStep> {
+  String dateFormat = DateFormat.yMMMMd().format(DateTime.now());
   DateTime dateFrom = DateTime.now();
   DateTime dateTo = DateTime.now();
+  List<Widget> widgets = [];
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text("Experiences"),
-        flatTextField("Salon Name"),
-        flatTextField("Salon Address"),
+        const Text(
+          "Experiences\n",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        flatTextField("Salon Name*"),
+        flatTextField("Salon Address*"),
         flatTextField("Salon Contact Number"),
         const SizedBox(height: defaultPadding),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Column(
               children: [
@@ -40,7 +48,7 @@ class _thirdStepState extends State<thirdStep> {
                   },
                   child: const Text("Date From"),
                 ),
-                Text(DateUtils.dateOnly(dateFrom).toString()),
+                Text(DateFormat.yMMMMd().format(dateFrom)),
               ],
             ),
             const SizedBox(
@@ -61,13 +69,17 @@ class _thirdStepState extends State<thirdStep> {
                   },
                   child: const Text("Date To"),
                 ),
-                Text(DateUtils.dateOnly(dateTo).toString()),
+                Text(DateFormat.yMMMMd().format(dateTo)),
               ],
             ),
           ],
         ),
         const SizedBox(height: defaultPadding),
-        ElevatedButton(onPressed: () {}, child: const Text("Add More+"))
+        TextButton(
+            onPressed: () {
+              widgets.add(Text('New Widget ${widgets.length + 1}'));
+            },
+            child: const Text("Add More+")),
       ],
     );
   }

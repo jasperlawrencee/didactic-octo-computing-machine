@@ -103,6 +103,7 @@ class _secondStepState extends State<secondStep> {
         const Text(
           "Service Category\nYou may select multiple",
           textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(
           height: defaultPadding,

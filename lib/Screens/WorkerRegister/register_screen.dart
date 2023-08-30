@@ -1,21 +1,24 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names, camel_case_types, library_private_types_in_public_api, duplicate_ignore
 
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Register/forms/step1.dart';
-import 'package:flutter_auth/Screens/Register/forms/step2.dart';
-import 'package:flutter_auth/Screens/Register/forms/step3.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step5.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class WorkerRegisterScreen extends StatefulWidget {
+  const WorkerRegisterScreen({Key? key}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _WorkerRegisterScreenState createState() => _WorkerRegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   late String fName;
   int currentStep = 0;
   @override
@@ -23,7 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Background(
       child: Theme(
         data: ThemeData(
-            canvasColor: Colors.white70,
+            canvasColor: Colors.transparent,
             colorScheme: Theme.of(context).colorScheme.copyWith(
                   primary: kPrimaryColor,
                   background: Colors.white70,
@@ -37,10 +40,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   children: <Widget>[
-                    ElevatedButton(
-                      onPressed: controls.onStepContinue,
-                      child: const Text("NEXT"),
-                    ),
+                    if (currentStep >= 0 && currentStep <= 3)
+                      ElevatedButton(
+                        onPressed: controls.onStepContinue,
+                        child: const Text("NEXT"),
+                      ),
+                    if (currentStep == 4)
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WorkerSummaryScreen()));
+                        },
+                        child: const Text("NEXT"),
+                      ),
                     if (currentStep != 0)
                       TextButton(
                         onPressed: controls.onStepCancel,
@@ -48,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           "BACK",
                           style: TextStyle(color: kPrimaryColor),
                         ),
-                      )
+                      ),
                   ],
                 ),
               );
@@ -71,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   continued() {
-    currentStep < 2 ? setState(() => currentStep += 1) : null;
+    currentStep < 4 ? setState(() => currentStep += 1) : null;
   }
 
   cancel() {
@@ -97,12 +111,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Step(
           isActive: currentStep >= 3,
           title: const Text(''),
-          content: const Text("4"),
+          content: const fourthStep(),
         ),
         Step(
           isActive: currentStep >= 4,
           title: const Text(''),
-          content: const Text("5"),
+          content: const fifthStep(),
         ),
       ];
 }

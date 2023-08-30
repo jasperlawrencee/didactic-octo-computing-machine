@@ -28,6 +28,7 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.1
   image_picker: ^1.0.2
+  firebase_core: ^2.15.1
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

@@ -24,8 +24,8 @@ class LoginScreen extends StatelessWidget {
 
 class MobileLoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController username = TextEditingController();
+  final TextEditingController password = TextEditingController();
 
   MobileLoginScreen({Key? key}) : super(key: key);
 
@@ -46,7 +46,7 @@ class MobileLoginScreen extends StatelessWidget {
                       "Your Username",
                       Icons.person,
                       false,
-                      usernameController,
+                      username,
                     ),
                     const SizedBox(
                       height: defaultPadding,
@@ -55,14 +55,13 @@ class MobileLoginScreen extends StatelessWidget {
                       "Your Password",
                       Icons.lock,
                       true,
-                      passwordController,
+                      password,
                     ),
                     const SizedBox(
                       height: defaultPadding,
                     ),
                     SignInSignUp(context, true, () {
-                      usernameController.text.isNotEmpty &&
-                              passwordController.text.isNotEmpty
+                      username.text.isNotEmpty && password.text.isNotEmpty
                           ? loginUser()
                           : const AlertDialog(
                               content:

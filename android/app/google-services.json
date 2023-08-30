@@ -1,41 +1,33 @@
 {
   "project_info": {
-    "project_number": "119244327560",
-    "project_id": "technoapp-284b2",
-    "storage_bucket": "technoapp-284b2.appspot.com"
+    "project_number": "633300206578",
+    "project_id": "pamphere-f2557",
+    "storage_bucket": "pamphere-f2557.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:119244327560:android:012c57be89266c9fcf2d3d",
+        "mobilesdk_app_id": "1:633300206578:android:9449c1c7864c9cb98b616b",
         "android_client_info": {
-          "package_name": "com.example.flutter_auth"
+          "package_name": "com.example.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "119244327560-jirpl9vojbvi79udgdf41qhvrp43vivo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.flutter_auth",
-            "certificate_hash": "8dbfc366d8d56e1237013345e754dcc48782bfff"
-          }
-        },
-        {
-          "client_id": "119244327560-sl49jkl8ohdfnfmao56fo709fpo45hlf.apps.googleusercontent.com",
+          "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDPHBj8s8JpnuwMVtWyNKRQnmvyFYu2gfg"
+          "current_key": "AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "119244327560-sl49jkl8ohdfnfmao56fo709fpo45hlf.apps.googleusercontent.com",
+              "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

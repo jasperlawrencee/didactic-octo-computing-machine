@@ -1,11 +1,11 @@
 // ignore_for_file: camel_case_types, library_private_types_in_public_api
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
+import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/features/user_auth/firebase_auth.dart';
 
 class fifthStep extends StatefulWidget {
   const fifthStep({Key? key}) : super(key: key);
@@ -15,23 +15,46 @@ class fifthStep extends StatefulWidget {
 }
 
 class _fifthStepState extends State<fifthStep> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final TextEditingController username = TextEditingController();
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
+  @override
+  void dispose() {
+    username.dispose();
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        Text(
-          "Summary",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        firstStep(),
-        SizedBox(height: defaultPadding),
-        secondStep(),
-        SizedBox(height: defaultPadding),
-        thirdStep(),
-        SizedBox(height: defaultPadding),
-        fourthStep(),
-        SizedBox(height: defaultPadding),
+        const Text("Account Information"),
+        const SizedBox(height: defaultPadding),
+        flatTextField("Username", username),
+        flatTextField("Email", email),
+        flatTextField("Password", password),
       ],
     );
+  }
+
+  void signUp() async {
+    String _username = username.text;
+    String _email = email.text;
+    String _password = password.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(_email, _password);
+
+    if (user != null) {
+      print("User Created");
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return WelcomeScreen();
+      }));
+    } else {
+      print("error has occured");
+    }
   }
 }

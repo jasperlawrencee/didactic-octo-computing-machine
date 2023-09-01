@@ -6,6 +6,7 @@ import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step5.dart';
+// import 'package:flutter_auth/Screens/WorkerRegister/forms/step5.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -19,6 +20,7 @@ class WorkerRegisterScreen extends StatefulWidget {
 }
 
 class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
+  final addUser = fifthStep();
   late String fName;
   int currentStep = 0;
   @override
@@ -48,10 +50,7 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
                     if (currentStep == 4)
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => WorkerSummaryScreen()));
+                          _dialogBuilder(context);
                         },
                         child: const Text("NEXT"),
                       ),
@@ -119,4 +118,39 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
           content: const fifthStep(),
         ),
       ];
+
+  Future<void> _dialogBuilder(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm?'),
+          content: const Text('Pwede paka mag review sa imo deets'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WorkerSummaryScreen()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

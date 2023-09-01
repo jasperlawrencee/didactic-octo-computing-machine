@@ -4,6 +4,8 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
 class WorkerSummaryScreen extends StatefulWidget {
+  const WorkerSummaryScreen({Key? key}) : super(key: key);
+
   @override
   _WorkerSummaryScreenState createState() => _WorkerSummaryScreenState();
 }

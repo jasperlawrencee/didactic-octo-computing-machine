@@ -13,6 +13,16 @@ class firstStep extends StatefulWidget {
 }
 
 class _firstStepState extends State<firstStep> {
+  TextEditingController firstName = TextEditingController();
+  TextEditingController middleName = TextEditingController();
+  TextEditingController lastName = TextEditingController();
+  TextEditingController phoneNum1 = TextEditingController();
+  TextEditingController phoneNum2 = TextEditingController();
+  TextEditingController city = TextEditingController();
+  TextEditingController barangay = TextEditingController();
+  TextEditingController stAddress = TextEditingController();
+  TextEditingController extAddress = TextEditingController();
+
   final gender = ["Male", "Female", "Non-binary"];
   String? value;
   @override
@@ -35,16 +45,17 @@ class _firstStepState extends State<firstStep> {
           "User Information",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("First Name*"),
-        flatTextField("Middle Name"),
-        flatTextField("Last Name*"),
+        flatTextField("First Name*", firstName),
+        flatTextField("Middle Name", middleName),
+        flatTextField("Last Name*", lastName),
         Align(
           alignment: Alignment.topLeft,
           child: DropdownButton<String>(
+              hint: const Text("Gender"),
               value: value,
               icon: const Icon(Icons.arrow_drop_down),
               // elevation: 16,
-              style: const TextStyle(fontSize: 13),
+              style: const TextStyle(fontSize: 13, color: Colors.black),
               underline: Container(
                 color: kPrimaryColor,
                 height: 2,
@@ -57,17 +68,17 @@ class _firstStepState extends State<firstStep> {
           "Contact Info",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("Primary Phone Number*"),
-        flatTextField("Secondary Phone Number"),
+        flatTextField("Primary Phone Number*", phoneNum1),
+        flatTextField("Secondary Phone Number", phoneNum2),
         const SizedBox(height: defaultPadding),
         const Text(
           "Address",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("City"),
-        flatTextField("Barangay"),
-        flatTextField("Street Address"),
-        flatTextField("Extended Address"),
+        flatTextField("City", city),
+        flatTextField("Barangay", barangay),
+        flatTextField("Street Address", stAddress),
+        flatTextField("Extended Address", extAddress),
       ],
     );
   }

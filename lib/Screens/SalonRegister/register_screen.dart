@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step2.dart';
-import 'package:flutter_auth/Screens/SalonRegister/forms/step3.dart';
+// import 'package:flutter_auth/Screens/SalonRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/SalonRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -37,19 +37,15 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   children: <Widget>[
-                    if (currentStep >= 0 && currentStep <= 1)
+                    if (currentStep <= 0)
                       ElevatedButton(
                         onPressed: controls.onStepContinue,
                         child: const Text("NEXT"),
                       ),
-                    if (currentStep == 2)
+                    if (currentStep == 1)
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SalonSummaryScreen()));
+                          _dialogBuilder(context);
                         },
                         child: const Text("NEXT"),
                       ),
@@ -83,7 +79,7 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
   }
 
   continued() {
-    currentStep < 2 ? setState(() => currentStep += 1) : null;
+    currentStep < 1 ? setState(() => currentStep += 1) : null;
   }
 
   cancel() {
@@ -101,10 +97,45 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
           title: const Text(''),
           content: const step2(),
         ),
-        Step(
-          isActive: currentStep >= 2,
-          title: const Text(''),
-          content: const step3(),
-        ),
+        // Step(
+        //   isActive: currentStep >= 2,
+        //   title: const Text(''),
+        //   content: const step3(),
+        // ),
       ];
+
+  Future<void> _dialogBuilder(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm?'),
+          content: const Text('Pwede paka mag review sa imo deets'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SalonSummaryScreen()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

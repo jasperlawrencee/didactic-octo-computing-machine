@@ -13,6 +13,16 @@ class step1 extends StatefulWidget {
 }
 
 class _step1State extends State<step1> {
+  TextEditingController salonName = TextEditingController();
+  TextEditingController roomBuilding = TextEditingController();
+  TextEditingController streetRoad = TextEditingController();
+  TextEditingController barangay = TextEditingController();
+  TextEditingController city = TextEditingController();
+  TextEditingController salonOwner = TextEditingController();
+  TextEditingController salonNumber = TextEditingController();
+  TextEditingController salonRepresentative = TextEditingController();
+  TextEditingController representativeEmail = TextEditingController();
+  TextEditingController representativeNum = TextEditingController();
   XFile? image;
   final ImagePicker picker = ImagePicker();
 
@@ -93,27 +103,27 @@ class _step1State extends State<step1> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: defaultPadding),
-        flatTextField("Salon Name*"),
+        flatTextField("Salon Name*", salonName),
         const SizedBox(height: defaultPadding),
         const Text(
           "Salon Address",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("Room No./Building*"),
-        flatTextField("Street/Road*"),
-        flatTextField("Barangay*"),
-        flatTextField("City*"),
+        flatTextField("Room No./Building*", roomBuilding),
+        flatTextField("Street/Road*", streetRoad),
+        flatTextField("Barangay*", barangay),
+        flatTextField("City*", city),
         const SizedBox(height: defaultPadding),
         const Text(
           "Salon Details",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: defaultPadding),
-        flatTextField("Salon Owner Name*"),
-        flatTextField("Salon Contact Number*"),
-        flatTextField("Salon Representative Name*"),
-        flatTextField("Representative Email Address*"),
-        flatTextField("Representative Contact Number*"),
+        flatTextField("Salon Owner Name*", salonOwner),
+        flatTextField("Salon Contact Number*", salonNumber),
+        flatTextField("Salon Representative Name*", salonRepresentative),
+        flatTextField("Representative Email Address*", representativeEmail),
+        flatTextField("Representative Contact Number*", representativeNum),
         const SizedBox(height: defaultPadding),
         AttachImage(context, "Attach Representative ID+"),
       ],

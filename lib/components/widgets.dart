@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 
-TextField textField(
+TextFormField textField(
   String text,
   IconData icon,
   bool isPasswordType,
   TextEditingController controller,
 ) {
-  return TextField(
+  return TextFormField(
+    validator: (value) {
+      if (value == null || value.isEmpty) return 'This field cannot be empty';
+      return null;
+    },
     obscureText: isPasswordType,
     style: const TextStyle(
       fontSize: 13,
@@ -27,11 +31,10 @@ TextField textField(
   );
 }
 
-TextField flatTextField(
-  String text,
-  // TextEditingController controller
-) {
+TextField flatTextField(String text, TextEditingController controller,
+    {void Function(String)? onchanged}) {
   return TextField(
+    onChanged: onchanged,
     style: const TextStyle(
       fontSize: 13,
       fontFamily: 'Inter',
@@ -40,30 +43,6 @@ TextField flatTextField(
     cursorColor: kPrimaryColor,
     decoration: InputDecoration(
       hintText: text,
-    ),
-  );
-}
-
-// ignore: non_constant_identifier_names
-Container SignInSignUp(BuildContext context, bool isLogin, Function onTap) {
-  return Container(
-    width: MediaQuery.of(context).size.width,
-    height: 50,
-    margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-    decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
-    child: ElevatedButton(
-      onPressed: () {
-        onTap();
-      },
-      child: Text(
-        isLogin ? 'LOG IN' : 'USER SIGN UP',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontFamily: 'Inter',
-          fontWeight: FontWeight.w500,
-        ),
-      ),
     ),
   );
 }

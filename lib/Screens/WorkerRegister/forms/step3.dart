@@ -13,22 +13,71 @@ class thirdStep extends StatefulWidget {
 }
 
 class _thirdStepState extends State<thirdStep> {
-  String dateFormat = DateFormat.yMMMMd().format(DateTime.now());
-  DateTime dateFrom = DateTime.now();
-  DateTime dateTo = DateTime.now();
   List<Widget> widgets = [];
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: defaultPadding),
         const Text(
           "Experiences\n",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("Salon Name*"),
-        flatTextField("Salon Address*"),
-        flatTextField("Salon Contact Number"),
+        const Section(),
+        const SizedBox(height: defaultPadding),
+        Column(
+          children: widgets,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  widgets.add(const Section());
+                });
+              },
+              child: const Text("Add More+"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  widgets.removeLast();
+                });
+              },
+              child: const Text("Delete Section"),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
+
+class Section extends StatefulWidget {
+  const Section({Key? key}) : super(key: key);
+
+  @override
+  State<Section> createState() => _SectionState();
+}
+
+class _SectionState extends State<Section> {
+  TextEditingController salonName = TextEditingController();
+  TextEditingController salonAddress = TextEditingController();
+  TextEditingController salonNum = TextEditingController();
+  String dateFormat = DateFormat.yMMMMd().format(DateTime.now());
+  DateTime dateFrom = DateTime.now();
+  DateTime dateTo = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: defaultPadding),
+        flatTextField("Salon Name*", salonName),
+        flatTextField("Salon Address*", salonAddress),
+        flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -74,12 +123,6 @@ class _thirdStepState extends State<thirdStep> {
             ),
           ],
         ),
-        const SizedBox(height: defaultPadding),
-        TextButton(
-            onPressed: () {
-              widgets.add(Text('New Widget ${widgets.length + 1}'));
-            },
-            child: const Text("Add More+")),
       ],
     );
   }

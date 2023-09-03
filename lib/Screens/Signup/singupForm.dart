@@ -2,7 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
+import 'package:flutter_auth/Screens/Signup/verification_page.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/responsive.dart';
@@ -149,7 +149,7 @@ class _MobileSignupState extends State<MobileSignup> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return const SignUpScreen();
+                                return const Verification();
                               },
                             ),
                           );

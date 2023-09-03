@@ -36,3 +36,7 @@ lib/generated_plugin_registrant.dart
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 pubspec.lock
+
+# Google API Key Detected by GitGuardian
+./ios/Runner/GoogleService-Info.plist
+./macos/Runner/GoogleService-Info.plist

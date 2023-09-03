@@ -22,8 +22,6 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.google.gms.google-services'
-
 android {
     namespace "com.example.android"
     compileSdkVersion flutter.compileSdkVersion

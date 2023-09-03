@@ -5,8 +5,6 @@ import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step5.dart';
-// import 'package:flutter_auth/Screens/WorkerRegister/forms/step5.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -20,7 +18,7 @@ class WorkerRegisterScreen extends StatefulWidget {
 }
 
 class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
-  final addUser = fifthStep();
+  // final addUser = const fifthStep();
   late String fName;
   int currentStep = 0;
   @override
@@ -42,12 +40,12 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   children: <Widget>[
-                    if (currentStep >= 0 && currentStep <= 3)
+                    if (currentStep >= 0 && currentStep <= 2)
                       ElevatedButton(
                         onPressed: controls.onStepContinue,
                         child: const Text("NEXT"),
                       ),
-                    if (currentStep == 4)
+                    if (currentStep == 3)
                       ElevatedButton(
                         onPressed: () {
                           _dialogBuilder(context);
@@ -84,7 +82,7 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   }
 
   continued() {
-    currentStep < 4 ? setState(() => currentStep += 1) : null;
+    currentStep < 3 ? setState(() => currentStep += 1) : null;
   }
 
   cancel() {
@@ -111,11 +109,6 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
           isActive: currentStep >= 3,
           title: const Text(''),
           content: const fourthStep(),
-        ),
-        Step(
-          isActive: currentStep >= 4,
-          title: const Text(''),
-          content: const fifthStep(),
         ),
       ];
 

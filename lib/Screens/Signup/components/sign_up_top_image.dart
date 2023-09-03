@@ -19,16 +19,14 @@ class SignUpScreenTopImage extends StatelessWidget {
         const SizedBox(height: defaultPadding),
         Row(
           children: [
-            const Spacer(),
             Expanded(
               flex: 8,
               child: SvgPicture.asset(
-                "assets/icons/diary.svg",
-                height: 266,
+                'assets/icons/enter.svg',
+                height: 260,
                 width: 316,
               ),
             ),
-            const Spacer(),
           ],
         ),
         const SizedBox(height: defaultPadding),

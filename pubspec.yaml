@@ -24,7 +24,7 @@ dependencies:
   file_picker: ^5.2.5
   google_nav_bar: ^5.0.6
   flutter_native_splash: ^2.3.2
-  firebase_auth: ^4.8.0
+  firebase_auth: ^4.9.0
   table_calendar: ^3.0.9
   intl: ^0.18.1
   image_picker: ^1.0.2

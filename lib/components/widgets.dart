@@ -12,6 +12,7 @@ TextFormField textField(
       if (value == null || value.isEmpty) return 'This field cannot be empty';
       return null;
     },
+    controller: controller,
     obscureText: isPasswordType,
     style: const TextStyle(
       fontSize: 13,

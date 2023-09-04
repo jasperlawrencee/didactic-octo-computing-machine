@@ -16,13 +16,11 @@ class fifthStep extends StatefulWidget {
 
 class _fifthStepState extends State<fifthStep> {
   final FirebaseAuthService _auth = FirebaseAuthService();
-  final TextEditingController username = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
 
   @override
   void dispose() {
-    username.dispose();
     email.dispose();
     password.dispose();
     super.dispose();
@@ -34,7 +32,6 @@ class _fifthStepState extends State<fifthStep> {
       children: [
         const Text("Account Information"),
         const SizedBox(height: defaultPadding),
-        flatTextField("Username", username),
         flatTextField("Email", email),
         flatTextField("Password", password),
       ],
@@ -42,7 +39,6 @@ class _fifthStepState extends State<fifthStep> {
   }
 
   void signUp() async {
-    String _username = username.text;
     String _email = email.text;
     String _password = password.text;
 
@@ -51,7 +47,7 @@ class _fifthStepState extends State<fifthStep> {
     if (user != null) {
       print("User Created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return WelcomeScreen();
+        return const WelcomeScreen();
       }));
     } else {
       print("error has occured");

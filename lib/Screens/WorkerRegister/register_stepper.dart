@@ -1,6 +1,9 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names, camel_case_types, library_private_types_in_public_api, duplicate_ignore
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/worker_screen.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
@@ -40,6 +43,14 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   children: <Widget>[
+                    if (currentStep != 0)
+                      TextButton(
+                        onPressed: controls.onStepCancel,
+                        child: const Text(
+                          "BACK",
+                          style: TextStyle(color: kPrimaryColor),
+                        ),
+                      ),
                     if (currentStep >= 0 && currentStep <= 2)
                       ElevatedButton(
                         onPressed: controls.onStepContinue,
@@ -51,14 +62,6 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
                           _dialogBuilder(context);
                         },
                         child: const Text("NEXT"),
-                      ),
-                    if (currentStep != 0)
-                      TextButton(
-                        onPressed: controls.onStepCancel,
-                        child: const Text(
-                          "BACK",
-                          style: TextStyle(color: kPrimaryColor),
-                        ),
                       ),
                   ],
                 ),
@@ -139,11 +142,27 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const WorkerSummaryScreen()));
+                addRoleToFireStore();
               },
             ),
           ],
         );
       },
     );
+  }
+
+  addRoleToFireStore() {
+    var user = FirebaseAuth.instance.currentUser;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    try {
+      ref.doc(user!.uid).update({'role': 'freelancer'});
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return const WorkerScreen();
+      }));
+      print("added freelancer role to firestore");
+    } catch (e) {
+      print("$user $ref");
+      print(e);
+    }
   }
 }

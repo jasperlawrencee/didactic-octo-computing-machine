@@ -30,6 +30,8 @@ dependencies:
   image_picker: ^1.0.2
   firebase_core: ^2.15.1
   provider: ^6.0.5
+  cloud_firestore: ^4.9.1
+  floating_navbar: ^2.0.2
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

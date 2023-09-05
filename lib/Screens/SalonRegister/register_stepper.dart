@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step2.dart';
@@ -36,6 +38,14 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   children: <Widget>[
+                    if (currentStep != 0)
+                      TextButton(
+                        onPressed: controls.onStepCancel,
+                        child: const Text(
+                          "BACK",
+                          style: TextStyle(color: kPrimaryColor),
+                        ),
+                      ),
                     if (currentStep <= 0)
                       ElevatedButton(
                         onPressed: controls.onStepContinue,
@@ -47,14 +57,6 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
                           _dialogBuilder(context);
                         },
                         child: const Text("NEXT"),
-                      ),
-                    if (currentStep != 0)
-                      TextButton(
-                        onPressed: controls.onStepCancel,
-                        child: const Text(
-                          "BACK",
-                          style: TextStyle(color: kPrimaryColor),
-                        ),
                       ),
                   ],
                 ),
@@ -96,11 +98,6 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
           title: const Text(''),
           content: const step2(),
         ),
-        // Step(
-        //   isActive: currentStep >= 2,
-        //   title: const Text(''),
-        //   content: const step3(),
-        // ),
       ];
 
   Future<void> _dialogBuilder(BuildContext context) {
@@ -126,15 +123,27 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SalonSummaryScreen()));
+                addRoleToFireStore();
               },
             ),
           ],
         );
       },
     );
+  }
+
+  addRoleToFireStore() {
+    var user = FirebaseAuth.instance.currentUser;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    try {
+      ref.doc(user!.uid).update({'role': 'salon'});
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return const SalonSummaryScreen();
+      }));
+      print("added salon role to firestore");
+    } catch (e) {
+      print("$user $ref");
+      print(e);
+    }
   }
 }

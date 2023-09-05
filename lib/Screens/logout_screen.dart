@@ -17,8 +17,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            flex: 8,
+          SafeArea(
             child: Column(
               children: [
                 ElevatedButton(
@@ -29,11 +28,11 @@ class _LogoutScreenState extends State<LogoutScreen> {
                       return const WelcomeScreen();
                     }));
                   },
-                  child: Text("Logout"),
+                  child: const Text("Logout"),
                 )
               ],
             ),
-          )
+          ),
         ],
       ),
     );

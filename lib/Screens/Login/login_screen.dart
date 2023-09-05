@@ -1,13 +1,17 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/salon_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/worker_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
-import 'package:flutter_auth/Screens/Signup/verification_page.dart';
+import 'package:flutter_auth/Screens/Verification/verification_page.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/features/user_auth/firebase_auth.dart';
-
+import 'package:flutter_auth/features/firebase/firebase_services.dart';
 import '../../components/background.dart';
 import 'components/login_screen_top_image.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -22,7 +26,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  final FirebaseAuthService _authService = FirebaseAuthService();
+  final FirebaseService _authService = FirebaseService();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
@@ -122,20 +126,54 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+//route constructor to salon or worker when logged in
+// throws error when login na walay role sa database
+  void route() {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        if (documentSnapshot.get('role') == 'freelancer') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const WorkerScreen();
+          }));
+        } else if (documentSnapshot.get('role') == 'salon') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const SalonScreen();
+          }));
+        } else {
+          print(e);
+        }
+      } else {
+        print("document does not exist in the database");
+        // Navigator.push(context, MaterialPageRoute(builder: (context) {
+        //   return const Verification();
+        // }));
+      }
+    });
+  }
+
   void _login() async {
     String email = _email.text;
     String password = _password.text;
-
-    User? user = await _authService.signInWithEmailAndPassword(email, password);
-
-    if (user != null) {
-      print("User Logged In");
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Verification();
-      }));
-    } else {
-      print("email: " + email);
-      print("password: " + password);
+    try {
+      User? user =
+          await _authService.signInWithEmailAndPassword(email, password);
+      route();
+      if (user != null) {
+        print("user logged in");
+      } else {
+        print(e);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('no user found');
+      } else if (e.code == 'wrong-password') {
+        print('wrong password');
+      }
     }
   }
 }

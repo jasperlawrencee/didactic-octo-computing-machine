@@ -5,9 +5,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/register_stepper.dart';
 import 'package:flutter_auth/Screens/Verification/components/verification_top_image.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/register_screen.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/features/firebase/firebase_services.dart';
 import 'package:flutter_auth/responsive.dart';
 import '../../components/background.dart';
 
@@ -25,8 +26,15 @@ class Verification extends StatelessWidget {
   }
 }
 
-class MobileVerification extends StatelessWidget {
+class MobileVerification extends StatefulWidget {
   const MobileVerification({Key? key}) : super(key: key);
+
+  @override
+  State<MobileVerification> createState() => _MobileVerificationState();
+}
+
+class _MobileVerificationState extends State<MobileVerification> {
+  final FirebaseService firebaseService = FirebaseService();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,17 +56,89 @@ class MobileVerification extends StatelessWidget {
                           height: defaultPadding,
                         ),
                         nextButton(context, () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return const WorkerRegisterScreen();
-                          }));
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Theme(
+                                  data: ThemeData(
+                                      canvasColor: Colors.transparent,
+                                      colorScheme: Theme.of(context)
+                                          .colorScheme
+                                          .copyWith(
+                                            primary: kPrimaryColor,
+                                            background: Colors.white70,
+                                            secondary: kPrimaryLightColor,
+                                          )),
+                                  child: AlertDialog(
+                                    title: const Text(
+                                        "Continue Registering as Worker?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          style: TextButton.styleFrom(
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("No")),
+                                      TextButton(
+                                          style: TextButton.styleFrom(
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return const WorkerRegisterScreen();
+                                            }));
+                                          },
+                                          child: const Text("Yes")),
+                                    ],
+                                  ),
+                                );
+                              });
                         }, "REGISTER AS WORKER"),
                         nextButton(context, () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return const SalonRegisterScreen();
-                          }));
-                        }, "REGISTER AS STORE"),
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Theme(
+                                  data: ThemeData(
+                                      canvasColor: Colors.transparent,
+                                      colorScheme: Theme.of(context)
+                                          .colorScheme
+                                          .copyWith(
+                                            primary: kPrimaryColor,
+                                            background: Colors.white70,
+                                            secondary: kPrimaryLightColor,
+                                          )),
+                                  child: AlertDialog(
+                                    title: const Text(
+                                        "Continue Registering as Salon?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("No")),
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return const SalonRegisterScreen();
+                                            }));
+                                          },
+                                          child: const Text("Yes")),
+                                    ],
+                                  ),
+                                );
+                              });
+                        }, "REGISTER AS SALON"),
                         const SizedBox(
                           height: defaultPadding,
                         ),

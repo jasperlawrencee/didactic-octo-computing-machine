@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
 import 'package:flutter_auth/constants.dart';
 
 TextFormField textField(
@@ -111,5 +113,62 @@ Container addImage(BuildContext context, String label) {
           label,
           style: const TextStyle(color: Colors.black),
         )),
+  );
+}
+
+SizedBox logOutButton(BuildContext context) {
+  return SizedBox(
+    child: InkWell(
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Theme(
+                  data: ThemeData(
+                      canvasColor: Colors.transparent,
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                            primary: kPrimaryColor,
+                            background: Colors.white70,
+                            secondary: kPrimaryLightColor,
+                          )),
+                  child: AlertDialog(
+                    title: const Text("Confirm Logout?"),
+                    actions: <Widget>[
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('No'),
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        onPressed: () async {
+                          try {
+                            await FirebaseAuth.instance.signOut();
+                            print("logged out");
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return WelcomeScreen();
+                            }));
+                          } catch (e) {
+                            print('error: $e');
+                          }
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  ));
+            });
+      },
+      child: const Icon(
+        Icons.logout,
+        color: kPrimaryColor,
+      ),
+    ),
   );
 }

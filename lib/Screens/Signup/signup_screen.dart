@@ -2,15 +2,16 @@
 
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
+import 'package:flutter_auth/Screens/HomeScreens/worker_screen.dart';
 import 'package:flutter_auth/Screens/logout_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/features/user_auth/firebase_auth.dart';
-import 'package:flutter_auth/responsive.dart';
+import 'package:flutter_auth/features/firebase/firebase_services.dart';
 
 import '../../components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -25,7 +26,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  final FirebaseAuthService _authService = FirebaseAuthService();
+  final FirebaseService _authService = FirebaseService();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
@@ -82,7 +83,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 if (formKey.currentState!.validate()) {
                                   print("email and password filled up dady");
                                   log("${_email.text} ${_password.text}");
-                                  _signup();
+                                  _signup(_email.text, _password.text);
                                 }
                               },
                               child: isLoading
@@ -126,20 +127,34 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _signup() async {
+  void _signup(String email, String password) async {
+    CircularProgressIndicator();
     String email = _email.text;
     String password = _password.text;
 
     User? user = await _authService.signUpWithEmailAndPassword(email, password);
-
+    postEmailToFireStore();
     if (user != null) {
-      print("User Successfuly Created");
+      print("user created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const LogoutScreen();
       }));
     } else {
       print("email: $email");
       print("password: $password");
+    }
+  }
+
+  postEmailToFireStore() {
+    try {
+      var user = FirebaseAuth.instance.currentUser;
+      CollectionReference ref = FirebaseFirestore.instance.collection('users');
+      ref.doc(user!.uid).set({'email': _email.text});
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const WorkerScreen()));
+      print("user added to firestore");
+    } catch (e) {
+      print(e);
     }
   }
 }

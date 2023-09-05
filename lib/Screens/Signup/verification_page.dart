@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/SalonRegister/register_screen.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/register_screen.dart';
+import 'package:flutter_auth/Screens/SalonRegister/register_stepper.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';

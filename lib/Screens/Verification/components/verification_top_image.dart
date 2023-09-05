@@ -13,7 +13,7 @@ class VerificationTopImage extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "Sign Up".toUpperCase(),
+          "Proceed".toUpperCase(),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: defaultPadding),

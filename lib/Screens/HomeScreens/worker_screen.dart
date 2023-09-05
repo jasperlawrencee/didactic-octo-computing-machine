@@ -14,9 +14,9 @@ class _WorkerScreenState extends State<WorkerScreen> {
   int selectedIndex = 0;
 
   final List<Widget> pages = [
-    home(),
-    services(),
-    profile(),
+    const home(),
+    const services(),
+    const profile(),
   ];
 
   void onTapped(int index) {
@@ -73,27 +73,33 @@ class _WorkerScreenState extends State<WorkerScreen> {
 }
 
 class home extends StatelessWidget {
+  const home({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Page 1 Content'),
     );
   }
 }
 
 class services extends StatelessWidget {
+  const services({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Page 2 Content'),
     );
   }
 }
 
 class profile extends StatelessWidget {
+  const profile({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Page 3 Content'),
     );
   }

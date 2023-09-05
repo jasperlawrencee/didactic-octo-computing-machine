@@ -153,7 +153,7 @@ SizedBox logOutButton(BuildContext context) {
                             print("logged out");
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return WelcomeScreen();
+                              return const WelcomeScreen();
                             }));
                           } catch (e) {
                             print('error: $e');

@@ -15,7 +15,20 @@ class WelcomeScreen extends StatelessWidget {
         child: SafeArea(
           child: Responsive(
             desktop: Row(
-              children: [Text("Butangi og admin diri")],
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(child: WelcomeImage()),
+                Expanded(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 450,
+                      child: LoginAndSignupBtn(),
+                    )
+                  ],
+                ))
+              ],
             ),
             mobile: MobileWelcomeScreen(),
           ),

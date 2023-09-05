@@ -128,7 +128,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _signup(String email, String password) async {
-    CircularProgressIndicator();
+    const CircularProgressIndicator();
     String email = _email.text;
     String password = _password.text;
 

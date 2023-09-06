@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
-import 'package:flutter_auth/Screens/HomeScreens/worker_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
 import 'package:flutter_auth/Screens/logout_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';

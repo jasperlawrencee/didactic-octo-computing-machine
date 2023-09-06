@@ -1,5 +1,5 @@
 name: flutter_auth
-description: A new Flutter project.
+description: chareng.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -22,16 +22,14 @@ dependencies:
   cupertino_icons: ^1.0.5
   flutter_svg: ^2.0.7
   file_picker: ^5.2.5
-  google_nav_bar: ^5.0.6
-  flutter_native_splash: ^2.3.2
   firebase_auth: ^4.9.0
   table_calendar: ^3.0.9
   intl: ^0.18.1
   image_picker: ^1.0.2
   firebase_core: ^2.15.1
-  provider: ^6.0.5
   cloud_firestore: ^4.9.1
-  floating_navbar: ^2.0.2
+  persistent_bottom_nav_bar: ^5.0.2
+  
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

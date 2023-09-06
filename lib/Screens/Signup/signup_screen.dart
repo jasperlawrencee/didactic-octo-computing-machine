@@ -29,11 +29,13 @@ class _SignupScreenState extends State<SignupScreen> {
   final FirebaseService _authService = FirebaseService();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final TextEditingController _username = TextEditingController();
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _username.dispose();
     super.dispose();
   }
 
@@ -54,8 +56,17 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: Column(
                       children: <Widget>[
                         textField(
-                          "Email Address",
+                          "Username",
                           Icons.person,
+                          false,
+                          _username,
+                        ),
+                        const SizedBox(
+                          height: defaultPadding,
+                        ),
+                        textField(
+                          "Email Address",
+                          Icons.mail,
                           false,
                           _email,
                         ),
@@ -65,7 +76,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         textField(
                           "Password",
                           Icons.lock,
-                          false,
+                          true,
                           _password,
                         ),
                         const SizedBox(
@@ -149,7 +160,9 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       var user = FirebaseAuth.instance.currentUser;
       CollectionReference ref = FirebaseFirestore.instance.collection('users');
-      ref.doc(user!.uid).set({'email': _email.text});
+      ref
+          .doc(user!.uid)
+          .set({'email': _email.text, 'username': _username.text});
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));
       print("user added to firestore");

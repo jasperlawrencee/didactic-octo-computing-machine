@@ -56,6 +56,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       );
                     }
+                    return null;
                   },
                 ),
                 firstDay: DateTime.utc(1900),

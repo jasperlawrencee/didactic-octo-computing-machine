@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textField(
                           "Password",
                           Icons.lock,
-                          false,
+                          true,
                           _password,
                         ),
                         const SizedBox(

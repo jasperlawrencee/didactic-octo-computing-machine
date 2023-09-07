@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/AdminScreens/Sidebar.dart';
 import 'package:flutter_auth/components/background.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -11,6 +12,9 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Background(child: Text('admin screen'));
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 249, 247, 251),
+      body: SidebarAdmin(),
+    );
   }
 }

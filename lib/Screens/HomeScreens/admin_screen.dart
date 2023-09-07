@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/AdminScreens/DashboardAdmin.dart';
 import 'package:flutter_auth/Screens/AdminScreens/Sidebar.dart';
 import 'package:flutter_auth/components/background.dart';
 
@@ -14,7 +15,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 247, 251),
-      body: SidebarAdmin(),
+      body: Row(children: [SidebarAdmin(), Expanded(child: Dashboard())]),
     );
   }
 }

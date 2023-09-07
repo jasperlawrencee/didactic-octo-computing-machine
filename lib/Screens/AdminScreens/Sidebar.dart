@@ -26,29 +26,37 @@ class _SidebarAdminState extends State<SidebarAdmin> {
           250, // Adjust the width as per your design // Adjust the color as per your design
       child: Column(
         children: [
-          ListTile(
-            title: Container(
-                width: 250,
-                height: 100,
-                child: Image.asset(
-                  'assets/logo.png',
-                  fit: BoxFit.contain,
-                )),
-            onTap: () {},
+          Material(
+            child: ListTile(
+              title: Container(
+                  width: 250,
+                  height: 180,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.scaleDown,
+                  )),
+              onTap: () {},
+            ),
           ),
-          ListTile(
-            leading: Icon(Icons.dashboard),
-            title: Text('Item 2'),
-            onTap: () {
-              // Add functionality for Item 2 here
-            },
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.dashboard),
+              title: Text('Dashboard'),
+              hoverColor: Color.fromARGB(70, 111, 53, 165),
+              onTap: () {
+                // Add functionality for Item 2 here
+              },
+            ),
           ),
-          ListTile(
-            leading: Icon(Icons.people),
-            title: Text('Manage Users'),
-            onTap: () {
-              // Add functionality for Item 2 here
-            },
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.people),
+              title: Text('Manage Users'),
+              hoverColor: Color.fromARGB(70, 111, 53, 165),
+              onTap: () {
+                // Add functionality for Item 2 here
+              },
+            ),
           ),
           // Add more ListTiles for additional sidebar items
         ],

@@ -12,7 +12,29 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Background(child: listView()));
+    return Scaffold(
+      body: Background(
+          child: Container(
+        margin: const EdgeInsets.only(top: 35),
+        child: Column(
+          children: [
+            Text(
+              "Notifications".toUpperCase(),
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: kPrimaryColor,
+              ),
+            ),
+            const SizedBox(
+              height: defaultPadding,
+            ),
+            Expanded(child: listView()),
+          ],
+        ),
+      )),
+    );
   }
 
   Widget listView() {

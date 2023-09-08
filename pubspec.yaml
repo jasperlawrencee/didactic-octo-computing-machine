@@ -29,6 +29,7 @@ dependencies:
   firebase_core: ^2.15.1
   cloud_firestore: ^4.9.1
   persistent_bottom_nav_bar: ^5.0.2
+  flutter_rating_bar: ^4.0.1
   
 
 dependency_overrides:

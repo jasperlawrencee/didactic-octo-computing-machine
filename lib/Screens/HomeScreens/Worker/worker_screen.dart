@@ -46,10 +46,10 @@ class _WorkerScreenState extends State<WorkerScreen> {
   List<Widget> screens() {
     return [
       const home(),
-      CalendarPage(),
-      ServicesPage(),
-      NotificationPage(),
-      ProfilePage(),
+      const CalendarPage(),
+      const ServicesPage(),
+      const NotificationPage(),
+      const ProfilePage(),
     ];
   }
 }

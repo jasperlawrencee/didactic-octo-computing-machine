@@ -12,28 +12,30 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-          child: Container(
-        margin: const EdgeInsets.only(top: 35),
-        child: Column(
-          children: [
-            Text(
-              "Notifications".toUpperCase(),
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: kPrimaryColor,
+    return SafeArea(
+      child: Scaffold(
+        body: Background(
+            child: Container(
+          margin: const EdgeInsets.only(top: 35),
+          child: Column(
+            children: [
+              Text(
+                "Notifications".toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: kPrimaryColor,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: defaultPadding,
-            ),
-            Expanded(child: listView()),
-          ],
-        ),
-      )),
+              const SizedBox(
+                height: defaultPadding,
+              ),
+              Expanded(child: listView()),
+            ],
+          ),
+        )),
+      ),
     );
   }
 
@@ -43,7 +45,7 @@ class _NotificationPageState extends State<NotificationPage> {
           return listViewItem(index);
         },
         separatorBuilder: (context, index) {
-          return Divider(
+          return const Divider(
             height: 0,
           );
         },
@@ -52,14 +54,14 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget listViewItem(int index) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           prefixIcon(),
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [message(index), timeAndDate(index)],
@@ -75,12 +77,12 @@ class _NotificationPageState extends State<NotificationPage> {
     return Container(
       height: 50,
       width: 50,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(10),
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: kPrimaryLightColor,
       ),
-      child: Icon(
+      child: const Icon(
         Icons.notifications,
         size: 25,
         color: kPrimaryColor,
@@ -101,7 +103,7 @@ class _NotificationPageState extends State<NotificationPage> {
               color: Colors.black,
               fontWeight: FontWeight.bold,
             ),
-            children: [
+            children: const [
               TextSpan(
                   text: 'Message Inside Notification Chuchu',
                   style: TextStyle(fontWeight: FontWeight.w400))
@@ -112,8 +114,8 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget timeAndDate(int index) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
-      child: Row(
+      margin: const EdgeInsets.only(top: 5),
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(

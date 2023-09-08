@@ -28,7 +28,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Pamphere".toUpperCase(),
+                    "Calendar".toUpperCase(),
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.bold,

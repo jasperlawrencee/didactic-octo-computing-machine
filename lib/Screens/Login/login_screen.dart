@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/admin_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/salon_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Salon/salon_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';

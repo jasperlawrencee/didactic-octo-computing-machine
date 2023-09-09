@@ -61,7 +61,7 @@ class _ServicesPageState extends State<ServicesPage> {
             ),
           ),
           const Spacer(),
-          Align(
+          const Align(
             alignment: Alignment.bottomRight,
             child: Text('price-range'),
           )

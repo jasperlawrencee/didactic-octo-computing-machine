@@ -43,7 +43,11 @@ class _thirdStepState extends State<thirdStep> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  widgets.removeLast();
+                  try {
+                    widgets != 0 ? widgets.removeLast() : null;
+                  } catch (e) {
+                    print(e);
+                  }
                 });
               },
               child: const Text("Delete Section"),

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
+import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/constants.dart';
 
 TextFormField textField(
@@ -153,7 +153,7 @@ SizedBox logOutButton(BuildContext context) {
                             print("logged out");
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return const WelcomeScreen();
+                              return LoginScreen();
                             }));
                           } catch (e) {
                             print('error: $e');

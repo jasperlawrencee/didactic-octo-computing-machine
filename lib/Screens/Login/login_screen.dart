@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/admin_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/salon_screen.dart';
@@ -39,6 +38,79 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _login() async {
+    String email = _email.text;
+    String password = _password.text;
+    try {
+      User? user =
+          await _authService.signInWithEmailAndPassword(email, password);
+      route();
+      if (user != null) {
+        print("user logged in");
+      } else {
+        print(e);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    } on StateError catch (e) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return const Verification();
+      }));
+      print('No nested field exists!');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // route constructor to salon or worker when logged in
+  // verifies if user has finalized roles in 'verification' page at the same time
+  // kulang og snackbar if invalid login
+  route() {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      try {
+        dynamic nested = documentSnapshot.get(FieldPath(['role']));
+        if (documentSnapshot.exists) {
+          if (documentSnapshot.get('role') == 'freelancer') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const WorkerScreen();
+            }));
+          } else if (documentSnapshot.get('role') == 'salon') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const SalonScreen();
+            }));
+          } else if (documentSnapshot.get('role') == 'admin') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const AdminScreen();
+            }));
+          }
+        }
+      } on StateError catch (e) {
+        print('Logged In');
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return const Verification();
+        }));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          const SnackBar(content: Text('No user found for that email.'));
+          print('No user found for that email.');
+        } else if (e.code == 'wrong-password') {
+          const SnackBar(
+              content: Text('Wrong password provided for that user.'));
+          print('Wrong password provided for that user.');
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -55,20 +127,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: formKey,
                     child: Column(
                       children: <Widget>[
+                        const SizedBox(height: defaultPadding),
                         textField(
                           "Email Address",
                           Icons.person,
                           false,
                           _email,
+                          emailType: false,
                         ),
-                        const SizedBox(
-                          height: defaultPadding,
-                        ),
+                        const SizedBox(height: defaultPadding),
                         textField(
                           "Password",
                           Icons.lock,
                           true,
                           _password,
+                          emailType: false,
                         ),
                         const SizedBox(
                           height: defaultPadding,
@@ -83,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (formKey.currentState!.validate()) {
-                                  print("email and password clear");
+                                  print("email and password filled");
                                   _login();
                                 }
                               },
@@ -126,72 +199,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
-  }
-
-  verifyUser() {}
-
-  // route constructor to salon or worker when logged in
-  //verifies if user has finalized roles in 'verification' page
-  route() {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      try {
-        dynamic nested = documentSnapshot.get(FieldPath(['role']));
-        if (documentSnapshot.exists) {
-          if (documentSnapshot.get('role') == 'freelancer') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const WorkerScreen();
-            }));
-          } else if (documentSnapshot.get('role') == 'salon') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const SalonScreen();
-            }));
-          } else if (documentSnapshot.get('role') == 'admin') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const AdminScreen();
-            }));
-          } else {
-            print(e);
-          }
-        }
-      } on StateError catch (e) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const Verification();
-        }));
-        print('No nested field exists!');
-        print(e);
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          print('No user found for that email.');
-        } else if (e.code == 'wrong-password') {
-          print('Wrong password provided for that user.');
-        }
-      }
-    });
-  }
-
-  void _login() async {
-    String email = _email.text;
-    String password = _password.text;
-    try {
-      User? user =
-          await _authService.signInWithEmailAndPassword(email, password);
-      route();
-      if (user != null) {
-        print("user logged in");
-      } else {
-        print(e);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('no user found');
-      } else if (e.code == 'wrong-password') {
-        print('wrong password');
-      }
-    }
   }
 }

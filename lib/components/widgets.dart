@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/constants.dart';
 
-TextFormField textField(
-  String text,
-  IconData icon,
-  bool isPasswordType,
-  TextEditingController controller,
-) {
+TextFormField textField(String text, IconData icon, bool isPasswordType,
+    TextEditingController controller,
+    {bool? emailType}) {
   return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) return 'This field cannot be empty';
-      return null;
-    },
+    validator: emailType == false
+        ? (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field cannot be empty';
+            }
+            if (value.length < 3) {
+              return '$text must be at least 3 characters long';
+            }
+            return null;
+          }
+        : null,
     controller: controller,
     obscureText: isPasswordType,
     style: const TextStyle(

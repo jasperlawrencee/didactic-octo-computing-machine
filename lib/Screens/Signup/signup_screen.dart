@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:developer';
 
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
-import 'package:flutter_auth/Screens/logout_screen.dart';
+import 'package:flutter_auth/Screens/Signup/signup_logout.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/firebase/firebase_services.dart';
@@ -61,6 +61,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             Icons.person,
                             false,
                             _username,
+                            emailType: false,
                           ),
                           const SizedBox(
                             height: defaultPadding,
@@ -70,6 +71,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             Icons.mail,
                             false,
                             _email,
+                            emailType: RegExp(
+                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(_email.text),
                           ),
                           const SizedBox(
                             height: defaultPadding,
@@ -79,6 +83,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             Icons.lock,
                             true,
                             _password,
+                            emailType: false,
                           ),
                           const SizedBox(
                             height: defaultPadding,
@@ -140,21 +145,31 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // kulang og snackbar if invalid login
   void _signup(String email, String password) async {
     const CircularProgressIndicator();
     String email = _email.text;
     String password = _password.text;
 
     User? user = await _authService.signUpWithEmailAndPassword(email, password);
+
+    //add email and username to firestore
     postEmailToFireStore();
+
     if (user != null) {
       print("user created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const LogoutScreen();
+        return const SignupLogout();
       }));
     } else {
-      print("email: $email");
-      print("password: $password");
+      showDialog<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return SnackBar(
+              content: const Text('Login Error'),
+              action: SnackBarAction(label: 'Close', onPressed: () {}),
+            );
+          });
     }
   }
 

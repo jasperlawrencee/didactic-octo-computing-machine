@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Salon/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/profile_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
@@ -45,7 +46,7 @@ class _SalonScreenState extends State<SalonScreen> {
 List<Widget> screens() {
   return [
     const home(),
-    // const calendarPage(),
+    const CalendarPage(),
     const ProfilePage(),
   ];
 }
@@ -57,6 +58,12 @@ List<PersistentBottomNavBarItem> navBarItems() {
         title: 'Home',
         activeColorPrimary: kPrimaryColor,
         inactiveColorPrimary: kPrimaryLightColor),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.calendar_month_outlined),
+      title: 'Bookings',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
     PersistentBottomNavBarItem(
       icon: const Icon(Icons.person),
       title: 'Salon',

@@ -24,7 +24,8 @@ class _firstStepState extends State<firstStep> {
   TextEditingController extAddress = TextEditingController();
 
   final gender = ["Male", "Female", "Non-binary"];
-  String? value;
+  String? genderValue;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -51,17 +52,18 @@ class _firstStepState extends State<firstStep> {
         Align(
           alignment: Alignment.topLeft,
           child: DropdownButton<String>(
-              hint: const Text("Gender"),
-              value: value,
-              icon: const Icon(Icons.arrow_drop_down),
-              // elevation: 16,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
-              underline: Container(
-                color: kPrimaryColor,
-                height: 2,
-              ),
-              onChanged: (value) => setState(() => this.value = value),
-              items: gender.map(buildMenuItem).toList()),
+            hint: const Text("Gender"),
+            value: genderValue,
+            icon: const Icon(Icons.arrow_drop_down),
+            // elevation: 16,
+            style: const TextStyle(fontSize: 13, color: Colors.black),
+            underline: Container(
+              color: kPrimaryColor,
+              height: 2,
+            ),
+            onChanged: (value) => setState(() => genderValue = value),
+            items: gender.map(buildMenuItem).toList(),
+          ),
         ),
         const SizedBox(height: defaultPadding),
         const Text(

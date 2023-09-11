@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/notification_screen.dart';
@@ -89,9 +91,14 @@ List<PersistentBottomNavBarItem> navbarItems() {
   ];
 }
 
-class home extends StatelessWidget {
+class home extends StatefulWidget {
   const home({Key? key}) : super(key: key);
 
+  @override
+  State<home> createState() => _homeState();
+}
+
+class _homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -126,21 +133,32 @@ class home extends StatelessWidget {
               const SizedBox(
                 height: defaultPadding,
               ),
-              const Row(
-                children: [
-                  Text(
-                    "Welcome, {name}!",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+              Column(children: [
+                Text('$workerName'),
+                TextButton(onPressed: workerName, child: Text('data'))
+              ]),
               //put navbar here
             ],
           ),
         ),
       ),
     );
+  }
+
+  String workerName() {
+    String name = '';
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      print(documentSnapshot.get('username'));
+      setState(() {
+        name = documentSnapshot.get('username');
+      });
+    }));
+    print(name);
+    return name;
   }
 }

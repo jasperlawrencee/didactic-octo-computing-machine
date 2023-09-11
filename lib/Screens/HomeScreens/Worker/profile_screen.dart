@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: innerHeight * 0.65,
                             width: innerWidth,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(15),
                               color: kPrimaryLightColor,
                             ),
                             child: Column(

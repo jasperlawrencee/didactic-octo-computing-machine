@@ -99,6 +99,9 @@ class home extends StatefulWidget {
 }
 
 class _homeState extends State<home> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  String name = '';
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -134,8 +137,7 @@ class _homeState extends State<home> {
                 height: defaultPadding,
               ),
               Column(children: [
-                Text('$workerName'),
-                TextButton(onPressed: workerName, child: Text('data'))
+                Text('Welcome back, $name!'),
               ]),
               //put navbar here
             ],
@@ -145,9 +147,9 @@ class _homeState extends State<home> {
     );
   }
 
-  String workerName() {
-    String name = '';
-    User? currentUser = FirebaseAuth.instance.currentUser;
+  @override
+  void initState() {
+    super.initState;
     FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser!.uid)
@@ -158,7 +160,5 @@ class _homeState extends State<home> {
         name = documentSnapshot.get('username');
       });
     }));
-    print(name);
-    return name;
   }
 }

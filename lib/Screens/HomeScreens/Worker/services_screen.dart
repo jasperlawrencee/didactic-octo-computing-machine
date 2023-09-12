@@ -31,7 +31,7 @@ class _ServicesPageState extends State<ServicesPage> {
               Expanded(
                 child: ListView.builder(
                     shrinkWrap: true,
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                     itemCount: 10,
                     itemBuilder: (context, index) {
                       return serviceCard(index);

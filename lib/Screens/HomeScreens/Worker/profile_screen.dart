@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -11,6 +13,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  String name = '';
+
   @override
   Widget build(BuildContext context) {
     // double width = MediaQuery.of(context).size.width;
@@ -55,9 +60,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Column(
                               children: [
                                 const SizedBox(height: 65),
-                                const Text(
-                                  "@username",
-                                  style: TextStyle(
+                                Text(
+                                  name,
+                                  style: const TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w700,
@@ -65,6 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 RatingBar.builder(
+                                  ignoreGestures: true,
                                   initialRating: 3,
                                   minRating: 1,
                                   direction: Axis.horizontal,
@@ -124,6 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   .copyWith(primary: kPrimaryColor),
                             ),
                             child: AlertDialog(
+                              //add list of creds here
                               title: const Text('List of Credentials'),
                               content: const SingleChildScrollView(
                                 child: Text('list of images'),
@@ -142,7 +149,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(width: defaultPadding),
                     profileStats('Profile Visits', body: '123'),
-                    const SizedBox(width: defaultPadding),
                   ],
                 ),
               ),
@@ -195,5 +201,20 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      print(documentSnapshot.get('username'));
+      setState(() {
+        name = documentSnapshot.get('username');
+      });
+    }));
   }
 }

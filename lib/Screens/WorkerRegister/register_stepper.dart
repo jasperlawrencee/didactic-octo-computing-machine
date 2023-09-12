@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names, camel_case_types, library_private_types_in_public_api, duplicate_ignore
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -159,10 +161,10 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const WorkerScreen();
       }));
-      print("added freelancer role to firestore");
+      log("added freelancer role to firestore");
     } catch (e) {
-      print("$user $ref");
-      print(e);
+      log("$user $ref");
+      log(e.toString());
     }
   }
 }

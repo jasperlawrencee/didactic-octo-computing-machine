@@ -98,7 +98,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (formKey.currentState!.validate()) {
-                                    print("email and password filled up dady");
+                                    log("email and password filled up dady");
                                     log("${_email.text} ${_password.text}");
                                     _signup(_email.text, _password.text);
                                   }
@@ -157,7 +157,7 @@ class _SignupScreenState extends State<SignupScreen> {
     postEmailToFireStore();
 
     if (user != null) {
-      print("user created");
+      log("user created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const SignupLogout();
       }));
@@ -182,9 +182,9 @@ class _SignupScreenState extends State<SignupScreen> {
           .set({'email': _email.text, 'username': _username.text});
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));
-      print("user added to firestore");
+      log("user added to firestore");
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 }

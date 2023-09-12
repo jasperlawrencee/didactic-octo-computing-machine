@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
 
 CollectionReference users = FirebaseFirestore.instance.collection('users');
 DocumentReference docRef = users.doc('document_id');
@@ -17,12 +18,10 @@ class FirebaseService {
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        log('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        log('The account already exists for that email.');
       }
-    } catch (e) {
-      print(e);
     }
     return null;
   }
@@ -35,9 +34,9 @@ class FirebaseService {
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print(e);
+        log(e.code);
       } else if (e.code == 'wrong-password') {
-        print(e);
+        log(e.code);
       }
     }
     return null;
@@ -53,12 +52,12 @@ class FirebaseService {
             .get('role'); // Replace 'field_name' with the actual field name
 
         // Use the field value
-        print('Field Value: $fieldValue');
+        log('Field Value: $fieldValue');
       } else {
-        print('Document does not exist');
+        log('Document does not exist');
       }
     } catch (e) {
-      print('Error: $e');
+      log('Error: $e');
     }
   }
 
@@ -72,12 +71,12 @@ class FirebaseService {
             .get('role'); // Replace 'field_name' with the actual field name
 
         // Use the field value
-        print('Field Value: $fieldValue');
+        log('Field Value: $fieldValue');
       } else {
-        print('Document does not exist');
+        log('Document does not exist');
       }
     } catch (e) {
-      print('Error: $e');
+      log('Error: $e');
     }
   }
 

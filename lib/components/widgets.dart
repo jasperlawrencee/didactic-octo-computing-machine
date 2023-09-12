@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
@@ -154,13 +158,13 @@ SizedBox logOutButton(BuildContext context) {
                         onPressed: () async {
                           try {
                             await FirebaseAuth.instance.signOut();
-                            print("logged out");
+                            log("logged out");
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return LoginScreen();
+                              return const LoginScreen();
                             }));
                           } catch (e) {
-                            print('error: $e');
+                            log('error: $e');
                           }
                         },
                         child: const Text('Yes'),

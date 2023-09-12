@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/profile_screen.dart';
@@ -73,9 +75,14 @@ List<PersistentBottomNavBarItem> navBarItems() {
   ];
 }
 
-class home extends StatelessWidget {
+class home extends StatefulWidget {
   const home({Key? key}) : super(key: key);
 
+  @override
+  State<home> createState() => _homeState();
+}
+
+class _homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(

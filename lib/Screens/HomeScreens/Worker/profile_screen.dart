@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,10 @@ import 'package:flutter_auth/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  final String parentDocumentId;
+
+  const ProfilePage({Key? key, required this.parentDocumentId})
+      : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -14,6 +19,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<String> imageUrl = [];
   String name = '';
 
   @override
@@ -83,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     color: Colors.amber,
                                   ),
                                   onRatingUpdate: (rating) {
-                                    print(rating);
+                                    log(rating.toString());
                                   },
                                 ),
                               ],
@@ -131,9 +138,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             child: AlertDialog(
                               //add list of creds here
+
                               title: const Text('List of Credentials'),
-                              content: const SingleChildScrollView(
-                                child: Text('list of images'),
+                              content: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .80,
+                                child: ListView.separated(
+                                    itemBuilder: (context, index) {
+                                      return Image.network(imageUrl[index]);
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return const SizedBox(
+                                          height: defaultPadding);
+                                    },
+                                    itemCount: imageUrl.length),
                               ),
                               actions: <Widget>[
                                 TextButton(
@@ -158,6 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: defaultPadding),
+              //custom about user
               const Text(
                   'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.'),
               const SizedBox(height: defaultPadding)
@@ -205,16 +224,31 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
+    //grab name function
     super.initState;
     FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser!.uid)
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
-      print(documentSnapshot.get('username'));
+      log(documentSnapshot.get('username'));
       setState(() {
         name = documentSnapshot.get('username');
       });
     }));
+    //grab subcollection from 'users' collection in db
+    _firestore
+        .collection('users')
+        .doc(widget.parentDocumentId)
+        .collection('userDetails')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      setState(() {
+        imageUrl =
+            querySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
+      });
+    }).catchError((e) {
+      log('error: $e');
+    });
   }
 }

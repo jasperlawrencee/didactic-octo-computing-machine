@@ -1,4 +1,6 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, unrelated_type_equality_checks
+
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -46,7 +48,7 @@ class _thirdStepState extends State<thirdStep> {
                   try {
                     widgets != 0 ? widgets.removeLast() : null;
                   } catch (e) {
-                    print(e);
+                    log(e.toString());
                   }
                 });
               },

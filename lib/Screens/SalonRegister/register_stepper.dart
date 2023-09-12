@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -140,10 +142,10 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const SalonSummaryScreen();
       }));
-      print("added salon role to firestore");
+      log("added salon role to firestore");
     } catch (e) {
-      print("$user $ref");
-      print(e);
+      log("$user $ref");
+      log(e.toString());
     }
   }
 }

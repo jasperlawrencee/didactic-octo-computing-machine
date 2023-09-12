@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   )),
                   //salon address
-                  salonCard(Column(
+                  salonCard(const Column(
                     children: [
                       SizedBox(
                         height: 75,
@@ -58,8 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           size: 50,
                         ),
                       ),
-                      const Spacer(),
-                      const Text(
+                      Spacer(),
+                      Text(
                         'Salon Address, Barangay, Building Number',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: kPrimaryColor),
@@ -78,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   InkWell(
                     //call function
                     onTap: (() {}),
-                    child: Text(
+                    child: const Text(
                       '+639123456789',
                       style: TextStyle(
                           color: kPrimaryColor,

@@ -1,6 +1,6 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously, unused_local_variable
 
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,23 +46,19 @@ class _LoginScreenState extends State<LoginScreen> {
           await _authService.signInWithEmailAndPassword(email, password);
       route();
       if (user != null) {
-        print("user logged in");
-      } else {
-        print(e);
+        log("user logged in");
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        log('No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+        log('Wrong password provided for that user.');
       }
-    } on StateError catch (e) {
+    } on StateError {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const Verification();
       }));
-      print('No nested field exists!');
-    } catch (e) {
-      print(e);
+      log('No nested field exists!');
     }
   }
 
@@ -77,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       try {
-        dynamic nested = documentSnapshot.get(FieldPath(['role']));
+        dynamic nested = documentSnapshot.get(FieldPath(const ['role']));
         if (documentSnapshot.exists) {
           if (documentSnapshot.get('role') == 'freelancer') {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -93,19 +89,19 @@ class _LoginScreenState extends State<LoginScreen> {
             }));
           }
         }
-      } on StateError catch (e) {
-        print('Logged In');
+      } on StateError {
+        log('Logged In');
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return const Verification();
         }));
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           const SnackBar(content: Text('No user found for that email.'));
-          print('No user found for that email.');
+          log('No user found for that email.');
         } else if (e.code == 'wrong-password') {
           const SnackBar(
               content: Text('Wrong password provided for that user.'));
-          print('Wrong password provided for that user.');
+          log('Wrong password provided for that user.');
         }
       }
     });
@@ -156,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (formKey.currentState!.validate()) {
-                                  print("email and password filled");
+                                  log("email and password filled");
                                   _login();
                                 }
                               },

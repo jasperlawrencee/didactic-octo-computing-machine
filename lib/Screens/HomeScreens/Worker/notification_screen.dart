@@ -92,23 +92,21 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget message(int index) {
     double textSize = 14;
-    return Container(
-      child: RichText(
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-        text: TextSpan(
-            text: 'Message',
-            style: TextStyle(
-              fontSize: textSize,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-            children: const [
-              TextSpan(
-                  text: 'Message Inside Notification Chuchu',
-                  style: TextStyle(fontWeight: FontWeight.w400))
-            ]),
-      ),
+    return RichText(
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+          text: 'Message',
+          style: TextStyle(
+            fontSize: textSize,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+          children: const [
+            TextSpan(
+                text: 'Message Inside Notification Chuchu',
+                style: TextStyle(fontWeight: FontWeight.w400))
+          ]),
     );
   }
 

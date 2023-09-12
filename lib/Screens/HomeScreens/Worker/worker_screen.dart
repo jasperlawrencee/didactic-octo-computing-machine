@@ -1,3 +1,7 @@
+// ignore_for_file: camel_case_types
+
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +55,9 @@ class _WorkerScreenState extends State<WorkerScreen> {
       const CalendarPage(),
       const ServicesPage(),
       const NotificationPage(),
-      const ProfilePage(),
+      const ProfilePage(
+        parentDocumentId: 'users',
+      ),
     ];
   }
 }
@@ -103,6 +109,21 @@ class _homeState extends State<home> {
   String name = '';
 
   @override
+  void initState() {
+    super.initState;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      log(documentSnapshot.get('username'));
+      setState(() {
+        name = documentSnapshot.get('username');
+      });
+    }));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Background(
@@ -127,9 +148,12 @@ class _homeState extends State<home> {
                     ),
                   ),
                   //Notification Widget
-                  const Icon(
-                    Icons.person,
-                    color: kPrimaryColor,
+                  InkWell(
+                    onTap: () {},
+                    child: const Icon(
+                      Icons.settings,
+                      color: kPrimaryColor,
+                    ),
                   ),
                 ],
               ),
@@ -145,20 +169,5 @@ class _homeState extends State<home> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get()
-        .then(((DocumentSnapshot documentSnapshot) {
-      print(documentSnapshot.get('username'));
-      setState(() {
-        name = documentSnapshot.get('username');
-      });
-    }));
   }
 }

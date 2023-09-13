@@ -76,23 +76,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fontSize: 20),
                                 ),
                                 const SizedBox(height: 8),
-                                RatingBar.builder(
-                                  ignoreGestures: true,
-                                  initialRating: 3,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 5,
-                                  itemPadding: const EdgeInsets.symmetric(
-                                      horizontal: 4.0),
-                                  itemBuilder: (context, _) => const Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    log(rating.toString());
-                                  },
-                                ),
+                                // RatingBar.builder(
+                                //   ignoreGestures: true,
+                                //   initialRating: 3,
+                                //   minRating: 1,
+                                //   direction: Axis.horizontal,
+                                //   allowHalfRating: true,
+                                //   itemCount: 5,
+                                //   itemPadding: const EdgeInsets.symmetric(
+                                //       horizontal: 4.0),
+                                //   itemBuilder: (context, _) => const Icon(
+                                //     Icons.star,
+                                //     color: Colors.amber,
+                                //   ),
+                                //   onRatingUpdate: (rating) {
+                                //     log(rating.toString());
+                                //   },
+                                // ),
                               ],
                             ),
                           ),
@@ -131,37 +131,21 @@ class _ProfilePageState extends State<ProfilePage> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) => Theme(
-                            data: ThemeData(
-                              colorScheme: Theme.of(context)
-                                  .colorScheme
-                                  .copyWith(primary: kPrimaryColor),
-                            ),
-                            child: AlertDialog(
-                              //add list of creds here
-
-                              title: const Text('List of Credentials'),
-                              content: SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .80,
-                                child: ListView.separated(
-                                    itemBuilder: (context, index) {
-                                      return Image.network(imageUrl[index]);
-                                    },
-                                    separatorBuilder: (context, index) {
-                                      return const SizedBox(
-                                          height: defaultPadding);
-                                    },
-                                    itemCount: imageUrl.length),
+                              data: ThemeData(
+                                colorScheme: Theme.of(context)
+                                    .colorScheme
+                                    .copyWith(primary: kPrimaryColor),
                               ),
-                              actions: <Widget>[
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Close'))
-                              ],
-                            ),
-                          ),
+                              child: AlertDialog(
+                                title: const Text('Credentials'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Close'))
+                                ],
+                              )),
                         );
                       },
                     ),
@@ -179,7 +163,8 @@ class _ProfilePageState extends State<ProfilePage> {
               //custom about user
               const Text(
                   'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.'),
-              const SizedBox(height: defaultPadding)
+              const SizedBox(height: defaultPadding),
+              TextButton(onPressed: getSubCollectionData, child: Text('data'))
             ],
           ),
         ),
@@ -222,6 +207,17 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  getSubCollectionData() async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> userDetailsQuery =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('userDetails')
+              .get();
+    } catch (e) {}
+  }
+
   @override
   void initState() {
     //grab name function
@@ -236,19 +232,5 @@ class _ProfilePageState extends State<ProfilePage> {
         name = documentSnapshot.get('username');
       });
     }));
-    //grab subcollection from 'users' collection in db
-    _firestore
-        .collection('users')
-        .doc(widget.parentDocumentId)
-        .collection('userDetails')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      setState(() {
-        imageUrl =
-            querySnapshot.docs.map((doc) => doc['imageUrl'] as String).toList();
-      });
-    }).catchError((e) {
-      log('error: $e');
-    });
   }
 }

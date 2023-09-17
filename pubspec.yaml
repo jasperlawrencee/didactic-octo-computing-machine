@@ -23,14 +23,13 @@ dependencies:
   flutter_svg: ^2.0.7
   file_picker: ^5.2.5
   firebase_auth: ^4.9.0
-  table_calendar: ^3.0.9
   intl: ^0.18.1
   image_picker: ^1.0.2
   firebase_core: ^2.15.1
   cloud_firestore: ^4.9.1
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
-  
+  calendar_view: ^1.0.4
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Worker/certificate_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -73,26 +74,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.black,
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 20),
+                                      fontSize: 16),
                                 ),
                                 const SizedBox(height: 8),
-                                // RatingBar.builder(
-                                //   ignoreGestures: true,
-                                //   initialRating: 3,
-                                //   minRating: 1,
-                                //   direction: Axis.horizontal,
-                                //   allowHalfRating: true,
-                                //   itemCount: 5,
-                                //   itemPadding: const EdgeInsets.symmetric(
-                                //       horizontal: 4.0),
-                                //   itemBuilder: (context, _) => const Icon(
-                                //     Icons.star,
-                                //     color: Colors.amber,
-                                //   ),
-                                //   onRatingUpdate: (rating) {
-                                //     log(rating.toString());
-                                //   },
-                                // ),
+                                SizedBox(
+                                  child: RatingBar.builder(
+                                    ignoreGestures: true,
+                                    initialRating: 3,
+                                    minRating: 1,
+                                    direction: Axis.horizontal,
+                                    allowHalfRating: true,
+                                    itemCount: 5,
+                                    itemPadding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0),
+                                    itemBuilder: (context, _) => const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                    ),
+                                    onRatingUpdate: (rating) {
+                                      log(rating.toString());
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -125,30 +128,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     profileStats('Last\nTransaction', body: 'Jasper'),
                     const SizedBox(width: defaultPadding),
                     InkWell(
-                      child: profileStats('Credentials',
-                          body: 'View', underline: true),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => Theme(
-                              data: ThemeData(
-                                colorScheme: Theme.of(context)
-                                    .colorScheme
-                                    .copyWith(primary: kPrimaryColor),
-                              ),
-                              child: AlertDialog(
-                                title: const Text('Credentials'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Close'))
-                                ],
-                              )),
-                        );
-                      },
-                    ),
+                        child: profileStats('Credentials',
+                            body: 'View', underline: true),
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return DisplayCertificates();
+                          }));
+                        }),
                     const SizedBox(width: defaultPadding),
                     profileStats('Profile Visits', body: '123'),
                   ],
@@ -164,7 +151,6 @@ class _ProfilePageState extends State<ProfilePage> {
               const Text(
                   'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.'),
               const SizedBox(height: defaultPadding),
-              TextButton(onPressed: getSubCollectionData, child: Text('data'))
             ],
           ),
         ),
@@ -207,27 +193,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  getSubCollectionData() async {
-    try {
-      final QuerySnapshot<Map<String, dynamic>> userDetailsQuery =
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(currentUser!.uid)
-              .collection('userDetails')
-              .get();
-    } catch (e) {}
-  }
-
   @override
   void initState() {
     //grab name function
     super.initState;
-    FirebaseFirestore.instance
+    _firestore
         .collection('users')
         .doc(currentUser!.uid)
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
-      log(documentSnapshot.get('username'));
       setState(() {
         name = documentSnapshot.get('username');
       });

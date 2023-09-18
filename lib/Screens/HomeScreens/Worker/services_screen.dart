@@ -88,7 +88,7 @@ class _ServicesPageState extends State<ServicesPage> {
         });
       }
     } catch (e) {
-      log(e.toString());
+      log('error: $e');
     }
   }
 
@@ -106,7 +106,6 @@ class _ServicesPageState extends State<ServicesPage> {
         setState(() {
           serviceType = hairField.map((item) => item as String).toList();
         });
-        log(serviceType.toString());
       }
     } catch (e) {
       log('error: $e');
@@ -140,7 +139,7 @@ class _ServicesPageState extends State<ServicesPage> {
           const Align(
             alignment: Alignment.bottomRight,
             child: Text('price-range'),
-          )
+          ),
         ],
       ),
     );

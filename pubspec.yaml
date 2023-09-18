@@ -29,8 +29,9 @@ dependencies:
   cloud_firestore: ^4.9.1
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
-  calendar_view: ^1.0.4
-
+  syncfusion_flutter_calendar: ^23.1.36
+  flutter_speed_dial: ^7.0.0
+  
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6
 

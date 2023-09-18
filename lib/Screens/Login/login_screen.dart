@@ -46,65 +46,51 @@ class _LoginScreenState extends State<LoginScreen> {
           await _authService.signInWithEmailAndPassword(email, password);
       route();
       if (user != null) {
-        log("user logged in");
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sucessfully Logged In')));
       }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        log('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        log('Wrong password provided for that user.');
-      }
-    } on StateError {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const Verification();
-      }));
-      log('No nested field exists!');
+    } catch (e) {
+      log(e.toString());
     }
   }
 
   // route constructor to salon or worker when logged in
   // verifies if user has finalized roles in 'verification' page at the same time
-  // kulang og snackbar if invalid login
   route() {
     User? currentUser = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      try {
-        dynamic nested = documentSnapshot.get(FieldPath(const ['role']));
-        if (documentSnapshot.exists) {
-          if (documentSnapshot.get('role') == 'freelancer') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const WorkerScreen();
-            }));
-          } else if (documentSnapshot.get('role') == 'salon') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const SalonScreen();
-            }));
-          } else if (documentSnapshot.get('role') == 'admin') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const AdminScreen();
-            }));
+    try {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        try {
+          dynamic nested = documentSnapshot.get(FieldPath(const ['role']));
+          if (documentSnapshot.exists) {
+            if (documentSnapshot.get('role') == 'freelancer') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const WorkerScreen();
+              }));
+            } else if (documentSnapshot.get('role') == 'salon') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const SalonScreen();
+              }));
+            } else if (documentSnapshot.get('role') == 'admin') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const AdminScreen();
+              }));
+            }
           }
+        } on StateError {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const Verification();
+          }));
         }
-      } on StateError {
-        log('Logged In');
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const Verification();
-        }));
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          const SnackBar(content: Text('No user found for that email.'));
-          log('No user found for that email.');
-        } else if (e.code == 'wrong-password') {
-          const SnackBar(
-              content: Text('Wrong password provided for that user.'));
-          log('Wrong password provided for that user.');
-        }
-      }
-    });
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Login Error: Check email and password')));
+    }
   }
 
   @override
@@ -152,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (formKey.currentState!.validate()) {
-                                  log("email and password filled");
                                   _login();
                                 }
                               },

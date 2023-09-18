@@ -133,7 +133,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return DisplayCertificates();
+                            return const DisplayCertificates();
                           }));
                         }),
                     const SizedBox(width: defaultPadding),

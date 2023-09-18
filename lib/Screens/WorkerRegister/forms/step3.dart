@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:intl/intl.dart';
 
 class thirdStep extends StatefulWidget {
   const thirdStep({Key? key}) : super(key: key);
@@ -48,7 +47,8 @@ class _thirdStepState extends State<thirdStep> {
                   try {
                     widgets != 0 ? widgets.removeLast() : null;
                   } catch (e) {
-                    log(e.toString());
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Cannot delete fields')));
                   }
                 });
               },
@@ -72,9 +72,10 @@ class _SectionState extends State<Section> {
   TextEditingController salonName = TextEditingController();
   TextEditingController salonAddress = TextEditingController();
   TextEditingController salonNum = TextEditingController();
-  String dateFormat = DateFormat.yMMMMd().format(DateTime.now());
-  DateTime dateFrom = DateTime.now();
-  DateTime dateTo = DateTime.now();
+  DateTimeRange selectedDays = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -85,49 +86,21 @@ class _SectionState extends State<Section> {
         flatTextField("Salon Address*", salonAddress),
         flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    DateTime? newDate = await showDatePicker(
-                      context: context,
-                      initialDate: dateFrom,
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2100),
-                    );
-                    if (newDate == null) return;
-                    setState(() => dateFrom = newDate);
-                  },
-                  child: const Text("Date From"),
-                ),
-                Text(DateFormat.yMMMMd().format(dateFrom)),
-              ],
-            ),
-            const SizedBox(
-              width: defaultPadding,
-            ),
-            Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    DateTime? newDate = await showDatePicker(
-                      context: context,
-                      initialDate: dateTo,
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2100),
-                    );
-                    if (newDate == null) return;
-                    setState(() => dateTo = newDate);
-                  },
-                  child: const Text("Date To"),
-                ),
-                Text(DateFormat.yMMMMd().format(dateTo)),
-              ],
-            ),
-          ],
+        Text('${selectedDays.start.year} to ${selectedDays.end.year}'),
+        ElevatedButton(
+          onPressed: () async {
+            final DateTimeRange? dateTimeRange = await showDateRangePicker(
+              context: context,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2500),
+            );
+            if (dateTimeRange != null) {
+              setState(() {
+                selectedDays = dateTimeRange;
+              });
+            }
+          },
+          child: const Text('Duration of Experience'),
         ),
       ],
     );

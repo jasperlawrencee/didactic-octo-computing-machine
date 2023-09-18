@@ -34,9 +34,9 @@ class FirebaseService {
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        log(e.code);
+        log('No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        log(e.code);
+        log('Wrong password provided for that user.');
       }
     }
     return null;

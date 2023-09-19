@@ -30,7 +30,7 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
   syncfusion_flutter_calendar: ^23.1.36
-  flutter_speed_dial: ^7.0.0
+  time_range_picker: ^2.2.0
   
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

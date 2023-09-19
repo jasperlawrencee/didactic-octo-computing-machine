@@ -42,10 +42,11 @@ TextFormField textField(String text, IconData icon, bool isPasswordType,
   );
 }
 
-TextField flatTextField(String text, TextEditingController controller,
+TextField flatTextField(String text, TextEditingController? controller,
     {void Function(String)? onchanged}) {
   return TextField(
     onChanged: onchanged,
+    controller: controller,
     style: const TextStyle(
       fontSize: 13,
       fontFamily: 'Inter',

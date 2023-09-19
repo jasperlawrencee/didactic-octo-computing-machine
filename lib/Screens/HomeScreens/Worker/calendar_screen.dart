@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Worker/event_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -12,20 +12,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  CalendarView _calendarView = CalendarView.day;
-
-  @override
-  void initState() {
-    super.initState();
-    changeCalendarView();
-  }
-
-  @override
-  void dispose() {
-    changeCalendarView();
-    super.dispose();
-  }
-
+  bool? allDay = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,36 +49,32 @@ class _CalendarPageState extends State<CalendarPage> {
                   child: Stack(
                     children: [
                       SfCalendar(
-                        view: _calendarView,
+                        view: CalendarView.day,
+                        allowViewNavigation: true,
+                        allowedViews: const [
+                          CalendarView.day,
+                          CalendarView.week,
+                          CalendarView.month,
+                        ],
+                        dataSource: MeetingDataSource(_getDataSource()),
+                        monthViewSettings: const MonthViewSettings(
+                            appointmentDisplayMode:
+                                MonthAppointmentDisplayMode.appointment),
                       ),
                       Align(
                         alignment: Alignment.bottomRight,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SpeedDial(
-                              direction: SpeedDialDirection.right,
-                              overlayColor: Colors.black,
-                              overlayOpacity: 0.4,
-                              children: [
-                                SpeedDialChild(
-                                    label: 'Day View',
-                                    onTap: changeCalendarView(
-                                        calendarView: CalendarView.day)),
-                                SpeedDialChild(
-                                    label: 'Month View',
-                                    onTap: changeCalendarView(
-                                        calendarView: CalendarView.month)),
-                              ],
+                        child: FloatingActionButton(
+                            child: const Icon(
+                              Icons.add,
+                              color: kPrimaryColor,
                             ),
-                            FloatingActionButton(
-                                child: const Icon(
-                                  Icons.add,
-                                  color: kPrimaryColor,
-                                ),
-                                onPressed: () {}),
-                          ],
-                        ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const EventScreen()));
+                            }),
                       ),
                     ],
                   ),
@@ -105,15 +88,55 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  changeCalendarView({CalendarView? calendarView}) {
-    setState(() {
-      _calendarView = calendarView!;
-    });
+  List<Meeting> _getDataSource() {
+    final List<Meeting> meetings = <Meeting>[];
+    final DateTime today = DateTime.now();
+    final DateTime startTime =
+        DateTime(today.year, today.month, today.day, 9, 0, 0);
+    final DateTime endTime = startTime.add(const Duration(hours: 2));
+    meetings
+        .add(Meeting('Conference', startTime, endTime, kPrimaryColor, false));
+    return meetings;
   }
 }
 
-class EventDataSource extends CalendarDataSource {
-  EventDataSource(List<Appointment> source) {
+class MeetingDataSource extends CalendarDataSource {
+  MeetingDataSource(List<Meeting> source) {
     appointments = source;
   }
+
+  @override
+  DateTime getStartTime(int index) {
+    return appointments![index].from;
+  }
+
+  @override
+  DateTime getEndTime(int index) {
+    return appointments![index].to;
+  }
+
+  @override
+  String getSubject(int index) {
+    return appointments![index].eventName;
+  }
+
+  @override
+  Color getColor(int index) {
+    return appointments![index].background;
+  }
+
+  @override
+  bool isAllDay(int index) {
+    return appointments![index].isAllDay;
+  }
+}
+
+class Meeting {
+  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+
+  String eventName;
+  DateTime from;
+  DateTime to;
+  Color background;
+  bool isAllDay;
 }

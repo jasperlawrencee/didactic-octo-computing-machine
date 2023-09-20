@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/event_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -12,7 +12,9 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  bool? allDay = false;
+  TextEditingController eventTitle = TextEditingController();
+  TimeOfDay timeFrom = TimeOfDay.now();
+  TimeOfDay timeTo = TimeOfDay.now();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +53,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       SfCalendar(
                         view: CalendarView.day,
                         allowViewNavigation: true,
+                        onTap: calendarTapped,
                         allowedViews: const [
                           CalendarView.day,
                           CalendarView.week,
@@ -61,21 +64,21 @@ class _CalendarPageState extends State<CalendarPage> {
                             appointmentDisplayMode:
                                 MonthAppointmentDisplayMode.appointment),
                       ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: FloatingActionButton(
-                            child: const Icon(
-                              Icons.add,
-                              color: kPrimaryColor,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const EventScreen()));
-                            }),
-                      ),
+                      // Align(
+                      //   alignment: Alignment.bottomRight,
+                      //   child: FloatingActionButton(
+                      //       child: const Icon(
+                      //         Icons.add,
+                      //         color: kPrimaryColor,
+                      //       ),
+                      //       onPressed: () {
+                      //         Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(
+                      //                 builder: (context) =>
+                      //                     const EventScreen()));
+                      //       }),
+                      // ),
                     ],
                   ),
                 ),
@@ -86,6 +89,71 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       ),
     );
+  }
+
+  //shows event details when tapped
+  void calendarTapped(CalendarTapDetails details) {
+    if (details.targetElement == CalendarElement.appointment ||
+        details.targetElement == CalendarElement.agenda) {
+      final Appointment appointmentDetails = details.appointments![0];
+      _subjectText = appointmentDetails.subject;
+      _dateText = DateFormat('MMMM dd, yyyy')
+          .format(appointmentDetails.startTime)
+          .toString();
+      _startTimeText =
+          DateFormat('hh:mm a').format(appointmentDetails.startTime).toString();
+      _endTimeText =
+          DateFormat('hh:mm a').format(appointmentDetails.endTime).toString();
+      if (appointmentDetails.isAllDay) {
+        _timeDetails = 'All day';
+      } else {
+        _timeDetails = '$timeFrom - $timeTo';
+      }
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Container(child: const Text('$_subjectText')),
+              content: Container(
+                height: 80,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          '$_dateText',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(''),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(_timeDetails!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w400, fontSize: 15)),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('close'))
+              ],
+            );
+          });
+    }
   }
 
   List<Meeting> _getDataSource() {

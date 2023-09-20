@@ -12,6 +12,9 @@ class EventScreen extends StatefulWidget {
 
 class _EventScreenState extends State<EventScreen> {
   TextEditingController eventTitle = TextEditingController();
+  TimeOfDay timeFrom = TimeOfDay.now();
+  TimeOfDay timeTo = TimeOfDay.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,17 +47,16 @@ class _EventScreenState extends State<EventScreen> {
               flatTextField('Event Title', eventTitle),
               const SizedBox(height: defaultPadding),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  InkWell(
-                    onTap: () {},
-                    child: Container(
-                        decoration:
-                            const BoxDecoration(color: kPrimaryLightColor),
-                        child: const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Text('data'),
-                        )),
-                  )
+                  ElevatedButton(
+                      onPressed: () async {
+                        final TimeOfDay? timeOfDay = await showTimePicker(
+                            context: context,
+                            initialTime: timeFrom,
+                            initialEntryMode: TimePickerEntryMode.inputOnly);
+                      },
+                      child: Text('${timeFrom.hour}:${timeFrom.minute}'))
                 ],
               ),
               const SizedBox(height: defaultPadding),

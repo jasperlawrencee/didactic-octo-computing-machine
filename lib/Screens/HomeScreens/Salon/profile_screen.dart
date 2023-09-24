@@ -1,3 +1,7 @@
+// ignore_for_file: unnecessary_null_comparison
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -10,6 +14,35 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  final _firestore = FirebaseFirestore.instance;
+  String barangay = '', city = '', streetAddress = '', salonName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getSalonAddress();
+  }
+
+  void getSalonAddress() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step1')
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot != null) {
+        setState(() {
+          salonName = documentSnapshot.get('salonName');
+          barangay = documentSnapshot.get('barangay');
+          city = documentSnapshot.get('city');
+          streetAddress = documentSnapshot.get('streetRoad');
+        });
+      }
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -40,17 +73,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Image.asset('assets/avatars/5.jpg')),
                       ),
                       const Spacer(),
-                      const Text(
-                        'Jollibee Beauty Salon',
+                      Text(
+                        salonName,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: kPrimaryColor),
+                        style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],
                   )),
                   //salon address
-                  salonCard(const Column(
+                  salonCard(Column(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 75,
                         child: Icon(
                           Icons.location_on,
@@ -58,11 +91,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           size: 50,
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Text(
-                        'Salon Address, Barangay, Building Number',
+                        '$barangay, $streetAddress, $city',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: kPrimaryColor),
+                        style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],
                   )),

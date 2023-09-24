@@ -107,8 +107,8 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm?'),
-          content: const Text('Pwede paka mag review sa imo deets'),
+          title: const Text('Confirm'),
+          content: const Text('Finalize and complete registration?'),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(

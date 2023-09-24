@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,6 +25,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<String> imageUrl = [];
   String name = '';
+  String about = '';
+  String barangay = '', city = '', streetAddress = '';
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +127,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 // padding: const EdgeInsets.only(right: defaultPadding),
                 child: Row(
                   children: [
+                    profileStats('Address', body: '$streetAddress, $barangay'),
+                    const SizedBox(width: defaultPadding),
                     profileStats('Transactions\nDone', body: '123'),
                     const SizedBox(width: defaultPadding),
                     profileStats('Last\nTransaction', body: 'Jasper'),
@@ -148,8 +154,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: defaultPadding),
               //custom about user
-              const Text(
-                  'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh viverra non semper suscipit posuere a pede.'),
+              //Maximum of 400 characters lang dapat kay mag overflow ang widgets T_T
+              //check firestore para sa sulod sa about
+              Text(
+                about,
+                textAlign: TextAlign.left,
+              ),
               const SizedBox(height: defaultPadding),
             ],
           ),
@@ -182,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: body != null
                   ? Text(
                       body,
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         decoration: underline ? TextDecoration.underline : null,
                         color: underline ? kPrimaryColor : null,
@@ -197,6 +208,12 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     //grab name function
     super.initState;
+    getWorkerUsername();
+    getAboutUser();
+    getAddress();
+  }
+
+  void getWorkerUsername() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
@@ -206,5 +223,41 @@ class _ProfilePageState extends State<ProfilePage> {
         name = documentSnapshot.get('username');
       });
     }));
+  }
+
+  void getAboutUser() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('userAbout')
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot != null) {
+        setState(() {
+          about = documentSnapshot.get('about');
+        });
+      } else {
+        log('getting about error');
+      }
+    }));
+  }
+
+  void getAddress() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step1')
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot != null) {
+        setState(() {
+          barangay = documentSnapshot.get('barangay');
+          city = documentSnapshot.get('city');
+          streetAddress = documentSnapshot.get('streetAddress');
+        });
+      }
+    });
   }
 }

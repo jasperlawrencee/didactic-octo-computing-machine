@@ -16,13 +16,13 @@ class ServicesPage extends StatefulWidget {
 class _ServicesPageState extends State<ServicesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
-  List<String> service = [];
-  List<String> serviceType = [];
+  List<Map<String, dynamic>> arrayData = [];
+  List<List<Map<String, dynamic>>> arrayOfArrays = [];
+
   @override
   void initState() {
     super.initState();
-    getServiceType();
-    getService();
+    getAllInDocument();
   }
 
   @override
@@ -57,11 +57,12 @@ class _ServicesPageState extends State<ServicesPage> {
               ),
               const SizedBox(height: defaultPadding),
               Expanded(
-                child: ListView(
-                  children: serviceType.map((wiwi) {
-                    return serviceCard('Hair', wiwi.toString());
-                  }).toList(),
-                ),
+                child: ListView(children: [
+                  for (var arrayData in arrayOfArrays)
+                    for (var item in arrayData)
+                      serviceCard('${item['name']}'.toUpperCase(),
+                          '${item['value']}', 'priceRange')
+                ]),
               ),
             ],
           ),
@@ -70,30 +71,7 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-// gets the specific service of the worker
-// in this example we only grabbed the services under the hair category
-// wala pani nahuman pls intawon
-  void getService() async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('uesrs')
-          .doc(currentUser!.uid)
-          .collection('step2')
-          .get();
-      if (querySnapshot.docs.isNotEmpty) {
-        Map<String, dynamic> getDocName =
-            querySnapshot.docs.first.data() as Map<String, dynamic>;
-        setState(() {
-          service = getDocName.keys.toList();
-        });
-      }
-    } catch (e) {
-      log('error: $e');
-    }
-  }
-
-// gets the service type of the worker ie(hair, nails, wax, etc)
-  void getServiceType() async {
+  getAllInDocument() async {
     try {
       DocumentSnapshot documentSnapshot = await _firestore
           .collection('users')
@@ -102,17 +80,29 @@ class _ServicesPageState extends State<ServicesPage> {
           .doc('step2')
           .get();
       if (documentSnapshot.exists) {
-        List<dynamic> hairField = documentSnapshot['hair'];
-        setState(() {
-          serviceType = hairField.map((item) => item as String).toList();
+        Map<String, dynamic> documentData =
+            documentSnapshot.data() as Map<String, dynamic>;
+        documentData.forEach((fieldName, fieldValue) {
+          if (fieldValue is List) {
+            //convert array to a list of maps with label
+            setState(() {
+              arrayData = fieldValue.map((item) {
+                return {'name': fieldName, 'value': item};
+              }).toList();
+              arrayOfArrays.add(arrayData);
+            });
+          }
         });
+      } else {
+        return [];
       }
     } catch (e) {
       log('error: $e');
     }
   }
 
-  Widget serviceCard(String service, String serviceType) {
+  Widget serviceCard(
+      String serviceName, String serviceType, String priceRange) {
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: defaultPadding),
@@ -127,18 +117,19 @@ class _ServicesPageState extends State<ServicesPage> {
           Align(
             alignment: Alignment.topLeft,
             child: Text(
-              service,
+              serviceName,
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
+          const SizedBox(height: 4),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(serviceType),
           ),
           const Spacer(),
-          const Align(
+          Align(
             alignment: Alignment.bottomRight,
-            child: Text('price-range'),
+            child: Text(priceRange),
           ),
         ],
       ),

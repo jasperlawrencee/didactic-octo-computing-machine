@@ -1,5 +1,7 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, unnecessary_null_comparison
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/profile_screen.dart';
@@ -83,6 +85,32 @@ class home extends StatefulWidget {
 }
 
 class _homeState extends State<home> {
+  String salonName = '';
+  final _firestore = FirebaseFirestore.instance;
+  User? currentUser = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    getSalonName();
+  }
+
+  void getSalonName() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step1')
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot != null) {
+        setState(() {
+          salonName = documentSnapshot.get('salonName');
+        });
+      }
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -117,11 +145,11 @@ class _homeState extends State<home> {
               const SizedBox(
                 height: defaultPadding,
               ),
-              const Row(
+              Row(
                 children: [
                   Text(
-                    "Good Day, {salon}!",
-                    style: TextStyle(
+                    "Good Day, $salonName!",
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),

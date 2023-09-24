@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, non_constant_identifier_names
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, non_constant_identifier_names, unrelated_type_equality_checks
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -59,7 +59,12 @@ class _fourthStepState extends State<fourthStep> {
           TextButton(
             onPressed: () {
               setState(() {
-                widgets.removeLast();
+                try {
+                  widgets != 0 ? widgets.removeLast() : null;
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Cannot delete fields')));
+                }
               });
             },
             child: const Text("Delete Section"),

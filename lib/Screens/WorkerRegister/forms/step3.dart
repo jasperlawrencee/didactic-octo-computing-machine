@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:intl/intl.dart';
 
 class thirdStep extends StatefulWidget {
   const thirdStep({Key? key}) : super(key: key);
@@ -84,13 +85,15 @@ class _SectionState extends State<Section> {
         flatTextField("Salon Address*", salonAddress),
         flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
-        Text('${selectedDays.start.year} to ${selectedDays.end.year}'),
+        Text(
+            '${DateFormat.yMMMd().format(selectedDays.start)} to ${DateFormat.yMMMd().format(selectedDays.end)}'),
         ElevatedButton(
           onPressed: () async {
             final DateTimeRange? dateTimeRange = await showDateRangePicker(
               context: context,
               firstDate: DateTime(2000),
               lastDate: DateTime(2500),
+              initialEntryMode: DatePickerEntryMode.inputOnly,
             );
             if (dateTimeRange != null) {
               setState(() {
@@ -100,6 +103,7 @@ class _SectionState extends State<Section> {
           },
           child: const Text('Duration of Experience'),
         ),
+        const Text('Example: Date From - Date To')
       ],
     );
   }

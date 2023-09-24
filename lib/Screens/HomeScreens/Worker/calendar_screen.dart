@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -64,21 +66,6 @@ class _CalendarPageState extends State<CalendarPage> {
                             appointmentDisplayMode:
                                 MonthAppointmentDisplayMode.appointment),
                       ),
-                      // Align(
-                      //   alignment: Alignment.bottomRight,
-                      //   child: FloatingActionButton(
-                      //       child: const Icon(
-                      //         Icons.add,
-                      //         color: kPrimaryColor,
-                      //       ),
-                      //       onPressed: () {
-                      //         Navigator.push(
-                      //             context,
-                      //             MaterialPageRoute(
-                      //                 builder: (context) =>
-                      //                     const EventScreen()));
-                      //       }),
-                      // ),
                     ],
                   ),
                 ),
@@ -90,6 +77,12 @@ class _CalendarPageState extends State<CalendarPage> {
       ),
     );
   }
+
+  String? _subjectText = '',
+      _startTimeText = '',
+      _endTimeText = '',
+      _dateText = '',
+      _timeDetails = '';
 
   //shows event details when tapped
   void calendarTapped(CalendarTapDetails details) {
@@ -107,69 +100,94 @@ class _CalendarPageState extends State<CalendarPage> {
       if (appointmentDetails.isAllDay) {
         _timeDetails = 'All day';
       } else {
-        _timeDetails = '$timeFrom - $timeTo';
+        _timeDetails = '$_startTimeText - $_endTimeText';
       }
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Container(child: const Text('$_subjectText')),
-              content: Container(
-                height: 80,
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          '$_dateText',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text(''),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text(_timeDetails!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 15)),
-                      ],
-                    )
-                  ],
+            return Theme(
+              data: ThemeData(
+                  canvasColor: Colors.transparent,
+                  colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: kPrimaryColor,
+                        background: Colors.white70,
+                        secondary: kPrimaryLightColor,
+                      )),
+              child: AlertDialog(
+                title: Text('$_subjectText'),
+                content: SizedBox(
+                  height: 80,
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text('$_dateText',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 20))
+                        ],
+                      ),
+                      const Row(
+                        children: <Widget>[
+                          Text(''),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(_timeDetails!,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 15)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
+                actions: <Widget>[
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Close')),
+                  TextButton(
+                      onPressed: () {},
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll(kPrimaryColor),
+                        foregroundColor: MaterialStatePropertyAll(Colors.white),
+                      ),
+                      child: const Text('Approve')),
+                ],
               ),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('close'))
-              ],
             );
           });
     }
   }
 
-  List<Meeting> _getDataSource() {
-    final List<Meeting> meetings = <Meeting>[];
+  List<Appointment> _getDataSource() {
+    final List<Appointment> meetings = <Appointment>[];
     final DateTime today = DateTime.now();
     final DateTime startTime =
         DateTime(today.year, today.month, today.day, 9, 0, 0);
     final DateTime endTime = startTime.add(const Duration(hours: 2));
-    meetings
-        .add(Meeting('Conference', startTime, endTime, kPrimaryColor, false));
+    meetings.add(
+      Appointment(
+          subject: 'Haircut',
+          startTime: startTime,
+          endTime: endTime,
+          color: kPrimaryColor),
+    );
+    meetings.add(
+      Appointment(
+          subject: 'Hair Color',
+          startTime: DateTime(today.year, today.month, today.day, 13, 0, 0),
+          endTime: DateTime(today.year, today.month, today.day, 15, 0, 0),
+          color: kPrimaryColor),
+    );
     return meetings;
   }
 }
 
 class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Meeting> source) {
+  MeetingDataSource(List<Appointment> source) {
     appointments = source;
   }
 
@@ -197,14 +215,4 @@ class MeetingDataSource extends CalendarDataSource {
   bool isAllDay(int index) {
     return appointments![index].isAllDay;
   }
-}
-
-class Meeting {
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
-
-  String eventName;
-  DateTime from;
-  DateTime to;
-  Color background;
-  bool isAllDay;
 }

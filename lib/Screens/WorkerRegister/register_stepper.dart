@@ -13,6 +13,7 @@ import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/models/forms.dart';
 
 class WorkerRegisterScreen extends StatefulWidget {
   const WorkerRegisterScreen({Key? key}) : super(key: key);
@@ -24,10 +25,56 @@ class WorkerRegisterScreen extends StatefulWidget {
 
 class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   // final addUser = const fifthStep();
-  late String fName;
   int currentStep = 0;
   @override
   Widget build(BuildContext context) {
+    final WorkerForm workerForm = WorkerForm(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+
+    List<Step> getSteps() => [
+          Step(
+            isActive: currentStep >= 0,
+            title: const Text(''),
+            content: firstStep(forms: workerForm),
+          ),
+          Step(
+            isActive: currentStep >= 1,
+            title: const Text(''),
+            content: const secondStep(),
+          ),
+          Step(
+            isActive: currentStep >= 2,
+            title: const Text(''),
+            content: const thirdStep(),
+          ),
+          Step(
+            isActive: currentStep >= 3,
+            title: const Text(''),
+            content: const fourthStep(),
+          ),
+        ];
+
     return Background(
       child: Theme(
         data: ThemeData(
@@ -93,29 +140,6 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   cancel() {
     currentStep > 0 ? setState(() => currentStep -= 1) : null;
   }
-
-  List<Step> getSteps() => [
-        Step(
-          isActive: currentStep >= 0,
-          title: const Text(''),
-          content: const firstStep(),
-        ),
-        Step(
-          isActive: currentStep >= 1,
-          title: const Text(''),
-          content: const secondStep(),
-        ),
-        Step(
-          isActive: currentStep >= 2,
-          title: const Text(''),
-          content: const thirdStep(),
-        ),
-        Step(
-          isActive: currentStep >= 3,
-          title: const Text(''),
-          content: const fourthStep(),
-        ),
-      ];
 
   Future<void> _dialogBuilder(BuildContext context) {
     return showDialog<void>(

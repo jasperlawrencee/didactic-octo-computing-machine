@@ -1,19 +1,20 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Worker/payment_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
+class WorkerCalendarPage extends StatefulWidget {
+  const WorkerCalendarPage({Key? key}) : super(key: key);
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  State<WorkerCalendarPage> createState() => _WorkerCalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _WorkerCalendarPageState extends State<WorkerCalendarPage> {
   TextEditingController eventTitle = TextEditingController();
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
@@ -148,7 +149,12 @@ class _CalendarPageState extends State<CalendarPage> {
                       },
                       child: const Text('Close')),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PaymentScreen()));
+                      },
                       style: ButtonStyle(
                         backgroundColor:
                             MaterialStatePropertyAll(kPrimaryColor),

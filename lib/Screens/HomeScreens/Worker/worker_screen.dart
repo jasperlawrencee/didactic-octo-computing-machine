@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/calendar_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/notification_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Worker/message_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/profile_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/services_screen.dart';
 import 'package:flutter_auth/components/background.dart';
@@ -52,9 +52,9 @@ class _WorkerScreenState extends State<WorkerScreen> {
   List<Widget> screens() {
     return [
       const home(),
-      const CalendarPage(),
+      const WorkerCalendarPage(),
       const ServicesPage(),
-      const NotificationPage(),
+      const MessagePage(),
       const ProfilePage(
         parentDocumentId: 'users',
       ),
@@ -83,8 +83,8 @@ List<PersistentBottomNavBarItem> navbarItems() {
       inactiveColorPrimary: kPrimaryLightColor,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.notifications),
-      title: 'Notifications',
+      icon: const Icon(Icons.message),
+      title: 'Messages',
       activeColorPrimary: kPrimaryColor,
       inactiveColorPrimary: kPrimaryLightColor,
     ),

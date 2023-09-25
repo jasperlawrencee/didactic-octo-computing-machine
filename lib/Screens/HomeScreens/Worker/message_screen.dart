@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
-class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+class MessagePage extends StatefulWidget {
+  const MessagePage({Key? key}) : super(key: key);
 
   @override
-  State<NotificationPage> createState() => _NotificationPageState();
+  State<MessagePage> createState() => _MessagePageState();
 }
 
-class _NotificationPageState extends State<NotificationPage> {
+class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -20,7 +20,7 @@ class _NotificationPageState extends State<NotificationPage> {
           child: Column(
             children: [
               Text(
-                "Notifications".toUpperCase(),
+                "Messages".toUpperCase(),
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.bold,

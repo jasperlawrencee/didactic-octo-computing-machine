@@ -9,6 +9,7 @@ import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Signup/components/sign_up_top_image.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
 import 'package:flutter_auth/Screens/Signup/signup_logout.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/firebase/firebase_services.dart';
@@ -46,6 +47,22 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Row(
+              children: [
+                const SizedBox(width: defaultPadding),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomeScreen(),
+                        ));
+                  },
+                  icon: const Icon(Icons.arrow_back),
+                  color: kPrimaryColor,
+                ),
+              ],
+            ),
             const SignUpScreenTopImage(),
             Row(
               children: [
@@ -133,6 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               );
                             },
                           ),
+                          const SizedBox(height: defaultPadding),
                         ],
                       ),
                     )),

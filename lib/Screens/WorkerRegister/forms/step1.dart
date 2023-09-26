@@ -1,33 +1,64 @@
 // ignore_for_file: camel_case_types, library_private_types_in_public_api
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/models/forms.dart';
 
 import '../../../components/widgets.dart';
 import '../../../constants.dart';
 
 class firstStep extends StatefulWidget {
-  const firstStep({Key? key}) : super(key: key);
+  final WorkerForm wForm;
+  const firstStep({Key? key, required this.wForm}) : super(key: key);
 
   @override
   _firstStepState createState() => _firstStepState();
 }
 
+String? genderValue;
+
 class _firstStepState extends State<firstStep> {
-  TextEditingController firstName = TextEditingController();
-  TextEditingController middleName = TextEditingController();
-  TextEditingController lastName = TextEditingController();
-  TextEditingController phoneNum1 = TextEditingController();
-  TextEditingController phoneNum2 = TextEditingController();
-  TextEditingController city = TextEditingController();
-  TextEditingController barangay = TextEditingController();
-  TextEditingController stAddress = TextEditingController();
-  TextEditingController extAddress = TextEditingController();
-
-  final gender = ["Male", "Female", "Non-binary"];
-  String? genderValue;
-
   @override
   Widget build(BuildContext context) {
+    final gender = ["Male", "Female", "Non-binary"];
+    TextEditingController firstName = TextEditingController();
+    TextEditingController middleName = TextEditingController();
+    TextEditingController lastName = TextEditingController();
+    TextEditingController phoneNum1 = TextEditingController();
+    TextEditingController phoneNum2 = TextEditingController();
+    TextEditingController city = TextEditingController();
+    TextEditingController barangay = TextEditingController();
+    TextEditingController stAddress = TextEditingController();
+    TextEditingController extAddress = TextEditingController();
+    firstName.addListener(() {
+      widget.wForm.firstName = firstName.text;
+    });
+    middleName.addListener(() {
+      widget.wForm.middleName = middleName.text;
+    });
+    lastName.addListener(() {
+      widget.wForm.lastName = lastName.text;
+    });
+    phoneNum1.addListener(() {
+      widget.wForm.phoneNum1 = phoneNum1.text;
+    });
+    phoneNum2.addListener(() {
+      widget.wForm.phoneNum2 = phoneNum2.text;
+    });
+    city.addListener(() {
+      widget.wForm.city = city.text;
+    });
+    barangay.addListener(() {
+      widget.wForm.barangay = barangay.text;
+    });
+    stAddress.addListener(() {
+      widget.wForm.stAddress = stAddress.text;
+    });
+    extAddress.addListener(() {
+      widget.wForm.extAddress = extAddress.text;
+    });
+
     return Column(
       children: [
         const Align(
@@ -51,18 +82,24 @@ class _firstStepState extends State<firstStep> {
         flatTextField("Last Name*", lastName),
         Align(
           alignment: Alignment.topLeft,
-          child: DropdownButton<String>(
-            hint: const Text("Gender"),
-            value: genderValue,
-            icon: const Icon(Icons.arrow_drop_down),
-            // elevation: 16,
-            style: const TextStyle(fontSize: 13, color: Colors.black),
-            underline: Container(
-              color: kPrimaryColor,
-              height: 2,
+          child: Theme(
+            data: ThemeData(canvasColor: Colors.white),
+            child: DropdownButton<String>(
+              hint: const Text("Gender"),
+              value: genderValue,
+              icon: const Icon(Icons.arrow_drop_down),
+              // elevation: 16,
+              style: const TextStyle(fontSize: 13, color: Colors.black),
+              underline: Container(
+                color: kPrimaryColor,
+                height: 2,
+              ),
+              onChanged: (value) => setState(() => {
+                    genderValue = value,
+                    widget.wForm.gender = genderValue,
+                  }),
+              items: gender.map(buildMenuItem).toList(),
             ),
-            onChanged: (value) => setState(() => genderValue = value),
-            items: gender.map(buildMenuItem).toList(),
           ),
         ),
         const SizedBox(height: defaultPadding),

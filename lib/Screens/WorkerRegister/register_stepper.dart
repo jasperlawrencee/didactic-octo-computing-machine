@@ -24,44 +24,21 @@ class WorkerRegisterScreen extends StatefulWidget {
 }
 
 class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
-  // final addUser = const fifthStep();
   int currentStep = 0;
   @override
   Widget build(BuildContext context) {
-    final WorkerForm workerForm = WorkerForm(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null);
+    final WorkerForm workerForm = WorkerForm();
 
     List<Step> getSteps() => [
           Step(
             isActive: currentStep >= 0,
             title: const Text(''),
-            content: firstStep(forms: workerForm),
+            content: firstStep(wForm: workerForm),
           ),
           Step(
             isActive: currentStep >= 1,
             title: const Text(''),
-            content: const secondStep(),
+            content: secondStep(wForm: workerForm),
           ),
           Step(
             isActive: currentStep >= 2,

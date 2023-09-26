@@ -1,7 +1,6 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';

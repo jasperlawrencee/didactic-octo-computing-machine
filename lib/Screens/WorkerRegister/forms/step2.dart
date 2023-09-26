@@ -1,89 +1,16 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore, must_be_immutable
+
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/models/forms.dart';
 
 import '../../../constants.dart';
 
-class ServiceItems extends StatefulWidget {
-  const ServiceItems({Key? key}) : super(key: key);
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _ServiceItemsState createState() => _ServiceItemsState();
-}
-
-class _ServiceItemsState extends State<ServiceItems> {
-  String? value;
-  final List<String> _items = [];
-  final TextEditingController _textController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        DropdownButton<String>(
-          hint: const Text("Service Type"),
-          value: value,
-          isExpanded: true,
-          items: _items.map(buildMenuItem).toList(),
-          onChanged: (value) => setState(() => this.value = value),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
-                ),
-                decoration:
-                    const InputDecoration(hintText: "Enter Service Type"),
-                controller: _textController,
-              ),
-            ),
-            //Add Button
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  _items.add(_textController.text);
-                  _textController.clear();
-                });
-              }),
-              child: const Text("Add"),
-            ),
-            //Delete Button
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  if (value != null) {
-                    _items.remove(value);
-                    value = null;
-                  }
-                });
-              }),
-              child: const Text("Delete"),
-            )
-          ],
-        )
-      ],
-    );
-  }
-
-  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-      );
-}
-
+//parent widget
 class secondStep extends StatefulWidget {
-  const secondStep({Key? key}) : super(key: key);
+  final WorkerForm wForm;
+  const secondStep({Key? key, required this.wForm}) : super(key: key);
 
   @override
   _secondStepState createState() => _secondStepState();
@@ -96,6 +23,25 @@ class _secondStepState extends State<secondStep> {
   bool nails = false;
   bool lashes = false;
   bool wax = false;
+  final TextEditingController _hairController = TextEditingController();
+  final TextEditingController _makeupController = TextEditingController();
+  final TextEditingController _spaController = TextEditingController();
+  final TextEditingController _nailsController = TextEditingController();
+  final TextEditingController _lashesController = TextEditingController();
+  final TextEditingController _waxController = TextEditingController();
+  String selectedHairValue = '';
+  String selectedMakeupValue = '';
+  String selectedSpaValue = '';
+  String selectedNailsValue = '';
+  String selectedLashesValue = '';
+  String selectedWaxValue = '';
+  List<String> hairValues = [];
+  List<String> makeupValues = [];
+  List<String> spaValues = [];
+  List<String> nailsValues = [];
+  List<String> lashesValues = [];
+  List<String> waxValues = [];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -117,7 +63,11 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Hair"),
         ),
-        if (hair) const ServiceItems(),
+        if (hair)
+          ServiceItems(
+              items: hairValues,
+              selectedValue: selectedHairValue,
+              serviceTextEditingController: _hairController),
         CheckboxListTile(
           value: makeup,
           onChanged: (value) {
@@ -127,7 +77,11 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Makeup"),
         ),
-        if (makeup) const ServiceItems(),
+        if (makeup)
+          ServiceItems(
+              items: makeupValues,
+              selectedValue: selectedMakeupValue,
+              serviceTextEditingController: _makeupController),
         CheckboxListTile(
           value: spa,
           onChanged: (value) {
@@ -137,7 +91,11 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Spa"),
         ),
-        if (spa) const ServiceItems(),
+        if (spa)
+          ServiceItems(
+              items: spaValues,
+              selectedValue: selectedSpaValue,
+              serviceTextEditingController: _spaController),
         CheckboxListTile(
           value: nails,
           onChanged: (value) {
@@ -147,7 +105,11 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Nails"),
         ),
-        if (nails) const ServiceItems(),
+        if (nails)
+          ServiceItems(
+              items: nailsValues,
+              selectedValue: selectedNailsValue,
+              serviceTextEditingController: _nailsController),
         CheckboxListTile(
           value: lashes,
           onChanged: (value) {
@@ -157,7 +119,11 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Lashes"),
         ),
-        if (lashes) const ServiceItems(),
+        if (lashes)
+          ServiceItems(
+              items: lashesValues,
+              selectedValue: selectedLashesValue,
+              serviceTextEditingController: _lashesController),
         CheckboxListTile(
           value: wax,
           onChanged: (value) {
@@ -167,8 +133,105 @@ class _secondStepState extends State<secondStep> {
           },
           title: const Text("Wax"),
         ),
-        if (wax) const ServiceItems(),
+        if (wax)
+          ServiceItems(
+              items: waxValues,
+              selectedValue: selectedWaxValue,
+              serviceTextEditingController: _waxController)
       ],
     );
   }
+}
+
+//child widget
+class ServiceItems extends StatefulWidget {
+  List<String> items;
+  String selectedValue;
+  TextEditingController serviceTextEditingController = TextEditingController();
+  ServiceItems(
+      {Key? key,
+      required this.items,
+      required this.selectedValue,
+      required this.serviceTextEditingController})
+      : super(key: key);
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _ServiceItemsState createState() => _ServiceItemsState();
+}
+
+class _ServiceItemsState extends State<ServiceItems> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Theme(
+          data: ThemeData(canvasColor: Colors.white),
+          child: DropdownButton<String>(
+            hint: const Text("Service Type"),
+            value: widget.selectedValue,
+            isExpanded: true,
+            items: widget.items.map(buildMenuItem).toList(),
+            onChanged: (value) => setState(() => widget.selectedValue = value!),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
+                decoration:
+                    const InputDecoration(hintText: "Enter Service Type"),
+                controller: widget.serviceTextEditingController,
+              ),
+            ),
+            //Add Button
+            TextButton(
+              onPressed: (() {
+                setState(() {
+                  String newValue = widget.serviceTextEditingController.text;
+                  if (newValue.isNotEmpty && widget.items.contains(newValue)) {
+                    widget.items.add(newValue);
+                    widget.serviceTextEditingController.clear();
+                    widget.selectedValue = newValue;
+                  }
+                });
+                log('on add list ${widget.items}');
+              }),
+              child: const Text("Add"),
+            ),
+            //Delete Button
+            TextButton(
+              onPressed: (() {
+                setState(() {
+                  if (widget.items.contains(widget.selectedValue)) {
+                    widget.items.remove(widget.selectedValue);
+                    widget.selectedValue = '';
+                  }
+                  log('deleted list ${widget.items}');
+                });
+              }),
+              child: const Text("Delete"),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+        value: item,
+        child: Text(
+          item,
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w500,
+            fontSize: 13,
+          ),
+        ),
+      );
 }

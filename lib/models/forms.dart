@@ -24,7 +24,7 @@ class WorkerForm {
   String? tinID;
   List? certificates = <XFile>[];
 
-  WorkerForm(
+  WorkerForm({
     this.firstName,
     this.middleName,
     this.lastName,
@@ -47,7 +47,7 @@ class WorkerForm {
     this.nbiClearance,
     this.tinID,
     this.certificates,
-  );
+  });
 }
 
 class SalonForm {

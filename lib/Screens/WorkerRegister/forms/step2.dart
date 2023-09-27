@@ -16,19 +16,6 @@ class secondStep extends StatefulWidget {
   _secondStepState createState() => _secondStepState();
 }
 
-String selectedHairValue = '';
-String selectedMakeupValue = '';
-String selectedSpaValue = '';
-String selectedNailsValue = '';
-String selectedLashesValue = '';
-String selectedWaxValue = '';
-List<String> hairValues = [];
-List<String> makeupValues = [];
-List<String> spaValues = [];
-List<String> nailsValues = [];
-List<String> lashesValues = [];
-List<String> waxValues = [];
-
 class _secondStepState extends State<secondStep> {
   bool hair = false;
   bool makeup = false;
@@ -45,6 +32,18 @@ class _secondStepState extends State<secondStep> {
     TextEditingController _nailsController = TextEditingController();
     TextEditingController _lashesController = TextEditingController();
     TextEditingController _waxController = TextEditingController();
+    String selectedHairValue = '';
+    String selectedMakeupValue = '';
+    String selectedSpaValue = '';
+    String selectedNailsValue = '';
+    String selectedLashesValue = '';
+    String selectedWaxValue = '';
+    List<String> hairValues = [];
+    List<String> makeupValues = [];
+    List<String> spaValues = [];
+    List<String> nailsValues = [];
+    List<String> lashesValues = [];
+    List<String> waxValues = [];
 
     return Column(
       children: <Widget>[
@@ -67,9 +66,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (hair)
           ServiceItems(
-              items: hairValues,
-              selectedValue: selectedHairValue,
-              serviceTextEditingController: _hairController),
+            items: hairValues,
+            selectedValue: selectedHairValue,
+            serviceTextEditingController: _hairController,
+            wForm: widget.wForm,
+            type: ServiceType.hair,
+          ),
         CheckboxListTile(
           value: makeup,
           onChanged: (value) {
@@ -81,9 +83,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (makeup)
           ServiceItems(
-              items: makeupValues,
-              selectedValue: selectedMakeupValue,
-              serviceTextEditingController: _makeupController),
+            items: makeupValues,
+            selectedValue: selectedMakeupValue,
+            serviceTextEditingController: _makeupController,
+            wForm: widget.wForm,
+            type: ServiceType.makeup,
+          ),
         CheckboxListTile(
           value: spa,
           onChanged: (value) {
@@ -95,9 +100,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (spa)
           ServiceItems(
-              items: spaValues,
-              selectedValue: selectedSpaValue,
-              serviceTextEditingController: _spaController),
+            items: spaValues,
+            selectedValue: selectedSpaValue,
+            serviceTextEditingController: _spaController,
+            wForm: widget.wForm,
+            type: ServiceType.spa,
+          ),
         CheckboxListTile(
           value: nails,
           onChanged: (value) {
@@ -109,9 +117,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (nails)
           ServiceItems(
-              items: nailsValues,
-              selectedValue: selectedNailsValue,
-              serviceTextEditingController: _nailsController),
+            items: nailsValues,
+            selectedValue: selectedNailsValue,
+            serviceTextEditingController: _nailsController,
+            wForm: widget.wForm,
+            type: ServiceType.nails,
+          ),
         CheckboxListTile(
           value: lashes,
           onChanged: (value) {
@@ -123,9 +134,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (lashes)
           ServiceItems(
-              items: lashesValues,
-              selectedValue: selectedLashesValue,
-              serviceTextEditingController: _lashesController),
+            items: lashesValues,
+            selectedValue: selectedLashesValue,
+            serviceTextEditingController: _lashesController,
+            wForm: widget.wForm,
+            type: ServiceType.lashes,
+          ),
         CheckboxListTile(
           value: wax,
           onChanged: (value) {
@@ -137,9 +151,12 @@ class _secondStepState extends State<secondStep> {
         ),
         if (wax)
           ServiceItems(
-              items: waxValues,
-              selectedValue: selectedWaxValue,
-              serviceTextEditingController: _waxController)
+            items: waxValues,
+            selectedValue: selectedWaxValue,
+            serviceTextEditingController: _waxController,
+            wForm: widget.wForm,
+            type: ServiceType.wax,
+          ),
       ],
     );
   }
@@ -150,11 +167,15 @@ class ServiceItems extends StatefulWidget {
   List<String> items;
   String selectedValue;
   TextEditingController serviceTextEditingController = TextEditingController();
+  final WorkerForm wForm;
+  final ServiceType type;
   ServiceItems(
       {Key? key,
       required this.items,
       required this.selectedValue,
-      required this.serviceTextEditingController})
+      required this.serviceTextEditingController,
+      required this.type,
+      required this.wForm})
       : super(key: key);
 
   @override
@@ -173,7 +194,12 @@ class _ServiceItemsState extends State<ServiceItems> {
             hint: const Text("Service Type"),
             value: widget.selectedValue,
             isExpanded: true,
-            items: widget.items.map(buildMenuItem).toList(),
+            items: widget.items.map<DropdownMenuItem<String>>((item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
             onChanged: (value) => setState(() => widget.selectedValue = value!),
           ),
         ),
@@ -193,16 +219,34 @@ class _ServiceItemsState extends State<ServiceItems> {
             ),
             //Add Button
             TextButton(
-              onPressed: (() {
-                setState(() {
-                  String newValue = widget.serviceTextEditingController.text;
-                  if (newValue.isNotEmpty && widget.items.contains(newValue)) {
-                    widget.items.add(newValue);
-                    widget.serviceTextEditingController.clear();
-                    widget.selectedValue = newValue;
-                    log('added on list ${newValue}');
-                  }
-                });
+              onPressed: () => setState(() {
+                String newValue = widget.serviceTextEditingController.text;
+                if (newValue.isNotEmpty && !widget.items.contains(newValue)) {
+                  widget.items.add(newValue);
+                  widget.serviceTextEditingController.clear();
+                  widget.selectedValue = newValue;
+                }
+                switch (widget.type) {
+                  case ServiceType.hair:
+                    widget.wForm.hair = widget.items;
+                    break;
+                  case ServiceType.makeup:
+                    widget.wForm.makeup = widget.items;
+                    break;
+                  case ServiceType.spa:
+                    widget.wForm.spa = widget.items;
+                    break;
+                  case ServiceType.nails:
+                    widget.wForm.nails = widget.items;
+                    break;
+                  case ServiceType.lashes:
+                    widget.wForm.lashes = widget.items;
+                    break;
+                  case ServiceType.wax:
+                    widget.wForm.wax = widget.items;
+                    break;
+                  default:
+                }
               }),
               child: const Text("Add"),
             ),
@@ -212,8 +256,15 @@ class _ServiceItemsState extends State<ServiceItems> {
                 setState(() {
                   if (widget.items.contains(widget.selectedValue)) {
                     widget.items.remove(widget.selectedValue);
-                    widget.selectedValue = '';
-                    log('deleted on list ${widget.items}');
+                    try {
+                      widget.selectedValue = widget.items.first;
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('No Items Remain')));
+                    }
+                  } else if (widget.items.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Nothing to Delete')));
                   }
                 });
               }),
@@ -224,16 +275,6 @@ class _ServiceItemsState extends State<ServiceItems> {
       ],
     );
   }
-
-  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-      );
 }
+
+enum ServiceType { hair, makeup, spa, nails, lashes, wax }

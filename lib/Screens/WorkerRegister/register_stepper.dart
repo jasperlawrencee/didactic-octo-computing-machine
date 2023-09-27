@@ -43,7 +43,7 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
           Step(
             isActive: currentStep >= 2,
             title: const Text(''),
-            content: const thirdStep(),
+            content: thirdStep(wForm: workerForm),
           ),
           Step(
             isActive: currentStep >= 3,

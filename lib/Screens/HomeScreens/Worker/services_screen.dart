@@ -104,8 +104,11 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
+  String? editValue;
   Future<void> editServiceCard(
       String title, String service, BuildContext context) {
+    //dapat naa diri tong gikan sa firebase
+    List<String> serviceName = [];
     return showDialog(
         context: context,
         builder: ((context) {
@@ -124,12 +127,30 @@ class _ServicesPageState extends State<ServicesPage> {
                       Navigator.of(context).pop();
                     },
                     child: const Text('No')),
-                TextButton(onPressed: () {}, child: const Text('Edit')),
+                TextButton(
+                    onPressed: () {
+                      Column(
+                        children: [
+                          DropdownButton<String>(
+                            items: serviceName.map(buildMenuItem).toList(),
+                            onChanged: (value) => setState(() {
+                              this.editValue = value;
+                            }),
+                          )
+                        ],
+                      );
+                    },
+                    child: const Text('Edit')),
               ],
             ),
           );
         }));
   }
+
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+        value: item,
+        child: Text(item),
+      );
 
   getAllInDocument() async {
     try {

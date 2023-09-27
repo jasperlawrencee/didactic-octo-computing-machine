@@ -5,10 +5,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/models/forms.dart';
 import 'package:intl/intl.dart';
 
 class thirdStep extends StatefulWidget {
-  const thirdStep({Key? key}) : super(key: key);
+  final WorkerForm wForm;
+  const thirdStep({Key? key, required this.wForm}) : super(key: key);
 
   @override
   _thirdStepState createState() => _thirdStepState();
@@ -16,6 +18,7 @@ class thirdStep extends StatefulWidget {
 
 class _thirdStepState extends State<thirdStep> {
   List<Widget> widgets = [];
+  List<dynamic> experience = [];
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +51,8 @@ class _thirdStepState extends State<thirdStep> {
                   try {
                     widgets != 0 ? widgets.removeLast() : null;
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Cannot delete fields')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Unable to delete field')));
                   }
                 });
               },

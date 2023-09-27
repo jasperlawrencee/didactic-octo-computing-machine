@@ -1,5 +1,7 @@
 // ignore_for_file: camel_case_types, library_private_types_in_public_api, unrelated_type_equality_checks
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';

@@ -34,22 +34,14 @@ class _ServicesPageState extends State<ServicesPage> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(width: 20),
                   Text(
                     "Services".toUpperCase(),
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: const Icon(
-                      Icons.edit_note,
                       color: kPrimaryColor,
                     ),
                   ),
@@ -61,7 +53,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   for (var arrayData in arrayOfArrays)
                     for (var item in arrayData)
                       serviceCard('${item['name']}'.toUpperCase(),
-                          '${item['value']}', 'priceRange')
+                          '${item['value']}', '(priceRange)')
                 ]),
               ),
             ],
@@ -69,6 +61,74 @@ class _ServicesPageState extends State<ServicesPage> {
         ),
       ),
     );
+  }
+
+  Widget serviceCard(
+      String serviceName, String serviceType, String priceRange) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: defaultPadding),
+      width: double.infinity,
+      height: 110,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: kPrimaryLightColor,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            serviceName,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Text(serviceType),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(priceRange),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: InkWell(
+              onTap: () => editServiceCard(serviceName, serviceType, context),
+              child: const Text(
+                'Edit',
+                style: TextStyle(
+                    color: kPrimaryColor, decoration: TextDecoration.underline),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> editServiceCard(
+      String title, String service, BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: ((context) {
+          return Theme(
+            data: ThemeData(
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                      primary: kPrimaryColor,
+                      background: Colors.white70,
+                      secondary: kPrimaryLightColor,
+                    )),
+            child: AlertDialog(
+              title: Text('Edit $title - $service'),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('No')),
+                TextButton(onPressed: () {}, child: const Text('Edit')),
+              ],
+            ),
+          );
+        }));
   }
 
   getAllInDocument() async {
@@ -99,40 +159,5 @@ class _ServicesPageState extends State<ServicesPage> {
     } catch (e) {
       log('error: $e');
     }
-  }
-
-  Widget serviceCard(
-      String serviceName, String serviceType, String priceRange) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: defaultPadding),
-      width: double.infinity,
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: kPrimaryLightColor,
-      ),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              serviceName,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(serviceType),
-          ),
-          const Spacer(),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Text(priceRange),
-          ),
-        ],
-      ),
-    );
   }
 }

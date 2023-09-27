@@ -16,6 +16,19 @@ class secondStep extends StatefulWidget {
   _secondStepState createState() => _secondStepState();
 }
 
+String selectedHairValue = '';
+String selectedMakeupValue = '';
+String selectedSpaValue = '';
+String selectedNailsValue = '';
+String selectedLashesValue = '';
+String selectedWaxValue = '';
+List<String> hairValues = [];
+List<String> makeupValues = [];
+List<String> spaValues = [];
+List<String> nailsValues = [];
+List<String> lashesValues = [];
+List<String> waxValues = [];
+
 class _secondStepState extends State<secondStep> {
   bool hair = false;
   bool makeup = false;
@@ -23,27 +36,16 @@ class _secondStepState extends State<secondStep> {
   bool nails = false;
   bool lashes = false;
   bool wax = false;
-  final TextEditingController _hairController = TextEditingController();
-  final TextEditingController _makeupController = TextEditingController();
-  final TextEditingController _spaController = TextEditingController();
-  final TextEditingController _nailsController = TextEditingController();
-  final TextEditingController _lashesController = TextEditingController();
-  final TextEditingController _waxController = TextEditingController();
-  String selectedHairValue = '';
-  String selectedMakeupValue = '';
-  String selectedSpaValue = '';
-  String selectedNailsValue = '';
-  String selectedLashesValue = '';
-  String selectedWaxValue = '';
-  List<String> hairValues = [];
-  List<String> makeupValues = [];
-  List<String> spaValues = [];
-  List<String> nailsValues = [];
-  List<String> lashesValues = [];
-  List<String> waxValues = [];
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController _hairController = TextEditingController();
+    TextEditingController _makeupController = TextEditingController();
+    TextEditingController _spaController = TextEditingController();
+    TextEditingController _nailsController = TextEditingController();
+    TextEditingController _lashesController = TextEditingController();
+    TextEditingController _waxController = TextEditingController();
+
     return Column(
       children: <Widget>[
         const Text(
@@ -198,9 +200,9 @@ class _ServiceItemsState extends State<ServiceItems> {
                     widget.items.add(newValue);
                     widget.serviceTextEditingController.clear();
                     widget.selectedValue = newValue;
+                    log('added on list ${newValue}');
                   }
                 });
-                log('on add list ${widget.items}');
               }),
               child: const Text("Add"),
             ),
@@ -211,8 +213,8 @@ class _ServiceItemsState extends State<ServiceItems> {
                   if (widget.items.contains(widget.selectedValue)) {
                     widget.items.remove(widget.selectedValue);
                     widget.selectedValue = '';
+                    log('deleted on list ${widget.items}');
                   }
-                  log('deleted list ${widget.items}');
                 });
               }),
               child: const Text("Delete"),

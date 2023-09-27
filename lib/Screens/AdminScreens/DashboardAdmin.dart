@@ -12,6 +12,16 @@ class _DashboardState extends State<Dashboard> {
       List.generate(6, (index) => {'id': index + 1, 'name': 'Item $index'})
           .toList();
 
+  List<String> dashboardTitle = [
+    'Total Service Fee Earnings',
+    'All Workers',
+    'All Salons',
+    'All Customers',
+    'All Unverified Salons',
+    'All Unverified Freelancers'
+  ];
+  List<String> data = ['2500', '100', '500', '6851', '8865', '5362'];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,7 +30,7 @@ class _DashboardState extends State<Dashboard> {
               maxCrossAxisExtent: 300,
               childAspectRatio: 3 / 2,
               crossAxisSpacing: 20,
-              mainAxisSpacing: 20),
+              mainAxisSpacing: 50),
           itemCount: dashboardItem.length,
           itemBuilder: (BuildContext ctx, index) {
             return Container(

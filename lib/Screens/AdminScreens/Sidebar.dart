@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/Admin%20Manage%20Users/ManageUsers.dart';
+import 'package:flutter_auth/constants.dart';
 
 class SidebarAdmin extends StatefulWidget {
   const SidebarAdmin({Key? key});
@@ -8,6 +10,14 @@ class SidebarAdmin extends StatefulWidget {
 }
 
 class _SidebarAdminState extends State<SidebarAdmin> {
+  late int selectedIndex;
+
+  void handleTap(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,6 +38,7 @@ class _SidebarAdminState extends State<SidebarAdmin> {
         children: [
           Material(
             child: ListTile(
+              // tileColor: selectedIndex  ? kPrimaryColor : null,
               title: Container(
                   width: 250,
                   height: 180,
@@ -43,9 +54,7 @@ class _SidebarAdminState extends State<SidebarAdmin> {
               leading: Icon(Icons.dashboard),
               title: Text('Dashboard'),
               hoverColor: Color.fromARGB(70, 111, 53, 165),
-              onTap: () {
-                // Add functionality for Item 2 here
-              },
+              onTap: () {},
             ),
           ),
           Material(
@@ -54,7 +63,10 @@ class _SidebarAdminState extends State<SidebarAdmin> {
               title: Text('Manage Users'),
               hoverColor: Color.fromARGB(70, 111, 53, 165),
               onTap: () {
-                // Add functionality for Item 2 here
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AdminManageUsers()));
               },
             ),
           ),

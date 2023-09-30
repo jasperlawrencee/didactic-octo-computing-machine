@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, unrelated_type_equality_checks
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, unrelated_type_equality_checks, non_constant_identifier_names
 
 import 'dart:developer';
 
@@ -8,6 +8,7 @@ import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/forms.dart';
 import 'package:intl/intl.dart';
 
+//parent widget
 class thirdStep extends StatefulWidget {
   final WorkerForm wForm;
   const thirdStep({Key? key, required this.wForm}) : super(key: key);
@@ -18,10 +19,26 @@ class thirdStep extends StatefulWidget {
 
 class _thirdStepState extends State<thirdStep> {
   List<Widget> widgets = [];
-  List<dynamic> experience = [];
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController salonName = TextEditingController();
+    TextEditingController salonAddress = TextEditingController();
+    TextEditingController salonNum = TextEditingController();
+    DateTimeRange selectedDays = DateTimeRange(
+      start: DateTime.now(),
+      end: DateTime.now(),
+    );
+
+    salonName.addListener(() {
+      log(widget.wForm.experiences.toString());
+      for (int i = 0; i < widget.wForm.experiences!.length; i++) {
+        for (int j = 0; j < widget.wForm.experiences![i].length; j++) {
+          widget.wForm.experiences![i][j] = salonName.text;
+        }
+      }
+    });
+
     return Column(
       children: [
         const SizedBox(height: defaultPadding),
@@ -29,7 +46,7 @@ class _thirdStepState extends State<thirdStep> {
           "Experiences\n",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        const Section(),
+        Section(salonName, salonAddress, salonNum, selectedDays),
         const SizedBox(height: defaultPadding),
         Column(
           children: widgets,
@@ -40,7 +57,12 @@ class _thirdStepState extends State<thirdStep> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  widgets.add(const Section());
+                  widgets.add(Section(
+                    salonName,
+                    salonAddress,
+                    salonNum,
+                    selectedDays,
+                  ));
                 });
               },
               child: const Text("Add More+"),
@@ -59,30 +81,23 @@ class _thirdStepState extends State<thirdStep> {
               child: const Text("Delete Section"),
             ),
           ],
-        )
+        ),
+        TextButton(
+            onPressed: () {
+              log('number of sections: ${widgets.length + 1}');
+              log(widget.wForm.experiences.toString());
+            },
+            child: const Text('data'))
       ],
     );
   }
-}
 
-class Section extends StatefulWidget {
-  const Section({Key? key}) : super(key: key);
-
-  @override
-  State<Section> createState() => _SectionState();
-}
-
-class _SectionState extends State<Section> {
-  TextEditingController salonName = TextEditingController();
-  TextEditingController salonAddress = TextEditingController();
-  TextEditingController salonNum = TextEditingController();
-  DateTimeRange selectedDays = DateTimeRange(
-    start: DateTime.now(),
-    end: DateTime.now(),
-  );
-
-  @override
-  Widget build(BuildContext context) {
+  Widget Section(
+    TextEditingController salonName,
+    salonAddress,
+    salonNum,
+    DateTimeRange selectedDays,
+  ) {
     return Column(
       children: [
         const SizedBox(height: defaultPadding),

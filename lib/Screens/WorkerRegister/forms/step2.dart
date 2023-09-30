@@ -1,6 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore, must_be_immutable
-
-import 'dart:developer';
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore, must_be_immutable, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/models/forms.dart';

@@ -10,6 +10,7 @@ import 'package:flutter_auth/Screens/SalonRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/SalonRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/models/forms.dart';
 
 class SalonRegisterScreen extends StatefulWidget {
   const SalonRegisterScreen({Key? key}) : super(key: key);
@@ -23,6 +24,21 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final SalonForm salonForm = SalonForm();
+
+    List<Step> getSteps() => [
+          Step(
+            isActive: currentStep >= 0,
+            title: const Text(''),
+            content: step1(sForm: salonForm),
+          ),
+          Step(
+            isActive: currentStep >= 1,
+            title: const Text(''),
+            content: step2(sForm: salonForm),
+          ),
+        ];
+
     return Background(
       child: Theme(
         data: ThemeData(
@@ -88,19 +104,6 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
   cancel() {
     currentStep > 0 ? setState(() => currentStep -= 1) : null;
   }
-
-  List<Step> getSteps() => [
-        Step(
-          isActive: currentStep >= 0,
-          title: const Text(''),
-          content: const step1(),
-        ),
-        Step(
-          isActive: currentStep >= 1,
-          title: const Text(''),
-          content: const step2(),
-        ),
-      ];
 
   Future<void> _dialogBuilder(BuildContext context) {
     return showDialog<void>(

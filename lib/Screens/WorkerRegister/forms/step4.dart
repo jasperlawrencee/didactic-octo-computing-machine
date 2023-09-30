@@ -1,12 +1,16 @@
 // ignore_for_file: camel_case_types, library_private_types_in_public_api, non_constant_identifier_names, unrelated_type_equality_checks
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/models/forms.dart';
 import 'package:image_picker/image_picker.dart';
 
 class fourthStep extends StatefulWidget {
-  const fourthStep({Key? key}) : super(key: key);
+  final WorkerForm wForm;
+  const fourthStep({Key? key, required this.wForm}) : super(key: key);
 
   @override
   _fourthStepState createState() => _fourthStepState();
@@ -16,10 +20,16 @@ class _fourthStepState extends State<fourthStep> {
   TextEditingController tinID = TextEditingController();
   XFile? image;
   final ImagePicker picker = ImagePicker();
-  List<Widget> widgets = [];
+  List<Widget> certificates = [];
 
   @override
   Widget build(BuildContext context) {
+    tinID.addListener(
+      () {
+        widget.wForm.tinID = tinID.text;
+      },
+    );
+
     return Column(children: [
       const SizedBox(height: defaultPadding),
       const Text(
@@ -42,7 +52,7 @@ class _fourthStepState extends State<fourthStep> {
       ),
       const addCertificate(),
       Column(
-        children: widgets,
+        children: certificates,
       ),
       const SizedBox(height: defaultPadding),
       Row(
@@ -51,7 +61,7 @@ class _fourthStepState extends State<fourthStep> {
           TextButton(
             onPressed: () {
               setState(() {
-                widgets.add(const addCertificate());
+                certificates.add(const addCertificate());
               });
             },
             child: const Text("Add More+"),
@@ -60,7 +70,7 @@ class _fourthStepState extends State<fourthStep> {
             onPressed: () {
               setState(() {
                 try {
-                  widgets != 0 ? widgets.removeLast() : null;
+                  certificates != 0 ? certificates.removeLast() : null;
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Cannot delete fields')));
@@ -159,10 +169,8 @@ class addCertificate extends StatefulWidget {
 }
 
 class _addCertificateState extends State<addCertificate> {
-  TextEditingController tinID = TextEditingController();
   XFile? image;
   final ImagePicker picker = ImagePicker();
-  late List<Widget> widgets;
 
   @override
   Widget build(BuildContext context) {

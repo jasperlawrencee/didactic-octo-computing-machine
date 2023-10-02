@@ -136,7 +136,6 @@ class _step2State extends State<step2> {
                                 Navigator.of(context).pop;
                                 getImage(
                                     ImageSource.gallery, image, imageReference);
-                                log(imageReference!.name);
                               },
                               child: const Row(
                                 children: [

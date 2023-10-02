@@ -41,13 +41,7 @@ class _step2State extends State<step2> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: defaultPadding),
-        AttachImage(
-          context,
-          "Business Permit +",
-          businessPermit,
-          businessPermitRef,
-          isBusinessAdded,
-        ),
+        AttachImage(context, "Business Permit +"),
         const SizedBox(height: defaultPadding),
         InkWell(
             onTap: () {
@@ -55,9 +49,19 @@ class _step2State extends State<step2> {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog();
+                      return AlertDialog(
+                        content: Image.file(businessPermit!),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Close'))
+                        ],
+                      );
                     });
               } else {
+                log('$businessPermit $businessPermitRef $isBusinessAdded');
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: const Text('No image provided'),
                   action: SnackBarAction(label: 'Close', onPressed: () {}),
@@ -73,43 +77,11 @@ class _step2State extends State<step2> {
               textAlign: TextAlign.center,
             )),
         const SizedBox(height: defaultPadding),
-        AttachImage(context, "Secondary License (BIR/Mayor's Permit) +",
-            secondary, secondaryRef, isSecondaryAdded),
-        const SizedBox(height: defaultPadding),
-        const Text(
-          "Place of Salon",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: defaultPadding),
-        AttachImage(context, "Salon Photo - Outside +", salonOutside,
-            salonOutsideRef, isOutsideAdded),
-        const SizedBox(height: defaultPadding),
-        AttachImage(context, "Salon Photo - Inside +", salonInside,
-            salonInsideRef, isInsideAdded),
-        const SizedBox(height: defaultPadding),
       ],
     );
   }
 
-  Future<String> getImage(
-      ImageSource media, File? image, XFile? imageReference) async {
-    var img = await picker.pickImage(source: media);
-
-    imageReference = img!;
-    image = File(imageReference.path);
-    // setState(() {
-    //   try {
-    //   } catch (e) {
-    //     isBusinessAdded = false;
-    //   }
-    //   isBusinessAdded = true;
-    // });
-    log(imageReference.name);
-    return imageReference.name;
-  }
-
-  Container AttachImage(BuildContext context, String label, File? image,
-      XFile? imageReference, bool isAdded) {
+  Container AttachImage(BuildContext context, String label) {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -122,60 +94,73 @@ class _step2State extends State<step2> {
             padding: const EdgeInsets.all(defaultPadding),
           ),
           onPressed: () {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text('Please choose media to select'),
-                    content: SizedBox(
-                      height: MediaQuery.of(context).size.height / 6,
-                      child: Column(
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop;
-                                getImage(
-                                    ImageSource.gallery, image, imageReference);
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.image),
-                                  Text('From Gallery')
-                                ],
-                              )),
-                          const SizedBox(height: defaultPadding),
-                          ElevatedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                try {
-                                  imageReference = await picker.pickImage(
-                                      source: ImageSource.camera);
-                                  setState(() {
-                                    if (imageReference != null) {
-                                      image = File(imageReference!.path);
-                                    }
-                                    isAdded = true;
-                                  });
-                                } catch (e) {
-                                  log(e.toString());
-                                }
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.camera),
-                                  Text('From Camera')
-                                ],
-                              )),
-                        ],
-                      ),
-                    ),
-                  );
-                });
+            PickImageDialog(context, businessPermitRef, businessPermit);
           },
           child: Text(
             label,
             style: const TextStyle(color: Colors.black),
           )),
     );
+  }
+
+  Future<dynamic> PickImageDialog(
+      BuildContext context, XFile? imageRef, File? image) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Please choose media to select'),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height / 4,
+              child: Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        tryMethod(businessPermitRef, businessPermit);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.image), Text('From Gallery')],
+                      )),
+                  const SizedBox(height: defaultPadding),
+                  ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        imageRef =
+                            await picker.pickImage(source: ImageSource.camera);
+                        try {
+                          setState(() {
+                            image = File(imageRef!.path);
+                            log("${imageRef!.name} 1");
+                          });
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.camera), Text('From Camera')],
+                      )),
+                  TextButton(
+                      onPressed: () {
+                        log(imageRef!.name);
+                      },
+                      child: Text('data'))
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  tryMethod(XFile? imageReference, File? image) async {
+    Navigator.of(context).pop();
+    imageReference = await picker.pickImage(source: ImageSource.gallery);
+    try {
+      setState(() {
+        image = File(imageReference!.path);
+        log("${imageReference.name} 2");
+      });
+    } catch (e) {
+      log(e.toString());
+    }
   }
 }

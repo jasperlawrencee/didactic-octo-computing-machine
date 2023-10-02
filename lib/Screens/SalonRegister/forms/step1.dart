@@ -173,6 +173,7 @@ class _step1State extends State<step1> {
                   ? setState(
                       () {
                         image = null;
+                        pickedImage = null;
                         photoAdded = false;
                       },
                     )
@@ -195,6 +196,7 @@ class _step1State extends State<step1> {
       image = img;
       try {
         pickedImage = File(image!.path);
+        widget.sForm.representativeID = File(image!.path);
       } catch (e) {
         photoAdded = false;
       }

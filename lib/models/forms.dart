@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:image_picker/image_picker.dart';
 
 class WorkerForm {
@@ -18,9 +20,9 @@ class WorkerForm {
   List<String>? lashes = [];
   List<String>? wax = [];
   List<dynamic>? experiences = [];
-  XFile? governmentID;
-  XFile? vaxCard;
-  XFile? nbiClearance;
+  File? governmentID;
+  File? vaxCard;
+  File? nbiClearance;
   String? tinID;
   List? certificates = <XFile>[];
 
@@ -61,13 +63,13 @@ class SalonForm {
   String? salonRepresentative;
   String? representativeEmail;
   String? representativeNum;
-  XFile? representativeID;
-  XFile? businessPermit;
-  XFile? secondaryLicense;
-  XFile? outsideSalonPhoto;
-  XFile? insideSalonPhoto;
+  File? representativeID;
+  File? businessPermit;
+  File? secondaryLicense;
+  File? outsideSalonPhoto;
+  File? insideSalonPhoto;
 
-  SalonForm(
+  SalonForm({
     this.salonName,
     this.roomBuilding,
     this.streetRoad,
@@ -83,5 +85,5 @@ class SalonForm {
     this.secondaryLicense,
     this.outsideSalonPhoto,
     this.insideSalonPhoto,
-  );
+  });
 }

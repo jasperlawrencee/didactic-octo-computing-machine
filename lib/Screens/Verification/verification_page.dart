@@ -90,6 +90,7 @@ class _MobileVerificationState extends State<MobileVerification> {
                                                 .labelLarge,
                                           ),
                                           onPressed: () {
+                                            Navigator.of(context).pop();
                                             Navigator.push(context,
                                                 MaterialPageRoute(
                                                     builder: (context) {
@@ -127,6 +128,7 @@ class _MobileVerificationState extends State<MobileVerification> {
                                           child: const Text("No")),
                                       TextButton(
                                           onPressed: () {
+                                            Navigator.of(context).pop();
                                             Navigator.push(context,
                                                 MaterialPageRoute(
                                                     builder: (context) {

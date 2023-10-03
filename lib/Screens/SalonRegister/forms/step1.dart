@@ -4,14 +4,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/SalonRegister/register_stepper.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/models/forms.dart';
 import 'package:image_picker/image_picker.dart';
 
 class step1 extends StatefulWidget {
-  final SalonForm sForm;
-  const step1({Key? key, required this.sForm}) : super(key: key);
+  const step1({Key? key}) : super(key: key);
 
   @override
   _step1State createState() => _step1State();
@@ -23,62 +22,65 @@ class _step1State extends State<step1> {
   final ImagePicker picker = ImagePicker();
   bool photoAdded = false;
 
+  TextEditingController salonName = TextEditingController();
+  TextEditingController roomBuilding = TextEditingController();
+  TextEditingController streetRoad = TextEditingController();
+  TextEditingController barangay = TextEditingController();
+  TextEditingController city = TextEditingController();
+  TextEditingController salonOwner = TextEditingController();
+  TextEditingController salonNumber = TextEditingController();
+  TextEditingController salonRepresentative = TextEditingController();
+  TextEditingController representativeEmail = TextEditingController();
+  TextEditingController representativeNum = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController salonName = TextEditingController();
-    TextEditingController roomBuilding = TextEditingController();
-    TextEditingController streetRoad = TextEditingController();
-    TextEditingController barangay = TextEditingController();
-    TextEditingController city = TextEditingController();
-    TextEditingController salonOwner = TextEditingController();
-    TextEditingController salonNumber = TextEditingController();
-    TextEditingController salonRepresentative = TextEditingController();
-    TextEditingController representativeEmail = TextEditingController();
-    TextEditingController representativeNum = TextEditingController();
     salonName.addListener(
       () {
-        widget.sForm.salonName = salonName.text;
+        salonForm.salonName = salonName.text;
       },
     );
     roomBuilding.addListener(
       () {
-        widget.sForm.roomBuilding = roomBuilding.text;
+        salonForm.roomBuilding = roomBuilding.text;
       },
     );
     streetRoad.addListener(
       () {
-        widget.sForm.streetRoad = streetRoad.text;
+        salonForm.streetRoad = streetRoad.text;
       },
     );
     barangay.addListener(
       () {
-        widget.sForm.barangay = barangay.text;
+        salonForm.barangay = barangay.text;
       },
     );
     city.addListener(
       () {
-        widget.sForm.city = city.text;
+        salonForm.city = city.text;
       },
     );
     salonOwner.addListener(
       () {
-        widget.sForm.salonOwner = salonOwner.text;
+        salonForm.salonOwner = salonOwner.text;
       },
     );
+    salonNumber.addListener(() {
+      salonForm.salonNumber = salonNumber.text;
+    });
     salonRepresentative.addListener(
       () {
-        widget.sForm.salonRepresentative = salonRepresentative.text;
+        salonForm.salonRepresentative = salonRepresentative.text;
       },
     );
     representativeEmail.addListener(
       () {
-        widget.sForm.representativeEmail = representativeEmail.text;
+        salonForm.representativeEmail = representativeEmail.text;
       },
     );
     representativeNum.addListener(
       () {
-        widget.sForm.representativeNum = representativeNum.text;
-        log(widget.sForm.representativeNum.toString());
+        salonForm.representativeNum = representativeNum.text;
       },
     );
 
@@ -165,26 +167,6 @@ class _step1State extends State<step1> {
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: defaultPadding),
-        if (photoAdded)
-          InkWell(
-            onTap: () {
-              image != null
-                  ? setState(
-                      () {
-                        image = null;
-                        pickedImage = null;
-                        photoAdded = false;
-                      },
-                    )
-                  : null;
-            },
-            child: const Text(
-              'Clear Image',
-              style: TextStyle(
-                  color: Colors.red, decoration: TextDecoration.underline),
-            ),
-          )
       ],
     );
   }
@@ -196,7 +178,7 @@ class _step1State extends State<step1> {
       image = img;
       try {
         pickedImage = File(image!.path);
-        widget.sForm.representativeID = File(image!.path);
+        salonForm.representativeID = File(image!.path);
       } catch (e) {
         photoAdded = false;
       }

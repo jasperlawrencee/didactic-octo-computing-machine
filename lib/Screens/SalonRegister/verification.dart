@@ -16,24 +16,30 @@ class _SalonSummaryScreenState extends State<SalonSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Background(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          "Thank You for Signing In!\nBefore Proceeding into the final step of signing up\nWe need to verify the validity of the documents that you have submitted\nThis will only take up to 3-5 business days.",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: kPrimaryColor),
-        ),
-        const SizedBox(height: defaultPadding),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WelcomeScreen()));
-            },
-            child: const Text("Proceed to Home")),
-      ],
+        child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Spacer(),
+          const Text(
+            "Thank You for Signing In!\nBefore Proceeding into the final step of signing up\nWe need to verify the validity of the documents that you have submitted\nThis will only take up to 3-5 business days.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: kPrimaryColor),
+          ),
+          const Spacer(),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WelcomeScreen()));
+              },
+              child: const Text("Proceed to Home")),
+          const SizedBox(height: defaultPadding),
+        ],
+      ),
     ));
   }
 }

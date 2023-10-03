@@ -1,19 +1,27 @@
 // ignore_for_file: library_private_types_in_public_api
 
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step2.dart';
-import 'package:flutter_auth/Screens/SalonRegister/verification.dart';
+import 'package:flutter_auth/Screens/SalonRegister/summary.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/forms.dart';
 
+SalonForm salonForm = SalonForm(
+    salonName: '',
+    roomBuilding: '',
+    streetRoad: '',
+    barangay: '',
+    city: '',
+    salonOwner: '',
+    salonNumber: '',
+    salonRepresentative: '',
+    representativeEmail: '',
+    representativeNum: '');
+
 class SalonRegisterScreen extends StatefulWidget {
-  const SalonRegisterScreen({Key? key}) : super(key: key);
+  SalonRegisterScreen({Key? key}) : super(key: key);
 
   @override
   _SalonRegisterScreenState createState() => _SalonRegisterScreenState();
@@ -23,19 +31,35 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
   int currentStep = 0;
 
   @override
-  Widget build(BuildContext context) {
-    final SalonForm salonForm = SalonForm();
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    salonForm = SalonForm(
+      salonName: '',
+      roomBuilding: '',
+      streetRoad: '',
+      barangay: '',
+      city: '',
+      salonOwner: '',
+      salonNumber: '',
+      salonRepresentative: '',
+      representativeEmail: '',
+      representativeNum: '',
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     List<Step> getSteps() => [
           Step(
             isActive: currentStep >= 0,
             title: const Text(''),
-            content: step1(sForm: salonForm),
+            content: const step1(),
           ),
           Step(
             isActive: currentStep >= 1,
             title: const Text(''),
-            content: step2(sForm: salonForm),
+            content: const step2(),
           ),
         ];
 
@@ -128,27 +152,16 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                addRoleToFireStore();
+                // addRoleToFireStore();
+                Navigator.of(context).pop();
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const Summary();
+                }));
               },
             ),
           ],
         );
       },
     );
-  }
-
-  addRoleToFireStore() {
-    var user = FirebaseAuth.instance.currentUser;
-    CollectionReference ref = FirebaseFirestore.instance.collection('users');
-    try {
-      ref.doc(user!.uid).update({'role': 'salon'});
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const SalonSummaryScreen();
-      }));
-      log("added salon role to firestore");
-    } catch (e) {
-      log("$user $ref");
-      log(e.toString());
-    }
   }
 }

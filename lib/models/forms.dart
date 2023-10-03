@@ -25,6 +25,7 @@ class WorkerForm {
   File? nbiClearance;
   String? tinID;
   List? certificates = <XFile>[];
+  bool verified = false;
 
   WorkerForm({
     this.firstName,
@@ -53,33 +54,34 @@ class WorkerForm {
 }
 
 class SalonForm {
-  String? salonName;
-  String? roomBuilding;
-  String? streetRoad;
-  String? barangay;
-  String? city;
-  String? salonOwner;
-  String? salonNumber;
-  String? salonRepresentative;
-  String? representativeEmail;
-  String? representativeNum;
+  String salonName;
+  String roomBuilding;
+  String streetRoad;
+  String barangay;
+  String city;
+  String salonOwner;
+  String salonNumber;
+  String salonRepresentative;
+  String representativeEmail;
+  String representativeNum;
   File? representativeID;
   File? businessPermit;
   File? secondaryLicense;
   File? outsideSalonPhoto;
   File? insideSalonPhoto;
+  bool verified = false;
 
   SalonForm({
-    this.salonName,
-    this.roomBuilding,
-    this.streetRoad,
-    this.barangay,
-    this.city,
-    this.salonOwner,
-    this.salonNumber,
-    this.salonRepresentative,
-    this.representativeEmail,
-    this.representativeNum,
+    required this.salonName,
+    required this.roomBuilding,
+    required this.streetRoad,
+    required this.barangay,
+    required this.city,
+    required this.salonOwner,
+    required this.salonNumber,
+    required this.salonRepresentative,
+    required this.representativeEmail,
+    required this.representativeNum,
     this.representativeID,
     this.businessPermit,
     this.secondaryLicense,

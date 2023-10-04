@@ -21,8 +21,11 @@ class Summary extends StatefulWidget {
 class _SummaryState extends State<Summary> {
   final _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
-  String uniqueID = DateTime.now().millisecondsSinceEpoch.toString();
-  String imageUrl = '';
+  String representativeID = '';
+  String businessPermit = '';
+  String secondaryLicense = '';
+  String outsideSalon = '';
+  String insideSalon = '';
 
   @override
   Widget build(BuildContext context) {
@@ -275,20 +278,12 @@ class _SummaryState extends State<Summary> {
                                     child: const Text('No')),
                                 TextButton(
                                     onPressed: () async {
-                                      Reference referenceRoot =
-                                          FirebaseStorage.instance.ref();
-                                      Reference referenceDirImages =
-                                          referenceRoot.child('images');
-                                      Reference referenceImageToUpload =
-                                          referenceDirImages.child(uniqueID);
-
                                       Navigator.of(context).pop();
                                       Navigator.push(context,
                                           MaterialPageRoute(builder: (context) {
                                         return const SalonSummaryScreen();
                                       }));
-                                      if (salonForm.representativeID == null)
-                                        return;
+
                                       try {
                                         //adds "salon" to firebase cloud storage
                                         addRoleToFireStore();
@@ -299,19 +294,10 @@ class _SummaryState extends State<Summary> {
                                             .collection('userDetails')
                                             .doc('step1')
                                             .set(step1());
-                                        //add images to firebase storage
-                                        await referenceImageToUpload.putFile(
-                                            salonForm.representativeID!);
-                                        //get image url
-                                        imageUrl = await referenceImageToUpload
-                                            .getDownloadURL();
-                                        //add imageUrl to firebase cloud storage
-                                        await _firestore
-                                            .collection('users')
-                                            .doc(currentUser!.uid)
-                                            .collection('userDetails')
-                                            .doc('step1')
-                                            .update({'imageUrl': imageUrl});
+                                        //adds imageUrl to firebase storage and step1 document in firebase cloud
+                                        addStep1Image();
+                                        //adds images to firebase storage
+                                        addStep2Image();
                                       } catch (e) {
                                         log(e.toString());
                                       }
@@ -339,12 +325,68 @@ class _SummaryState extends State<Summary> {
         'salonRepresentative': salonForm.salonRepresentative,
         'representativeEmail': salonForm.representativeEmail,
         'representativeNum': salonForm.representativeNum,
-        // 'representativeID':
-        // 'businessPermit':
-        // 'secondaryLicense':
-        // 'outsideSalonPhoto':
-        // 'insideSalonPhoto':
       };
+
+  Map<String, dynamic> step2() => {
+        'businessPermit': businessPermit,
+        'secondaryLicense': secondaryLicense,
+        'outsideSalon': outsideSalon,
+        'insideSalon': insideSalon,
+      };
+
+  addStep1Image() async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages =
+        referenceRoot.child('salonImage').child(currentUser!.uid);
+    Reference referenceImageToUpload =
+        referenceDirImages.child('representativeID');
+    //add images to firebase storage
+    await referenceImageToUpload.putFile(salonForm.representativeID!);
+    //get image url
+    representativeID = await referenceImageToUpload.getDownloadURL();
+    //add imageUrl to firebase cloud storage
+    await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step1')
+        .update({'representativeID': representativeID});
+    log('added image(s) in step1');
+  }
+
+  addStep2Image() async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages =
+        referenceRoot.child('salonImage').child(currentUser!.uid);
+    Reference businessPermitImage = referenceDirImages.child('businessPermit');
+    Reference secondaryLicenseImage =
+        referenceDirImages.child('secondaryLicense');
+    Reference outsideSalonImage = referenceDirImages.child('outsideSalonPhoto');
+    Reference insideSalonImage = referenceDirImages.child('insideSalonPhoto');
+    //add step2 images to firebase storage
+    await businessPermitImage.putFile(salonForm.businessPermit!);
+    await secondaryLicenseImage.putFile(salonForm.secondaryLicense!);
+    await outsideSalonImage.putFile(salonForm.outsideSalonPhoto!);
+    await insideSalonImage.putFile(salonForm.insideSalonPhoto!);
+    //get step2 imageUrls
+    businessPermit = await businessPermitImage.getDownloadURL();
+    secondaryLicense = await secondaryLicenseImage.getDownloadURL();
+    outsideSalon = await outsideSalonImage.getDownloadURL();
+    insideSalon = await insideSalonImage.getDownloadURL();
+    //add step2 imageUrls to firebase cloud storage
+    await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step2')
+        .set({
+      'businessPermit': businessPermit,
+      'secondaryLicense': secondaryLicense,
+      'outsideSalon': outsideSalon,
+      'insideSalon': insideSalon,
+    });
+    log('added image(s) in step2');
+  }
 
   addRoleToFireStore() {
     var user = FirebaseAuth.instance.currentUser;

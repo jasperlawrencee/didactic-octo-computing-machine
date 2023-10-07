@@ -37,12 +37,12 @@ class _secondStepState extends State<secondStep> {
   String selectedLashesValue = '';
   String selectedWaxValue = '';
 
-  List<String> hairValues = [];
-  List<String> makeupValues = [];
-  List<String> spaValues = [];
-  List<String> nailsValues = [];
-  List<String> lashesValues = [];
-  List<String> waxValues = [];
+  List<String> hairValues = ['hair'];
+  List<String> makeupValues = ['makeup'];
+  List<String> spaValues = ['spa'];
+  List<String> nailsValues = ['nails'];
+  List<String> lashesValues = ['lashes'];
+  List<String> waxValues = ['wax'];
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +206,13 @@ class _ServiceItemsState extends State<ServiceItems> {
                 child: Text(item),
               );
             }).toList(),
-            onChanged: (value) => setState(() => widget.selectedValue = value!),
+            onChanged: (value) => setState(() {
+              try {
+                widget.selectedValue = value!;
+              } catch (e) {
+                log(e.toString());
+              }
+            }),
           ),
         ),
         Row(
@@ -226,33 +232,37 @@ class _ServiceItemsState extends State<ServiceItems> {
             //Add Button
             TextButton(
               onPressed: () => setState(() {
-                String newValue = widget.serviceTextEditingController.text;
-                if (newValue.isNotEmpty && !widget.items.contains(newValue)) {
-                  widget.items.add(newValue);
-                  widget.serviceTextEditingController.clear();
-                  widget.selectedValue = newValue;
-                }
-                switch (widget.type) {
-                  case ServiceType.hair:
-                    workerForm.hair = widget.items;
-                    break;
-                  case ServiceType.makeup:
-                    workerForm.makeup = widget.items;
-                    break;
-                  case ServiceType.spa:
-                    workerForm.spa = widget.items;
-                    break;
-                  case ServiceType.nails:
-                    workerForm.nails = widget.items;
-                    break;
-                  case ServiceType.lashes:
-                    workerForm.lashes = widget.items;
-                    break;
-                  case ServiceType.wax:
-                    workerForm.wax = widget.items;
-                    break;
-                  default:
-                    [];
+                try {
+                  String newValue = widget.serviceTextEditingController.text;
+                  if (newValue.isNotEmpty && !widget.items.contains(newValue)) {
+                    widget.items.add(newValue);
+                    widget.serviceTextEditingController.clear();
+                    widget.selectedValue = newValue;
+                  }
+                  switch (widget.type) {
+                    case ServiceType.hair:
+                      workerForm.hair = widget.items;
+                      break;
+                    case ServiceType.makeup:
+                      workerForm.makeup = widget.items;
+                      break;
+                    case ServiceType.spa:
+                      workerForm.spa = widget.items;
+                      break;
+                    case ServiceType.nails:
+                      workerForm.nails = widget.items;
+                      break;
+                    case ServiceType.lashes:
+                      workerForm.lashes = widget.items;
+                      break;
+                    case ServiceType.wax:
+                      workerForm.wax = widget.items;
+                      break;
+                    default:
+                      [];
+                  }
+                } catch (e) {
+                  log(e.toString());
                 }
               }),
               child: const Text("Add"),
@@ -260,25 +270,30 @@ class _ServiceItemsState extends State<ServiceItems> {
             //Delete Button
             TextButton(
               onPressed: (() {
-                setState(() {
-                  if (widget.items.contains(widget.selectedValue)) {
-                    widget.items.remove(widget.selectedValue);
-                    try {
-                      widget.selectedValue = widget.items.first;
-                    } catch (e) {
+                try {
+                  setState(() {
+                    if (widget.items.contains(widget.selectedValue)) {
+                      widget.items.remove(widget.selectedValue);
+                      try {
+                        widget.selectedValue = widget.items.first;
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text('No Items Remain'),
+                          action:
+                              SnackBarAction(label: 'Close', onPressed: () {}),
+                        ));
+                      }
+                    } else if (widget.items.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text('No Items Remain'),
+                        content: const Text('Nothing to Delete'),
                         action:
                             SnackBarAction(label: 'Close', onPressed: () {}),
                       ));
                     }
-                  } else if (widget.items.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: const Text('Nothing to Delete'),
-                      action: SnackBarAction(label: 'Close', onPressed: () {}),
-                    ));
-                  }
-                });
+                  });
+                } catch (e) {
+                  log(e.toString());
+                }
               }),
               child: const Text("Delete"),
             )

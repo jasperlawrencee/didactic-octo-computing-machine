@@ -1,16 +1,16 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, non_constant_identifier_names, unrelated_type_equality_checks
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, non_constant_identifier_names, unrelated_type_equality_checks, must_be_immutable, unnecessary_nullable_for_final_variable_declarations
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/models/forms.dart';
 import 'package:image_picker/image_picker.dart';
 
 class fourthStep extends StatefulWidget {
-  final WorkerForm wForm;
-  const fourthStep({Key? key, required this.wForm}) : super(key: key);
+  const fourthStep({Key? key}) : super(key: key);
 
   @override
   _fourthStepState createState() => _fourthStepState();
@@ -18,30 +18,40 @@ class fourthStep extends StatefulWidget {
 
 class _fourthStepState extends State<fourthStep> {
   TextEditingController tinID = TextEditingController();
-  XFile? image;
   final ImagePicker picker = ImagePicker();
-  List<Widget> certificates = [];
+  List<XFile>? certificates = [];
+  XFile? govIDRef;
+  File? govID;
+  XFile? vaxCardRef;
+  File? vaxCard;
+  XFile? nbiClearanceRef;
+  File? nbiClearance;
 
   @override
   Widget build(BuildContext context) {
     tinID.addListener(
       () {
-        widget.wForm.tinID = tinID.text;
+        workerForm.tinID = tinID.text;
       },
     );
 
     return Column(children: [
-      const SizedBox(height: defaultPadding),
       const Text(
         "Goverment IDs",
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: defaultPadding),
-      AttachImage(context, "Attach Government ID*"),
+      AttachGovernmentID(context, 'Attach Government ID'),
       const SizedBox(height: defaultPadding),
-      AttachImage(context, "Attach Vaccination Card*"),
+      ShowImage(context, govIDRef, govID),
       const SizedBox(height: defaultPadding),
-      AttachImage(context, "Attach NBI Clearance*"),
+      AttachVaxCard(context, 'Attach Vaccination Certificate/Card'),
+      const SizedBox(height: defaultPadding),
+      ShowImage(context, vaxCardRef, vaxCard),
+      const SizedBox(height: defaultPadding),
+      AttachNBIClearance(context, 'Attach NBI Clearance'),
+      const SizedBox(height: defaultPadding),
+      ShowImage(context, nbiClearanceRef, nbiClearance),
       const SizedBox(height: defaultPadding),
       flatTextField("TIN ID", tinID),
       const SizedBox(height: defaultPadding),
@@ -50,97 +60,95 @@ class _fourthStepState extends State<fourthStep> {
         textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      const addCertificate(),
-      Column(
-        children: certificates,
-      ),
+      const SizedBox(height: defaultPadding),
+      AttachCertificatesButton(context),
       const SizedBox(height: defaultPadding),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                certificates.add(const addCertificate());
-              });
-            },
-            child: const Text("Add More+"),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                try {
-                  certificates != 0 ? certificates.removeLast() : null;
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Cannot delete fields')));
-                }
-              });
-            },
-            child: const Text("Delete Section"),
-          ),
+          // ClearCertificates(),
+          ViewCertificates(context),
         ],
-      ),
+      )
     ]);
   }
 
-  Future getImage(ImageSource media) async {
-    var img = await picker.pickImage(source: media);
-
-    setState(() {
-      image = img;
-    });
+  InkWell ClearCertificates() {
+    return InkWell(
+      onTap: () {
+        if (certificates!.isNotEmpty) {
+          setState(() {
+            certificates = null;
+          });
+        }
+      },
+      child: const Text(
+        'Clear',
+        style:
+            TextStyle(color: Colors.red, decoration: TextDecoration.underline),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 
-  void imageAlert() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            title: const Text('Please choose media to select'),
-            content: SizedBox(
-              height: MediaQuery.of(context).size.height / 6,
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    //if user click this button, user can upload image from gallery
-                    onPressed: () {
-                      Navigator.pop(context);
-                      getImage(ImageSource.gallery);
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.image),
-                        Text('From Gallery'),
-                      ],
+  InkWell ViewCertificates(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        certificates!.isNotEmpty
+            ? showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width / 1,
+                      height: MediaQuery.of(context).size.height / 1,
+                      child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          itemCount: certificates!.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                Image.file(File(certificates![index].path)),
+                                Container(height: 1),
+                              ],
+                            );
+                          }),
                     ),
-                  ),
-                  const SizedBox(
-                    height: defaultPadding,
-                  ),
-                  ElevatedButton(
-                    //if user click this button. user can upload image from camera
-                    onPressed: () {
-                      Navigator.pop(context);
-                      getImage(ImageSource.camera);
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.camera),
-                        Text('From Camera'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Close'))
+                    ],
+                  );
+                })
+            : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text(
+                  'No image(s) provided',
+                ),
+                action: SnackBarAction(label: 'Close', onPressed: () {}),
+              ));
+        log(workerForm.certificates.toString());
+      },
+      child: certificates!.isNotEmpty || certificates != null
+          ? const Text(
+              'View Images',
+              style: TextStyle(
+                  color: kPrimaryColor, decoration: TextDecoration.underline),
+              textAlign: TextAlign.center,
+            )
+          : const Text(
+              'Please provide image(s)',
+              style: TextStyle(
+                  color: kPrimaryColor, decoration: TextDecoration.underline),
+              textAlign: TextAlign.center,
             ),
-          );
-        });
+    );
   }
 
-  Container AttachImage(BuildContext context, String label) {
+  Container AttachCertificatesButton(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -152,41 +160,64 @@ class _fourthStepState extends State<fourthStep> {
             foregroundColor: kPrimaryColor,
             padding: const EdgeInsets.all(defaultPadding),
           ),
-          onPressed: imageAlert,
-          child: Text(
-            label,
-            style: const TextStyle(color: Colors.black),
+          onPressed: () {
+            AttachCertificates();
+          },
+          child: const Text(
+            'Attach Certificates',
+            style: TextStyle(color: Colors.black),
           )),
     );
   }
-}
 
-class addCertificate extends StatefulWidget {
-  const addCertificate({Key? key}) : super(key: key);
-
-  @override
-  State<addCertificate> createState() => _addCertificateState();
-}
-
-class _addCertificateState extends State<addCertificate> {
-  XFile? image;
-  final ImagePicker picker = ImagePicker();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Column(
-          children: [
-            const SizedBox(height: defaultPadding),
-            AttachImage(context, "Attach Certificate"),
-          ],
-        ),
-      ],
-    );
+  AttachCertificates() async {
+    final List<XFile>? selectedImages = await picker.pickMultipleMedia();
+    if (selectedImages != null) {
+      certificates!.addAll(selectedImages);
+      try {
+        setState(() {
+          workerForm.certificates = certificates;
+        });
+      } catch (e) {
+        log(e.toString());
+      }
+    }
   }
 
-  Container AttachImage(BuildContext context, String label) {
+  InkWell ShowImage(BuildContext context, XFile? imageRef, File? image) {
+    return InkWell(
+        onTap: () {
+          if (imageRef != null) {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Image.file(image!),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Close'))
+                    ],
+                  );
+                });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: const Text('No image provided'),
+              action: SnackBarAction(label: 'Close', onPressed: () {}),
+            ));
+          }
+        },
+        child: Text(
+          imageRef != null ? imageRef.name : 'Please provide an image',
+          style: const TextStyle(
+              color: kPrimaryColor, decoration: TextDecoration.underline),
+          textAlign: TextAlign.center,
+        ));
+  }
+
+  Container AttachGovernmentID(BuildContext context, String label) {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -198,7 +229,9 @@ class _addCertificateState extends State<addCertificate> {
             foregroundColor: kPrimaryColor,
             padding: const EdgeInsets.all(defaultPadding),
           ),
-          onPressed: imageAlert,
+          onPressed: () {
+            PickImageGovernmentID(context);
+          },
           child: Text(
             label,
             style: const TextStyle(color: Colors.black),
@@ -206,47 +239,33 @@ class _addCertificateState extends State<addCertificate> {
     );
   }
 
-  void imageAlert() {
-    showDialog(
+  Future<dynamic> PickImageGovernmentID(
+    BuildContext context,
+  ) {
+    return showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             title: const Text('Please choose media to select'),
             content: SizedBox(
               height: MediaQuery.of(context).size.height / 6,
               child: Column(
                 children: [
                   ElevatedButton(
-                    //if user click this button, user can upload image from gallery
-                    onPressed: () {
-                      Navigator.pop(context);
-                      getImage(ImageSource.gallery);
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.image),
-                        Text('From Gallery'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: defaultPadding,
-                  ),
+                      onPressed: () async {
+                        GovernmentID(ImageSource.gallery);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.image), Text('From Gallery')],
+                      )),
+                  const SizedBox(height: defaultPadding),
                   ElevatedButton(
-                    //if user click this button. user can upload image from camera
-                    onPressed: () {
-                      Navigator.pop(context);
-                      getImage(ImageSource.camera);
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.camera),
-                        Text('From Camera'),
-                      ],
-                    ),
-                  ),
+                      onPressed: () async {
+                        GovernmentID(ImageSource.camera);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.camera), Text('From Camera')],
+                      )),
                 ],
               ),
             ),
@@ -254,11 +273,154 @@ class _addCertificateState extends State<addCertificate> {
         });
   }
 
-  Future getImage(ImageSource media) async {
-    var img = await picker.pickImage(source: media);
+  GovernmentID(ImageSource media) async {
+    Navigator.of(context).pop();
+    govIDRef = await picker.pickImage(source: media);
+    try {
+      setState(() {
+        govID = File(govIDRef!.path);
+        workerForm.governmentID = File(govIDRef!.path);
+      });
+    } catch (e) {
+      log('${e.toString()} in');
+    }
+  }
 
-    setState(() {
-      image = img;
-    });
+  Container AttachVaxCard(BuildContext context, String label) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(90),
+        color: kPrimaryLightColor,
+      ),
+      child: TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: kPrimaryColor,
+            padding: const EdgeInsets.all(defaultPadding),
+          ),
+          onPressed: () {
+            PickImageVaxCard(context);
+          },
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.black),
+          )),
+    );
+  }
+
+  Future<dynamic> PickImageVaxCard(
+    BuildContext context,
+  ) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Please choose media to select'),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height / 6,
+              child: Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () async {
+                        VaxCard(ImageSource.gallery);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.image), Text('From Gallery')],
+                      )),
+                  const SizedBox(height: defaultPadding),
+                  ElevatedButton(
+                      onPressed: () async {
+                        VaxCard(ImageSource.camera);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.camera), Text('From Camera')],
+                      )),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  VaxCard(ImageSource media) async {
+    Navigator.of(context).pop();
+    vaxCardRef = await picker.pickImage(source: media);
+    try {
+      setState(() {
+        vaxCard = File(vaxCardRef!.path);
+        workerForm.vaxCard = File(vaxCardRef!.path);
+      });
+    } catch (e) {
+      log('${e.toString()} in');
+    }
+  }
+
+  Container AttachNBIClearance(BuildContext context, String label) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(90),
+        color: kPrimaryLightColor,
+      ),
+      child: TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: kPrimaryColor,
+            padding: const EdgeInsets.all(defaultPadding),
+          ),
+          onPressed: () {
+            PickImageNBIClearance(context);
+          },
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.black),
+          )),
+    );
+  }
+
+  Future<dynamic> PickImageNBIClearance(
+    BuildContext context,
+  ) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Please choose media to select'),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height / 6,
+              child: Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () async {
+                        NBIClearance(ImageSource.gallery);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.image), Text('From Gallery')],
+                      )),
+                  const SizedBox(height: defaultPadding),
+                  ElevatedButton(
+                      onPressed: () async {
+                        NBIClearance(ImageSource.camera);
+                      },
+                      child: const Row(
+                        children: [Icon(Icons.camera), Text('From Camera')],
+                      )),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  NBIClearance(ImageSource media) async {
+    Navigator.of(context).pop();
+    nbiClearanceRef = await picker.pickImage(source: media);
+    try {
+      setState(() {
+        nbiClearance = File(nbiClearanceRef!.path);
+        workerForm.nbiClearance = File(nbiClearanceRef!.path);
+      });
+    } catch (e) {
+      log('${e.toString()} in');
+    }
   }
 }

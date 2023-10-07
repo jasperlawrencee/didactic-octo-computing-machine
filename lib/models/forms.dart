@@ -13,13 +13,23 @@ class WorkerForm {
   String? barangay;
   String? stAddress;
   String? extAddress;
-  List<String>? hair = [];
-  List<String>? makeup = [];
-  List<String>? spa = [];
-  List<String>? nails = [];
-  List<String>? lashes = [];
-  List<String>? wax = [];
+  List<String> hair = ['Hair Services'];
+  bool isHairClicked = false;
+  List<String> makeup = ['Makeup Services'];
+  bool isMakeupClicked = false;
+  List<String> spa = ['Spa Services'];
+  bool isSpaClicked = false;
+  List<String> nails = ['Nails Services'];
+  bool isNailsClicked = false;
+  List<String> lashes = ['Lashes Services'];
+  bool isLashesClicked = false;
+  List<String> wax = ['Wax Services'];
+  bool isWaxClicked = false;
   List<dynamic>? experiences = [];
+  String? experienceName;
+  String? experienceAddress;
+  String? experienceNum;
+  String? selectedDays;
   File? governmentID;
   File? vaxCard;
   File? nbiClearance;
@@ -38,13 +48,17 @@ class WorkerForm {
     this.barangay,
     this.stAddress,
     this.extAddress,
-    this.hair,
-    this.makeup,
-    this.spa,
-    this.nails,
-    this.lashes,
-    this.wax,
+    required this.hair,
+    required this.makeup,
+    required this.spa,
+    required this.nails,
+    required this.lashes,
+    required this.wax,
     this.experiences,
+    this.experienceName,
+    this.experienceAddress,
+    this.experienceNum,
+    this.selectedDays,
     this.governmentID,
     this.vaxCard,
     this.nbiClearance,

@@ -132,7 +132,7 @@ class _MobileVerificationState extends State<MobileVerification> {
                                             Navigator.push(context,
                                                 MaterialPageRoute(
                                                     builder: (context) {
-                                              return SalonRegisterScreen();
+                                              return const SalonRegisterScreen();
                                             }));
                                           },
                                           child: const Text("Yes")),

@@ -134,7 +134,7 @@ class _ServicesPageState extends State<ServicesPage> {
                           DropdownButton<String>(
                             items: serviceName.map(buildMenuItem).toList(),
                             onChanged: (value) => setState(() {
-                              this.editValue = value;
+                              editValue = value;
                             }),
                           )
                         ],

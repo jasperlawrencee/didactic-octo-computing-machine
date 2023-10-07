@@ -67,8 +67,8 @@ class _CompletePaymentState extends State<CompletePayment> {
                     ),
                   ],
                 ),
-                SingleChildScrollView(),
-                Spacer(),
+                const SingleChildScrollView(),
+                const Spacer(),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(

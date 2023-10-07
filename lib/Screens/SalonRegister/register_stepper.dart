@@ -21,7 +21,7 @@ SalonForm salonForm = SalonForm(
     representativeNum: '');
 
 class SalonRegisterScreen extends StatefulWidget {
-  SalonRegisterScreen({Key? key}) : super(key: key);
+  const SalonRegisterScreen({Key? key}) : super(key: key);
 
   @override
   _SalonRegisterScreenState createState() => _SalonRegisterScreenState();
@@ -32,7 +32,6 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     salonForm = SalonForm(
       salonName: '',
@@ -152,7 +151,6 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                // addRoleToFireStore();
                 Navigator.of(context).pop();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const Summary();
@@ -163,5 +161,22 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
         );
       },
     );
+  }
+
+  bool isValidated() {
+    if (salonForm.salonName.isEmpty ||
+        salonForm.roomBuilding.isEmpty ||
+        salonForm.streetRoad.isEmpty ||
+        salonForm.barangay.isEmpty ||
+        salonForm.city.isEmpty ||
+        salonForm.salonOwner.isEmpty ||
+        salonForm.salonNumber.isEmpty ||
+        salonForm.salonRepresentative.isEmpty ||
+        salonForm.representativeEmail.isEmpty ||
+        salonForm.representativeNum.isEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

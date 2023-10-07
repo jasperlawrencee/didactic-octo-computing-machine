@@ -1,6 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api, camel_case_types, non_constant_identifier_names
 
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,6 +14,8 @@ class step1 extends StatefulWidget {
   @override
   _step1State createState() => _step1State();
 }
+
+final _form = GlobalKey<FormState>();
 
 class _step1State extends State<step1> {
   XFile? image;
@@ -84,90 +85,94 @@ class _step1State extends State<step1> {
       },
     );
 
-    return Column(
-      children: [
-        const Align(
-          alignment: Alignment.topRight,
-          child: Text(
-            "Required*",
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 10,
-              fontFamily: 'Inter',
+    return Form(
+      key: _form,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Column(
+        children: [
+          const Align(
+            alignment: Alignment.topRight,
+            child: Text(
+              "Required*",
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 10,
+                fontFamily: 'Inter',
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: defaultPadding),
-        const Text(
-          "Salon Data",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: defaultPadding),
-        flatTextField("Salon Name*", salonName),
-        const SizedBox(height: defaultPadding),
-        const Text(
-          "Salon Address",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        flatTextField("Room No./Building*", roomBuilding),
-        flatTextField("Street/Road*", streetRoad),
-        flatTextField("Barangay*", barangay),
-        flatTextField("City*", city),
-        const SizedBox(height: defaultPadding),
-        const Text(
-          "Salon Details",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: defaultPadding),
-        flatTextField("Salon Owner Name*", salonOwner),
-        flatTextField("Salon Contact Number*", salonNumber),
-        flatTextField("Salon Representative Name*", salonRepresentative),
-        flatTextField("Representative Email Address*", representativeEmail),
-        flatTextField("Representative Contact Number*", representativeNum),
-        const SizedBox(height: defaultPadding),
-        AttachImage(context, "Attach Representative ID+"),
-        const SizedBox(height: defaultPadding),
-        InkWell(
-          onTap: () {
-            if (image != null) {
-              showDialog(
-                  context: context,
-                  builder: ((context) {
-                    return Theme(
-                      data: ThemeData(
-                          canvasColor: Colors.transparent,
-                          colorScheme: Theme.of(context).colorScheme.copyWith(
-                                primary: kPrimaryColor,
-                                background: Colors.white70,
-                                secondary: kPrimaryLightColor,
-                              )),
-                      child: AlertDialog(
-                        content: Image.file(pickedImage!),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Close'))
-                        ],
-                      ),
-                    );
-                  }));
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: const Text('No image provided'),
-                action: SnackBarAction(label: 'Close', onPressed: () {}),
-              ));
-            }
-          },
-          child: Text(
-            image != null ? image!.name : 'Please provide an image',
-            style: const TextStyle(
-                color: kPrimaryColor, decoration: TextDecoration.underline),
-            textAlign: TextAlign.center,
+          const SizedBox(height: defaultPadding),
+          const Text(
+            "Salon Data",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ),
-      ],
+          const SizedBox(height: defaultPadding),
+          flatTextField("Salon Name*", salonName),
+          const SizedBox(height: defaultPadding),
+          const Text(
+            "Salon Address",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          flatTextField("Room No./Building*", roomBuilding),
+          flatTextField("Street/Road*", streetRoad),
+          flatTextField("Barangay*", barangay),
+          flatTextField("City*", city),
+          const SizedBox(height: defaultPadding),
+          const Text(
+            "Salon Details",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: defaultPadding),
+          flatTextField("Salon Owner Name*", salonOwner),
+          flatTextField("Salon Contact Number*", salonNumber),
+          flatTextField("Salon Representative Name*", salonRepresentative),
+          flatTextField("Representative Email Address*", representativeEmail),
+          flatTextField("Representative Contact Number*", representativeNum),
+          const SizedBox(height: defaultPadding),
+          AttachImage(context, "Attach Representative ID+"),
+          const SizedBox(height: defaultPadding),
+          InkWell(
+            onTap: () {
+              if (image != null) {
+                showDialog(
+                    context: context,
+                    builder: ((context) {
+                      return Theme(
+                        data: ThemeData(
+                            canvasColor: Colors.transparent,
+                            colorScheme: Theme.of(context).colorScheme.copyWith(
+                                  primary: kPrimaryColor,
+                                  background: Colors.white70,
+                                  secondary: kPrimaryLightColor,
+                                )),
+                        child: AlertDialog(
+                          content: Image.file(pickedImage!),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Close'))
+                          ],
+                        ),
+                      );
+                    }));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text('No image provided'),
+                  action: SnackBarAction(label: 'Close', onPressed: () {}),
+                ));
+              }
+            },
+            child: Text(
+              image != null ? image!.name : 'Please provide an image',
+              style: const TextStyle(
+                  color: kPrimaryColor, decoration: TextDecoration.underline),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

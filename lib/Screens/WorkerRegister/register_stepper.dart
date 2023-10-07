@@ -10,10 +10,19 @@ import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step4.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/summary.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/forms.dart';
+
+WorkerForm workerForm = WorkerForm(
+    hair: [''],
+    makeup: [''],
+    spa: [''],
+    nails: [''],
+    lashes: [''],
+    wax: [''],
+    experiences: ['']);
 
 class WorkerRegisterScreen extends StatefulWidget {
   const WorkerRegisterScreen({Key? key}) : super(key: key);
@@ -25,30 +34,42 @@ class WorkerRegisterScreen extends StatefulWidget {
 
 class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   int currentStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    workerForm = WorkerForm(
+        hair: [''],
+        makeup: [''],
+        spa: [''],
+        nails: [''],
+        lashes: [''],
+        wax: [''],
+        experiences: ['']);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final WorkerForm workerForm = WorkerForm();
-
     List<Step> getSteps() => [
           Step(
             isActive: currentStep >= 0,
             title: const Text(''),
-            content: firstStep(wForm: workerForm),
+            content: const firstStep(),
           ),
           Step(
             isActive: currentStep >= 1,
             title: const Text(''),
-            content: secondStep(wForm: workerForm),
+            content: const secondStep(),
           ),
           Step(
             isActive: currentStep >= 2,
             title: const Text(''),
-            content: thirdStep(wForm: workerForm),
+            content: const thirdStep(),
           ),
           Step(
             isActive: currentStep >= 3,
             title: const Text(''),
-            content: fourthStep(wForm: workerForm),
+            content: const fourthStep(),
           ),
         ];
 
@@ -141,11 +162,9 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WorkerSummaryScreen()));
-                addRoleToFireStore();
+                Navigator.of(context).pop();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Summary()));
               },
             ),
           ],

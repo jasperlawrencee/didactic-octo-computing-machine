@@ -110,7 +110,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             children: [],
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(

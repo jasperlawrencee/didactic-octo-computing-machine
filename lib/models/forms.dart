@@ -29,7 +29,7 @@ class WorkerForm {
   String? experienceName;
   String? experienceAddress;
   String? experienceNum;
-  String? selectedDays;
+  String selectedDays;
   File? governmentID;
   File? vaxCard;
   File? nbiClearance;
@@ -58,7 +58,7 @@ class WorkerForm {
     this.experienceName,
     this.experienceAddress,
     this.experienceNum,
-    this.selectedDays,
+    required this.selectedDays,
     this.governmentID,
     this.vaxCard,
     this.nbiClearance,

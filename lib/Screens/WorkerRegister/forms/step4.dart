@@ -130,7 +130,6 @@ class _fourthStepState extends State<fourthStep> {
                 ),
                 action: SnackBarAction(label: 'Close', onPressed: () {}),
               ));
-        log(workerForm.certificates.toString());
       },
       child: certificates!.isNotEmpty || certificates != null
           ? const Text(

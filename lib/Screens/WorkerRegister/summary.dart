@@ -1,8 +1,12 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -15,6 +19,24 @@ class Summary extends StatefulWidget {
 }
 
 class _SummaryState extends State<Summary> {
+  final _firestore = FirebaseFirestore.instance;
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  CollectionReference? imgRef;
+  String governmentID = '';
+  String vaccinationCard = '';
+  String nbiClearance = '';
+  List<String> certificates = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    imgRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -277,8 +299,16 @@ class _SummaryState extends State<Summary> {
             ),
             const SizedBox(height: defaultPadding),
             const Text(
-              'Pictures',
+              'Requirements',
               style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: defaultPadding),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('TIN ID'),
+                Text(workerForm.tinID.toString()),
+              ],
             ),
             const SizedBox(height: defaultPadding),
             Row(
@@ -349,47 +379,52 @@ class _SummaryState extends State<Summary> {
                 ),
                 InkWell(
                   onTap: () {
-                    workerForm.certificates!.isNotEmpty
-                        ? showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                content: SizedBox(
-                                  width: MediaQuery.of(context).size.width / 1,
-                                  height:
-                                      MediaQuery.of(context).size.height / 1,
-                                  child: ListView.builder(
-                                      scrollDirection: Axis.vertical,
-                                      itemCount:
-                                          workerForm.certificates!.length,
-                                      shrinkWrap: true,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Column(
-                                          children: [
-                                            Image.file(File(workerForm
-                                                .certificates![index].path)),
-                                            Container(height: 1),
-                                          ],
-                                        );
-                                      }),
-                                ),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Close'))
-                                ],
-                              );
-                            })
-                        : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: const Text(
-                              'No image(s) provided',
-                            ),
-                            action: SnackBarAction(
-                                label: 'Close', onPressed: () {}),
-                          ));
+                    try {
+                      workerForm.certificates!.isNotEmpty
+                          ? showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width / 1,
+                                    height:
+                                        MediaQuery.of(context).size.height / 1,
+                                    child: ListView.builder(
+                                        scrollDirection: Axis.vertical,
+                                        itemCount:
+                                            workerForm.certificates!.length,
+                                        shrinkWrap: true,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return Column(
+                                            children: [
+                                              Image.file(File(workerForm
+                                                  .certificates![index].path)),
+                                              Container(height: 1),
+                                            ],
+                                          );
+                                        }),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Close'))
+                                  ],
+                                );
+                              })
+                          : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: const Text(
+                                'No image(s) provided',
+                              ),
+                              action: SnackBarAction(
+                                  label: 'Close', onPressed: () {}),
+                            ));
+                    } catch (e) {
+                      log(e.toString());
+                    }
                   },
                   child: const Text(
                     'Preview',
@@ -401,12 +436,127 @@ class _SummaryState extends State<Summary> {
               ],
             ),
             const SizedBox(height: defaultPadding),
-            nextButton(context, () {}, 'Confirm'),
+            nextButton(context, () async {
+              Navigator.of(context).pop();
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const WorkerSummaryScreen();
+              }));
+
+              try {} catch (e) {
+                log(e.toString());
+              }
+            }, 'Confirm'),
             const SizedBox(height: defaultPadding),
           ],
         ),
       ),
     ));
+  }
+
+  Map<String, dynamic> step1() => {
+        'firstName': workerForm.firstName,
+        'middleName': workerForm.middleName,
+        'lastName': workerForm.lastName,
+        'gender': workerForm.gender,
+        'primaryPhoneNumber': workerForm.phoneNum1,
+        'secondaryPhoneNumber': workerForm.phoneNum2,
+        'city': workerForm.city,
+        'barangay': workerForm.barangay,
+        'streetAddress': workerForm.stAddress,
+        'extendedStAddress': workerForm.extAddress,
+      };
+
+  Map<String, dynamic> step2() => {
+        if (workerForm.isHairClicked) 'hair': workerForm.hair,
+        if (workerForm.isMakeupClicked) 'makeup': workerForm.makeup,
+        if (workerForm.isSpaClicked) 'spa': workerForm.spa,
+        if (workerForm.isNailsClicked) 'nails': workerForm.nails,
+        if (workerForm.isLashesClicked) 'lashes': workerForm.lashes,
+        if (workerForm.isWaxClicked) 'wax': workerForm.wax,
+      };
+
+  Map<String, dynamic> step3() => {
+        'salonName': workerForm.experienceName,
+        'salonAddress': workerForm.experienceAddress,
+        'salonContactNumber': workerForm.experienceNum,
+        'experienceDuration': workerForm.selectedDays,
+      };
+
+  Map<String, dynamic> step4() => {
+        'governmentID': governmentID,
+        'vaccinationCard': vaccinationCard,
+        'nbiClearance': nbiClearance,
+        'tinID': workerForm.tinID,
+      };
+
+  addStep1() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc()
+        .set(step1())
+        .onError((error, stackTrace) => null);
+  }
+
+  addStep2() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc()
+        .set(step2())
+        .onError((error, stackTrace) => null);
+  }
+
+  addStep3() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc()
+        .set(step3())
+        .onError((error, stackTrace) => null);
+  }
+
+  addStep4() async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages =
+        referenceRoot.child('freelancerImages').child(currentUser!.uid);
+    Reference governmentIDImage = referenceDirImages.child('governmentID');
+    Reference vaccinationCardImage =
+        referenceDirImages.child('vaccinationCard');
+    Reference nbiClearanceImage = referenceDirImages.child('nbiClearance');
+    Reference certificatesImage = referenceDirImages.child('certificates');
+
+    await governmentIDImage.putFile(workerForm.governmentID!);
+    await vaccinationCardImage.putFile(workerForm.vaxCard!);
+    await nbiClearanceImage.putFile(workerForm.nbiClearance!);
+    for (int i = 0; i < workerForm.certificates!.length; i++) {
+      await certificatesImage
+          .putFile(workerForm.certificates![i])
+          .whenComplete(() async {
+        await certificatesImage.getDownloadURL().then((value) => {
+              imgRef!.add({'url': value})
+            });
+      });
+    }
+
+    governmentID = await governmentIDImage.getDownloadURL();
+    vaccinationCard = await vaccinationCardImage.getDownloadURL();
+    nbiClearance = await nbiClearanceImage.getDownloadURL();
+  }
+
+  addRoleToFireStore() {
+    var user = FirebaseAuth.instance.currentUser;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    try {
+      ref.doc(user!.uid).update({'role': 'freelancer'});
+      log("added salon role to firestore");
+    } catch (e) {
+      log("$user $ref");
+      log(e.toString());
+    }
   }
 
   InkWell showServices(BuildContext context, List services) {
@@ -443,7 +593,7 @@ class _SummaryState extends State<Summary> {
                 action: SnackBarAction(label: 'Close', onPressed: () {}),
               ));
       },
-      child: Text(
+      child: const Text(
         'View',
         style: TextStyle(
             color: kPrimaryColor, decoration: TextDecoration.underline),

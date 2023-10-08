@@ -22,7 +22,8 @@ WorkerForm workerForm = WorkerForm(
     nails: [''],
     lashes: [''],
     wax: [''],
-    experiences: ['']);
+    experiences: [''],
+    selectedDays: '');
 
 class WorkerRegisterScreen extends StatefulWidget {
   const WorkerRegisterScreen({Key? key}) : super(key: key);
@@ -45,7 +46,8 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
         nails: [''],
         lashes: [''],
         wax: [''],
-        experiences: ['']);
+        experiences: [''],
+        selectedDays: '');
   }
 
   @override

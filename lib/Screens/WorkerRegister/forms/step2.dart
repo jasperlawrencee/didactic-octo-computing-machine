@@ -37,12 +37,12 @@ class _secondStepState extends State<secondStep> {
   String selectedLashesValue = '';
   String selectedWaxValue = '';
 
-  List<String> hairValues = ['hair'];
-  List<String> makeupValues = ['makeup'];
-  List<String> spaValues = ['spa'];
-  List<String> nailsValues = ['nails'];
-  List<String> lashesValues = ['lashes'];
-  List<String> waxValues = ['wax'];
+  List<String> hairValues = [''];
+  List<String> makeupValues = [''];
+  List<String> spaValues = [''];
+  List<String> nailsValues = [''];
+  List<String> lashesValues = [''];
+  List<String> waxValues = [''];
 
   @override
   Widget build(BuildContext context) {
@@ -198,14 +198,16 @@ class _ServiceItemsState extends State<ServiceItems> {
                 fontSize: 13,
               ),
             ),
-            value: widget.selectedValue,
+            value: widget.selectedValue.isEmpty ? null : widget.selectedValue,
             isExpanded: true,
-            items: widget.items.map<DropdownMenuItem<String>>((item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(item),
-              );
-            }).toList(),
+            items: widget.items.isNotEmpty
+                ? widget.items.map<DropdownMenuItem<String>>((item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(item),
+                    );
+                  }).toList()
+                : <DropdownMenuItem<String>>[],
             onChanged: (value) => setState(() {
               try {
                 widget.selectedValue = value!;

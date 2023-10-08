@@ -42,10 +42,12 @@ class _thirdStepState extends State<thirdStep> {
       children: [
         const SizedBox(height: defaultPadding),
         const Text(
-          "Experiences\n",
+          "Experiences\n(Optional)",
           style: TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
-        Section(experienceName, experienceAddress, experienceNum, selectedDays),
+        Section(context, experienceName, experienceAddress, experienceNum,
+            selectedDays),
         const SizedBox(height: defaultPadding),
         Column(
           children: widgets,
@@ -87,6 +89,7 @@ class _thirdStepState extends State<thirdStep> {
   }
 
   Widget Section(
+    BuildContext context,
     TextEditingController salonName,
     salonAddress,
     salonNum,
@@ -99,22 +102,28 @@ class _thirdStepState extends State<thirdStep> {
         flatTextField("Salon Address*", salonAddress),
         flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
-        Text(
-            '${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}'),
+        Text(workerForm.selectedDays!.isEmpty
+            ? 'Date Selected'
+            : workerForm.selectedDays.toString()),
+        // Text(
+        //     '${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}'),
         ElevatedButton(
           onPressed: () async {
-            final DateTimeRange? dateTimeRange = await showDateRangePicker(
+            DateTimeRange? dateTimeRange = await showDateRangePicker(
               context: context,
               firstDate: DateTime(2000),
               lastDate: DateTime(2500),
-              initialEntryMode: DatePickerEntryMode.input,
+              initialEntryMode: DatePickerEntryMode.inputOnly,
             );
             if (dateTimeRange != null) {
               setState(() {
                 pickedDays = dateTimeRange;
                 workerForm.selectedDays =
                     "${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}";
+                log('${workerForm.selectedDays}');
               });
+            } else {
+              log('wala');
             }
           },
           child: const Text('Duration of Experience'),

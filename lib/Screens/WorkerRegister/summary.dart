@@ -144,15 +144,93 @@ class _SummaryState extends State<Summary> {
               ],
             ),
             const SizedBox(height: defaultPadding),
-            const Text(
-              'Service Category',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: defaultPadding),
+            if (workerForm.isHairClicked ||
+                workerForm.isMakeupClicked ||
+                workerForm.isSpaClicked ||
+                workerForm.isNailsClicked ||
+                workerForm.isLashesClicked ||
+                workerForm.isWaxClicked)
+              const Text(
+                'Service Category',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             if (workerForm.isHairClicked && workerForm.hair.isNotEmpty)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [const Text('Hair'), showServices(context)],
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Hair'),
+                      showServices(context, workerForm.hair),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
+            if (workerForm.isMakeupClicked && workerForm.makeup.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Makeup'),
+                      showServices(context, workerForm.makeup),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
+            if (workerForm.isSpaClicked && workerForm.spa.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Spa'),
+                      showServices(context, workerForm.spa),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
+            if (workerForm.isNailsClicked && workerForm.nails.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Nails'),
+                      showServices(context, workerForm.nails),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
+            if (workerForm.isLashesClicked && workerForm.lashes.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Lashes'),
+                      showServices(context, workerForm.lashes),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
+            if (workerForm.isWaxClicked && workerForm.wax.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Wax'),
+                      showServices(context, workerForm.wax),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
               ),
             const Text(
               'Experiences',
@@ -331,10 +409,10 @@ class _SummaryState extends State<Summary> {
     ));
   }
 
-  InkWell showServices(BuildContext context) {
+  InkWell showServices(BuildContext context, List services) {
     return InkWell(
       onTap: () {
-        workerForm.hair.isNotEmpty
+        services.isNotEmpty
             ? showDialog(
                 context: context,
                 builder: (context) {
@@ -344,12 +422,12 @@ class _SummaryState extends State<Summary> {
                       height: MediaQuery.of(context).size.height / 4,
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
-                        itemCount: workerForm.hair.length,
+                        itemCount: services.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           return Column(
                             children: [
-                              Text(workerForm.hair[index]),
+                              Text(services[index]),
                               Container(height: defaultPadding),
                             ],
                           );

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/AdminScreens/Sidebar.dart';
 import 'package:flutter_auth/constants.dart';
@@ -27,10 +29,7 @@ class _AdminManageUsersState extends State<AdminManageUsers> {
 
         return Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
-              cell,
-              textAlign: TextAlign.left,
-            ));
+            child: Text(cell, textAlign: TextAlign.left, style: style));
       }).toList());
 
   @override
@@ -121,24 +120,8 @@ class _AdminManageUsersState extends State<AdminManageUsers> {
                             fontFamily: 'Inter',
                             color: Colors.black),
                       ),
-                      Table(
-                        children: [
-                          buildRow(['Name', 'Category', 'Services', 'Button'],
-                              isHeader: true),
-                          buildRow([
-                            'Wheein Jung',
-                            'Category',
-                            'Services',
-                            'Button'
-                          ]),
-                          buildRow([
-                            'Wheein Jung',
-                            'Category',
-                            'Services',
-                            'Button'
-                          ]),
-                        ],
-                      )
+                      //
+                      // DataTable(columns: columns, rows: rows)
                     ],
                   ),
                 ),

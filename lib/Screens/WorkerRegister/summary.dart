@@ -22,6 +22,7 @@ class _SummaryState extends State<Summary> {
   final _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
   CollectionReference? imgRef;
+  DocumentReference? urlRef;
   String governmentID = '';
   String vaccinationCard = '';
   String nbiClearance = '';
@@ -442,7 +443,14 @@ class _SummaryState extends State<Summary> {
                 return const WorkerSummaryScreen();
               }));
 
-              try {} catch (e) {
+              try {
+                //adds "freelancer" to firebase cloud storage
+                addRoleToFireStore();
+                addStep1();
+                addStep2();
+                addStep3();
+                addStep4();
+              } catch (e) {
                 log(e.toString());
               }
             }, 'Confirm'),
@@ -482,20 +490,14 @@ class _SummaryState extends State<Summary> {
         'experienceDuration': workerForm.selectedDays,
       };
 
-  Map<String, dynamic> step4() => {
-        'governmentID': governmentID,
-        'vaccinationCard': vaccinationCard,
-        'nbiClearance': nbiClearance,
-        'tinID': workerForm.tinID,
-      };
-
   addStep1() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
         .collection('userDetails')
-        .doc()
+        .doc('step1')
         .set(step1())
+        .whenComplete(() => log('added step1'))
         .onError((error, stackTrace) => null);
   }
 
@@ -504,8 +506,9 @@ class _SummaryState extends State<Summary> {
         .collection('users')
         .doc(currentUser!.uid)
         .collection('userDetails')
-        .doc()
+        .doc('step2')
         .set(step2())
+        .whenComplete(() => log('added step2'))
         .onError((error, stackTrace) => null);
   }
 
@@ -514,8 +517,9 @@ class _SummaryState extends State<Summary> {
         .collection('users')
         .doc(currentUser!.uid)
         .collection('userDetails')
-        .doc()
+        .doc('step3')
         .set(step3())
+        .whenComplete(() => log('added step3'))
         .onError((error, stackTrace) => null);
   }
 
@@ -532,19 +536,41 @@ class _SummaryState extends State<Summary> {
     await governmentIDImage.putFile(workerForm.governmentID!);
     await vaccinationCardImage.putFile(workerForm.vaxCard!);
     await nbiClearanceImage.putFile(workerForm.nbiClearance!);
-    for (int i = 0; i < workerForm.certificates!.length; i++) {
-      await certificatesImage
-          .putFile(workerForm.certificates![i])
-          .whenComplete(() async {
-        await certificatesImage.getDownloadURL().then((value) => {
-              imgRef!.add({'url': value})
-            });
-      });
+    if (workerForm.certificates!.isNotEmpty) {
+      for (int i = 0; i < workerForm.certificates!.length; i++) {
+        await certificatesImage
+            .putFile(File(workerForm.certificates![i].path))
+            .whenComplete(() async {
+          await certificatesImage.getDownloadURL().then((value) => {
+                imgRef!.doc('step4').set({'certificates': value})
+                // urlRef!
+                //     .collection('users')
+                //     .doc(currentUser!.uid)
+                //     .collection('userDetails')
+                //     .doc('step4')
+                //     .set({'url': value})
+              });
+        });
+      }
     }
 
     governmentID = await governmentIDImage.getDownloadURL();
     vaccinationCard = await vaccinationCardImage.getDownloadURL();
     nbiClearance = await nbiClearanceImage.getDownloadURL();
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('step4')
+        .set({
+          'governmentID': governmentID,
+          'vaccinationCard': vaccinationCard,
+          'nbiClearance': nbiClearance,
+          'tinID': workerForm.tinID,
+        })
+        .whenComplete(() => log('added step4'))
+        .onError((error, stackTrace) => null);
+    log('added step4');
   }
 
   addRoleToFireStore() {

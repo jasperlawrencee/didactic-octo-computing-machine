@@ -102,7 +102,7 @@ class _thirdStepState extends State<thirdStep> {
         flatTextField("Salon Address*", salonAddress),
         flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
-        Text(workerForm.selectedDays!.isEmpty
+        Text(workerForm.selectedDays.isEmpty
             ? 'Date Selected'
             : workerForm.selectedDays.toString()),
         // Text(

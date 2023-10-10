@@ -30,7 +30,7 @@ dependencies:
   cloud_firestore: ^4.9.1
   floating_navbar: ^2.0.2
   url_launcher: ^6.0.9
-
+  sidebarx: ^0.16.2
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
   syncfusion_flutter_calendar: ^23.1.36

@@ -28,6 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
   final FirebaseService _authService = FirebaseService();
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _username = TextEditingController();
@@ -173,7 +174,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
     //add email and username to firestore
     postEmailToFireStore();
-
     if (user != null) {
       log("user created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -195,9 +195,11 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       var user = FirebaseAuth.instance.currentUser;
       CollectionReference ref = FirebaseFirestore.instance.collection('users');
-      ref
-          .doc(user!.uid)
-          .set({'email': _email.text, 'username': _username.text});
+      ref.doc(user!.uid).set({
+        'email': _email.text,
+        'username': _username.text,
+        'status': 'unverified' // adds unverified status for admin to verify
+      });
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));
       log("user added to firestore");

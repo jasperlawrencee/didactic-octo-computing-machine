@@ -17,9 +17,14 @@ class _ApplicationsState extends State<Applications> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   List<String> type = ['All', 'Salon', 'Freelancer'];
   List<String> verification = ['Unverified', 'Verified'];
-  String firstName = '';
-  String middleName = '';
-  String lastName = '';
+  List<String> userNames = [];
+
+  @override
+  void initState() {
+    getUsername();
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,40 +59,120 @@ class _ApplicationsState extends State<Applications> {
                     }).toList()),
               ],
             ),
-            InkWell(
-              child: Container(
-                height: 150,
-                width: 220,
-                color: kPrimaryLightColor,
-              ),
-              onTap: () {},
-            )
+            const SizedBox(height: defaultPadding),
+            FutureBuilder<int>(
+                future: getNumberOfUnverified(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('error ${snapshot.error}');
+                  } else {
+                    final itemCount = snapshot.data ?? 0;
+                    return Expanded(
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 5),
+                        shrinkWrap: true,
+                        itemCount: itemCount,
+                        itemBuilder: (context, index) {
+                          return userBox(context, userNames[index]);
+                        },
+                      ),
+                    );
+                  }
+                })
           ],
         ),
       ),
     );
   }
 
-  //must grab all users in firestore
-  getUserFullName() {
-    _firebaseFirestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step1')
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      try {
-        if (documentSnapshot.exists) {
-          setState(() {
-            firstName = documentSnapshot.get('firstName');
-            middleName = documentSnapshot.get('middleName');
-            lastName = documentSnapshot.get('lastname');
-          });
+  //gets the number of unverified freelancers/salons
+  Future<int> getNumberOfUnverified() async {
+    try {
+      var userCollection = FirebaseFirestore.instance.collection('users');
+      //gets all unverified users
+      var querySnapshot =
+          await userCollection.where('status', isEqualTo: 'unverified').get();
+      return querySnapshot.size;
+    } catch (e) {
+      log('error counting documents: $e');
+      return 0;
+    }
+  }
+
+  Future<int> getNumberOfVerified() async {
+    try {
+      var userCollection = FirebaseFirestore.instance.collection('users');
+      //gets all unverified users
+      var querySnapshot =
+          await userCollection.where('status', isEqualTo: 'verified').get();
+      log(querySnapshot.size.toString());
+      return querySnapshot.size;
+    } catch (e) {
+      log('error counting documents: $e');
+      return 0;
+    }
+  }
+
+  getUserDetails() {}
+
+  //grab all freelancers/salons usernames from firestore
+  Future<List<String>> getUsername() async {
+    try {
+      List<String> collectionUsernames = [];
+      QuerySnapshot querySnapshot =
+          await _firebaseFirestore.collection('users').get();
+
+      querySnapshot.docs.forEach((DocumentSnapshot doc) {
+        if ((doc.data() as Map<String, dynamic>).containsKey('username') &&
+            doc.data() != null) {
+          if (doc.get('username') == 'adminUsername') {
+            return;
+          } else {
+            collectionUsernames.add(doc['username']);
+            setState(() {
+              userNames = collectionUsernames;
+            });
+          }
         }
-      } catch (e) {
-        log(e.toString());
-      }
-    });
+      });
+      log(userNames.toString());
+      return collectionUsernames;
+    } catch (e) {
+      log('error: $e');
+      return [];
+    }
+  }
+
+  //the container for showing users
+  userBox(BuildContext context, String username) {
+    return Container(
+      height: 20,
+      width: 20,
+      constraints: const BoxConstraints(maxWidth: 80),
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
+      color: kPrimaryLightColor,
+      child: Column(
+        children: [
+          Text(username),
+          InkWell(
+            child: Text('View'),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('User'),
+                    );
+                  });
+            },
+          )
+        ],
+      ),
+    );
   }
 }

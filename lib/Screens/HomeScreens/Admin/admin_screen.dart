@@ -41,12 +41,10 @@ class _AdminScreenState extends State<AdminScreen> {
                 builder: (context, child) {
                   switch (_sidebarController.selectedIndex) {
                     case 0:
-                      log('index 0');
                       return Center(
                         child: AdminHome(),
                       );
                     case 1:
-                      log('index 1');
                       return Center(
                         child: Applications(),
                       );

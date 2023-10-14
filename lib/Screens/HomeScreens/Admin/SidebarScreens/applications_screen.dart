@@ -147,6 +147,125 @@ class _ApplicationsState extends State<Applications> {
     }
   }
 
+  verifyWorkerDialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Verify'),
+            content: Container(
+              width: MediaQuery.of(context).size.width / 1.25,
+              height: MediaQuery.of(context).size.height / 1.5,
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('1'),
+                  Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'First Name',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('data')
+                            ],
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Row(
+                            children: [
+                              Text(
+                                'Middle Name',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('data')
+                            ],
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Row(
+                            children: [
+                              Text(
+                                'Last Name',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('data')
+                            ],
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Row(
+                            children: [
+                              Text(
+                                'Gender',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('data')
+                            ],
+                          ),
+                          SizedBox(height: defaultPadding),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            'Phone Number 1',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Text(
+                            'Phone Number 2',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            'City',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Text(
+                            'Barangay',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Text(
+                            'Street Address',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                          Text(
+                            'Extended ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: defaultPadding),
+                        ],
+                      )
+                    ],
+                  ),
+                  Text('2'),
+                  Divider(),
+                  Text('3'),
+                  Divider(),
+                  Text('4'),
+                  Divider(),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () {}, child: Text('Close')),
+              TextButton(onPressed: () {}, child: Text('Verify')),
+            ],
+          );
+        });
+  }
+
   //the container for showing users
   userBox(BuildContext context, String username) {
     return Container(

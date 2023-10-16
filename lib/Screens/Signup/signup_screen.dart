@@ -198,7 +198,8 @@ class _SignupScreenState extends State<SignupScreen> {
       ref.doc(user!.uid).set({
         'email': _email.text,
         'username': _username.text,
-        'status': 'unverified' // adds unverified status for admin to verify
+        'status': 'unverified', // adds unverified status for admin to verify
+        'role': ''
       });
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));

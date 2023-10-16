@@ -30,7 +30,6 @@ class _SummaryState extends State<Summary> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     imgRef = FirebaseFirestore.instance
         .collection('users')

@@ -120,7 +120,7 @@ class _thirdStepState extends State<thirdStep> {
                 pickedDays = dateTimeRange;
                 workerForm.selectedDays =
                     "${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}";
-                log('${workerForm.selectedDays}');
+                log(workerForm.selectedDays);
               });
             } else {
               log('wala');

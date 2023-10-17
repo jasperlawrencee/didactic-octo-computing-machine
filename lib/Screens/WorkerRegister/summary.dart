@@ -576,8 +576,8 @@ class _SummaryState extends State<Summary> {
     var user = FirebaseAuth.instance.currentUser;
     CollectionReference ref = FirebaseFirestore.instance.collection('users');
     try {
-      ref.doc(user!.uid).update({'role': 'freelancer'});
-      log("added salon role to firestore");
+      ref.doc(user!.uid).update({'role': 'pending'});
+      log("added pending role to firestore");
     } catch (e) {
       log("$user $ref");
       log(e.toString());

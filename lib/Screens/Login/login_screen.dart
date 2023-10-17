@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Admin/admin_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/salon_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
+import 'package:flutter_auth/Screens/SalonRegister/verification.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/Screens/Verification/verification_page.dart';
 import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
@@ -45,10 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       User? user =
           await _authService.signInWithEmailAndPassword(email, password);
-      route();
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sucessfully Logged In')));
+        route();
       }
     } catch (e) {
       log(e.toString());
@@ -80,11 +81,19 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const AdminScreen();
               }));
+            } else if (documentSnapshot.get('role') == 'pending') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const SalonSummaryScreen();
+              }));
+            } else if (documentSnapshot.get('role') == '') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const Verification();
+              }));
             }
           }
         } on StateError {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const Verification();
+            return const Placeholder();
           }));
         }
       });

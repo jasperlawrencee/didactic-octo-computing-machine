@@ -316,21 +316,24 @@ class _ApplicationsState extends State<Applications> {
     );
   }
 
-  // isToVerify() async {
-  //   try {
-  //     QuerySnapshot querySnapshot =
-  //         await _firebaseFirestore.collection('users').get();
-  //     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-  //       if (doc.data() != null &&
-  //           (doc.data() as Map<String, dynamic>).containsKey('role')) {
-  //         return true;
-  //       }
-  //     }
-  //   } catch (e) {
-  //     log(e.toString());
-  //   }
-  //   return false;
-  // }
+  Future<List<Map<String, dynamic>>> getAllSteps() async {
+    try {
+      var querySnapshot = await _firebaseFirestore.collection('users').get();
+      List<Map<String, dynamic>> stepsList = [];
+      querySnapshot.docs.forEach((DocumentSnapshot doc) {
+        if (doc.data() != null) {
+          Map<String, dynamic> documentFields =
+              doc.data() as Map<String, dynamic>;
+          stepsList.add(documentFields);
+        }
+      });
+      log(stepsList.toString());
+      return stepsList;
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
 
   //gets the number of freelancers/salons
   Future<int> getNumberofUsers() async {

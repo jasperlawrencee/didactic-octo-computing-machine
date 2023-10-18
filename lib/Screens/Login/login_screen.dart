@@ -67,13 +67,15 @@ class _LoginScreenState extends State<LoginScreen> {
           .get()
           .then((DocumentSnapshot documentSnapshot) {
         try {
-          dynamic nested = documentSnapshot.get(FieldPath(const ['role']));
+          var nested = documentSnapshot.get(FieldPath(const ['role']));
           if (documentSnapshot.exists) {
-            if (documentSnapshot.get('role') == 'freelancer') {
+            if (documentSnapshot.get('role') == 'freelancer' &&
+                documentSnapshot.get('status') == 'verified') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const WorkerScreen();
               }));
-            } else if (documentSnapshot.get('role') == 'salon') {
+            } else if (documentSnapshot.get('role') == 'salon' &&
+                documentSnapshot.get('status') == 'verified') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const SalonScreen();
               }));
@@ -81,13 +83,9 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const AdminScreen();
               }));
-            } else if (documentSnapshot.get('role') == 'pending') {
+            } else {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const SalonSummaryScreen();
-              }));
-            } else if (documentSnapshot.get('role') == '') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const Verification();
               }));
             }
           }

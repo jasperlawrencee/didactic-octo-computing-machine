@@ -209,7 +209,7 @@ class _ProfilePageState extends State<ProfilePage> {
     //grab name function
     super.initState;
     getWorkerUsername();
-    getAboutUser();
+    // getAboutUser();
     getAddress();
   }
 
@@ -225,23 +225,23 @@ class _ProfilePageState extends State<ProfilePage> {
     }));
   }
 
-  void getAboutUser() {
-    _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('userAbout')
-        .get()
-        .then(((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot != null) {
-        setState(() {
-          about = documentSnapshot.get('about');
-        });
-      } else {
-        log('getting about error');
-      }
-    }));
-  }
+  // void getAboutUser() {
+  //   _firestore
+  //       .collection('users')
+  //       .doc(currentUser!.uid)
+  //       .collection('userDetails')
+  //       .doc('userAbout')
+  //       .get()
+  //       .then(((DocumentSnapshot documentSnapshot) {
+  //     if (documentSnapshot != null) {
+  //       setState(() {
+  //         about = documentSnapshot.get('about');
+  //       });
+  //     } else {
+  //       log('getting about error');
+  //     }
+  //   }));
+  // }
 
   void getAddress() {
     _firestore

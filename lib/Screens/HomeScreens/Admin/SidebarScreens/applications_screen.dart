@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/SalonRegister/forms/step1.dart';
 import 'package:flutter_auth/constants.dart';
 
 class Applications extends StatefulWidget {
@@ -316,32 +317,12 @@ class _ApplicationsState extends State<Applications> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAllSteps() async {
-    try {
-      var querySnapshot = await _firebaseFirestore.collection('users').get();
-      List<Map<String, dynamic>> stepsList = [];
-      querySnapshot.docs.forEach((DocumentSnapshot doc) {
-        if (doc.data() != null) {
-          Map<String, dynamic> documentFields =
-              doc.data() as Map<String, dynamic>;
-          stepsList.add(documentFields);
-        }
-      });
-      log(stepsList.toString());
-      return stepsList;
-    } catch (e) {
-      log(e.toString());
-      return [];
-    }
-  }
-
   //gets the number of freelancers/salons
   Future<int> getNumberofUsers() async {
     try {
       var userCollection = FirebaseFirestore.instance.collection('users');
       //gets all unverified users
       var querySnapshot = await userCollection.where('username').get();
-      log(querySnapshot.size.toString());
       return querySnapshot.size;
     } catch (e) {
       log(e.toString());

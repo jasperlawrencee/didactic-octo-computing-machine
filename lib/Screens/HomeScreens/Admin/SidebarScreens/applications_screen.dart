@@ -22,12 +22,12 @@ class _ApplicationsState extends State<Applications> {
   List<String> verification = ['Unverified', 'Verified'];
   List<String> userNames = [];
   List<String> isUserVerified = [];
-  List<String> service = [];
-  String sortType = '';
-  String sortVerification = '';
+  List<String> documentName = [];
+  List<Map<String, dynamic>> resultList = [];
 
   @override
   void initState() {
+    getUserDetails();
     getUsername();
     getNumberofUsers();
     super.initState();
@@ -101,23 +101,6 @@ class _ApplicationsState extends State<Applications> {
     );
   }
 
-  verifySalonDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return Theme(
-            data: ThemeData(
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: kPrimaryColor,
-                      secondary: kPrimaryLightColor,
-                    )),
-            child: const AlertDialog(
-              content: Text('Salon Dialog'),
-            ),
-          );
-        });
-  }
-
   verifyWorkerDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -131,122 +114,13 @@ class _ApplicationsState extends State<Applications> {
             child: AlertDialog(
               title: const Text('Verify'),
               content: SizedBox(
-                width: MediaQuery.of(context).size.width / 1.25,
-                height: MediaQuery.of(context).size.height / 1.5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Email'),
-                        Text('Freelancer/Salon'),
-                        Text('Username'),
-                        Text('Verified/Unverified')
-                      ],
-                    ),
-                    SizedBox(height: defaultPadding),
-                    Text('1'),
-                    Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'First Name',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text('data')
-                              ],
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Row(
-                              children: [
-                                Text(
-                                  'Middle Name',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text('data')
-                              ],
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Row(
-                              children: [
-                                Text(
-                                  'Last Name',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text('data')
-                              ],
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Row(
-                              children: [
-                                Text(
-                                  'Gender',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text('data')
-                              ],
-                            ),
-                            SizedBox(height: defaultPadding),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Phone Number 1',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Text(
-                              'Phone Number 2',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'City',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Text(
-                              'Barangay',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Text(
-                              'Street Address',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Text(
-                              'Extended ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: defaultPadding),
-                          ],
-                        )
-                      ],
-                    ),
-                    Text('2'),
-                    Divider(),
-                    Text('3'),
-                    Divider(),
-                    Text('4'),
-                    Divider(),
-                  ],
-                ),
-              ),
+                  width: MediaQuery.of(context).size.width / 1.25,
+                  height: MediaQuery.of(context).size.height / 1.5,
+                  child: Column(
+                    children: resultList.map((value) {
+                      return Text(value.toString());
+                    }).toList(),
+                  )),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -260,6 +134,7 @@ class _ApplicationsState extends State<Applications> {
         });
   }
 
+///////////////////////////////////////////--WIDGETS--/////////////////////////////////////////
   //the container for showing users
   userBox(BuildContext context, String username, String status, bool toVerify) {
     return Container(
@@ -317,43 +192,31 @@ class _ApplicationsState extends State<Applications> {
     );
   }
 
+///////////////////////////////////////--FUNCTIONS////////////////////////////////////////////////////////
+  Future<void> getUserDetails() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firebaseFirestore.collectionGroup('userDetails').get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        resultList.add(data);
+      }
+      log(resultList.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   //gets the number of freelancers/salons
   Future<int> getNumberofUsers() async {
     try {
       var userCollection = FirebaseFirestore.instance.collection('users');
       //gets all unverified users
-      var querySnapshot = await userCollection.where('username').get();
+      var querySnapshot =
+          await userCollection.where('role', isNotEqualTo: 'admin').get();
       return querySnapshot.size;
     } catch (e) {
       log(e.toString());
-      return 0;
-    }
-  }
-
-  //gets the number of unverified freelancers/salons
-  Future<int> getNumberOfUnverified() async {
-    try {
-      var userCollection = FirebaseFirestore.instance.collection('users');
-      //gets all unverified users
-      var querySnapshot =
-          await userCollection.where('status', isEqualTo: 'unverified').get();
-      return querySnapshot.size;
-    } catch (e) {
-      log('error counting documents: $e');
-      return 0;
-    }
-  }
-
-  //gets the number of verified freelancers/salons
-  Future<int> getNumberOfVerified() async {
-    try {
-      var userCollection = FirebaseFirestore.instance.collection('users');
-      //gets all unverified users
-      var querySnapshot =
-          await userCollection.where('status', isEqualTo: 'verified').get();
-      return querySnapshot.size;
-    } catch (e) {
-      log('error counting documents: $e');
       return 0;
     }
   }
@@ -363,9 +226,10 @@ class _ApplicationsState extends State<Applications> {
     try {
       List<String> collectionUsernames = [];
       List<String> status = [];
-      QuerySnapshot querySnapshot =
-          await _firebaseFirestore.collection('users').get();
-
+      QuerySnapshot querySnapshot = await _firebaseFirestore
+          .collection('users')
+          .where('status', isEqualTo: 'unverified')
+          .get();
       querySnapshot.docs.forEach((DocumentSnapshot doc) {
         if ((doc.data() as Map<String, dynamic>).containsKey('username') &&
             doc.data() != null) {

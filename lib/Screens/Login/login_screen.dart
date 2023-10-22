@@ -52,6 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
         route();
       }
     } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
       log(e.toString());
     }
   }
@@ -82,6 +84,10 @@ class _LoginScreenState extends State<LoginScreen> {
             } else if (documentSnapshot.get('role') == 'admin') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const AdminScreen();
+              }));
+            } else if (documentSnapshot.get('status') == 'unverified') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const Verification();
               }));
             } else {
               Navigator.push(context, MaterialPageRoute(builder: (context) {

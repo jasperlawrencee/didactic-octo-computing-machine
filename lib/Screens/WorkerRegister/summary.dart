@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:js_interop';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -576,7 +577,7 @@ class _SummaryState extends State<Summary> {
     var user = FirebaseAuth.instance.currentUser;
     CollectionReference ref = FirebaseFirestore.instance.collection('users');
     try {
-      ref.doc(user!.uid).update({'role': 'pending'});
+      ref.doc(user!.uid).update({'role': 'freelancer'});
       log("added pending role to firestore");
     } catch (e) {
       log("$user $ref");

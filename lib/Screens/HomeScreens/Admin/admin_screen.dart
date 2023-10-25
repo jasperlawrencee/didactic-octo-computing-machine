@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Admin/SidebarScreens/applications_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Admin/SidebarScreens/home_screen.dart';

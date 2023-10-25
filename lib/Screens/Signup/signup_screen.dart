@@ -28,7 +28,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
   final FirebaseService _authService = FirebaseService();
-  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _username = TextEditingController();

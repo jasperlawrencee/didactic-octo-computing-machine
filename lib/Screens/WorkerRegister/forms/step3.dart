@@ -17,8 +17,6 @@ class thirdStep extends StatefulWidget {
 }
 
 class _thirdStepState extends State<thirdStep> {
-  List<Widget> widgets = [];
-
   TextEditingController experienceName = TextEditingController();
   TextEditingController experienceAddress = TextEditingController();
   TextEditingController experienceNum = TextEditingController();
@@ -26,18 +24,11 @@ class _thirdStepState extends State<thirdStep> {
     start: DateTime.now(),
     end: DateTime.now(),
   );
+  int index = 0;
+  List<Widget> widgetList = [];
 
   @override
   Widget build(BuildContext context) {
-    experienceName.addListener(() {
-      workerForm.experienceName = experienceName.text;
-    });
-    experienceAddress.addListener(() {
-      workerForm.experienceAddress = experienceAddress.text;
-    });
-    experienceNum.addListener(() {
-      workerForm.experienceNum = experienceNum.text;
-    });
     return Column(
       children: [
         const SizedBox(height: defaultPadding),
@@ -46,67 +37,69 @@ class _thirdStepState extends State<thirdStep> {
           style: TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
-        Section(context, experienceName, experienceAddress, experienceNum,
-            selectedDays),
         const SizedBox(height: defaultPadding),
         Column(
-          children: widgets,
+          children: [
+            Section(index),
+            Column(
+              children: widgetList,
+            )
+          ],
         ),
-
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //   children: [
-        //     TextButton(
-        //       onPressed: () {
-        //         setState(() {
-        //           widgets.add(Section(
-        //             salonName,
-        //             salonAddress,
-        //             salonNum,
-        //             selectedDays,
-        //           ));
-        //         });
-        //       },
-        //       child: const Text("Add More+"),
-        //     ),
-        //     TextButton(
-        //       onPressed: () {
-        //         setState(() {
-        //           try {
-        //             widgets != 0 ? widgets.removeLast() : null;
-        //           } catch (e) {
-        //             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        //                 content: Text('Unable to delete field')));
-        //           }
-        //         });
-        //       },
-        //       child: const Text("Delete Section"),
-        //     ),
-        //   ],
-        // ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  widgetList.add(Section(index));
+                });
+                index++;
+                log('list index $index');
+              },
+              child: const Text("Add More+"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  try {
+                    widgetList != 0 ? widgetList.removeLast() : null;
+                    index--;
+                    log('list index $index');
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Unable to delete field')));
+                  }
+                });
+              },
+              child: const Text("Delete Section"),
+            ),
+          ],
+        ),
       ],
     );
   }
 
-  Widget Section(
-    BuildContext context,
-    TextEditingController salonName,
-    salonAddress,
-    salonNum,
-    DateTimeRange pickedDays,
-  ) {
+  Widget Section(int index) {
+    experienceName.addListener(() {
+      try {
+        workerForm.experiences?[index].clear();
+        workerForm.experiences?[index].add(experienceName.text);
+        log("${workerForm.experiences?[index]}");
+      } catch (e) {
+        log(e.toString());
+      }
+    });
     return Column(
       children: [
         const SizedBox(height: defaultPadding),
-        flatTextField("Salon Name*", salonName),
-        flatTextField("Salon Address*", salonAddress),
-        flatTextField("Salon Contact Number", salonNum),
+        flatTextField("Salon Name*", experienceName),
+        flatTextField("Salon Address*", experienceAddress),
+        flatTextField("Salon Contact Number", experienceNum),
         const SizedBox(height: defaultPadding),
         Text(workerForm.selectedDays.isEmpty
             ? 'Date Selected'
             : workerForm.selectedDays.toString()),
-        // Text(
-        //     '${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}'),
         ElevatedButton(
           onPressed: () async {
             DateTimeRange? dateTimeRange = await showDateRangePicker(
@@ -117,9 +110,9 @@ class _thirdStepState extends State<thirdStep> {
             );
             if (dateTimeRange != null) {
               setState(() {
-                pickedDays = dateTimeRange;
+                selectedDays = dateTimeRange;
                 workerForm.selectedDays =
-                    "${DateFormat.yMMMd().format(pickedDays.start)} to ${DateFormat.yMMMd().format(pickedDays.end)}";
+                    "${DateFormat.yMMMd().format(selectedDays.start)} to ${DateFormat.yMMMd().format(selectedDays.end)}";
                 log(workerForm.selectedDays);
               });
             } else {

@@ -198,7 +198,7 @@ class _SignupScreenState extends State<SignupScreen> {
         'email': _email.text,
         'username': _username.text,
         'status': 'unverified', // adds unverified status for admin to verify
-        'role': ''
+        'role': 'pending'
       });
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));

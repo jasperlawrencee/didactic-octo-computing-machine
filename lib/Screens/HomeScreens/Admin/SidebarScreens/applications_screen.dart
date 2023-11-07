@@ -17,11 +17,13 @@ class Applications extends StatefulWidget {
 class _ApplicationsState extends State<Applications> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  List<String> type = ['All', 'Salon', 'Freelancer'];
-  List<String> verification = ['Unverified', 'Verified'];
+  List<String> type = ['All', 'Salons', 'Freelancers'];
+  List<String> verification = ['All', 'Unverified', 'Verified'];
   List<String> userNames = [];
   List<String> isUserVerified = [];
   List<Map<String, dynamic>> resultList = [];
+  TextEditingController typeController = TextEditingController();
+  TextEditingController verifyController = TextEditingController();
 
   @override
   void initState() {
@@ -48,21 +50,26 @@ class _ApplicationsState extends State<Applications> {
               children: [
                 const Text('Filter by: '),
                 DropdownMenu(
-                    initialSelection: type[0],
-                    dropdownMenuEntries:
-                        type.map<DropdownMenuEntry<String>>((String value) {
-                      return DropdownMenuEntry<String>(
-                          value: value, label: value);
-                    }).toList()),
+                  controller: typeController,
+                  initialSelection: type[0],
+                  dropdownMenuEntries:
+                      type.map<DropdownMenuEntry<String>>((String value) {
+                    return DropdownMenuEntry<String>(
+                        value: value, label: value);
+                  }).toList(),
+                  onSelected: (value) {
+                    filterUsers();
+                  },
+                ),
                 const SizedBox(width: defaultPadding),
                 DropdownMenu(
+                    controller: verifyController,
                     initialSelection: verification[0],
                     dropdownMenuEntries: verification
                         .map<DropdownMenuEntry<String>>((String value) {
                       return DropdownMenuEntry<String>(
                           value: value, label: value);
                     }).toList()),
-                Text('DISREGARD FILTERING DROPDOWNS XD')
               ],
             ),
             const SizedBox(height: defaultPadding),
@@ -93,7 +100,7 @@ class _ApplicationsState extends State<Applications> {
                       ),
                     );
                   }
-                })
+                }),
           ],
         ),
       ),
@@ -186,6 +193,12 @@ class _ApplicationsState extends State<Applications> {
   }
 
 ///////////////////////////////////////--FUNCTIONS////////////////////////////////////////////////////////
+  filterUsers() {
+    if (typeController.text == 'All') {
+    } else if (typeController.text == 'Salons') {
+    } else if (typeController.text == 'Freelancers') {}
+  }
+
   void verifyUser(int index) async {
     try {
       QuerySnapshot getDocNames = await _firebaseFirestore
@@ -233,7 +246,8 @@ class _ApplicationsState extends State<Applications> {
       var userCollection = FirebaseFirestore.instance.collection('users');
       //gets all unverified users
       var querySnapshot =
-          await userCollection.where('role', isNotEqualTo: 'admin').get();
+          await userCollection.where('role', isNotEqualTo: 'pending').get();
+      log(querySnapshot.size.toString());
       return querySnapshot.size;
     } catch (e) {
       log(e.toString());
@@ -248,7 +262,7 @@ class _ApplicationsState extends State<Applications> {
       List<String> status = [];
       QuerySnapshot querySnapshot = await _firebaseFirestore
           .collection('users')
-          .where('role', isNotEqualTo: 'admin')
+          .where('role', isNotEqualTo: 'pending')
           .get();
       querySnapshot.docs.forEach((DocumentSnapshot doc) {
         if ((doc.data() as Map<String, dynamic>).containsKey('username') &&
@@ -261,6 +275,7 @@ class _ApplicationsState extends State<Applications> {
           });
         }
       });
+      log(collectionUsernames.toString());
       return collectionUsernames;
     } catch (e) {
       log('error: $e');

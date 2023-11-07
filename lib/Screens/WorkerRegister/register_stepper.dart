@@ -15,15 +15,21 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/forms.dart';
 
-WorkerForm workerForm = WorkerForm(
-    hair: [''],
-    makeup: [''],
-    spa: [''],
-    nails: [''],
-    lashes: [''],
-    wax: [''],
-    experiences: [''],
-    selectedDays: '');
+WorkerForm workerForm = WorkerForm(hair: [
+  ''
+], makeup: [
+  ''
+], spa: [
+  ''
+], nails: [
+  ''
+], lashes: [
+  ''
+], wax: [
+  ''
+], experiences: [
+  ['']
+], selectedDays: '');
 
 class WorkerRegisterScreen extends StatefulWidget {
   const WorkerRegisterScreen({Key? key}) : super(key: key);
@@ -39,15 +45,21 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
   @override
   void initState() {
     super.initState();
-    workerForm = WorkerForm(
-        hair: [''],
-        makeup: [''],
-        spa: [''],
-        nails: [''],
-        lashes: [''],
-        wax: [''],
-        experiences: [''],
-        selectedDays: '');
+    workerForm = WorkerForm(hair: [
+      ''
+    ], makeup: [
+      ''
+    ], spa: [
+      ''
+    ], nails: [
+      ''
+    ], lashes: [
+      ''
+    ], wax: [
+      ''
+    ], experiences: [
+      ['']
+    ], selectedDays: '');
   }
 
   @override

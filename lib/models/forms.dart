@@ -25,7 +25,7 @@ class WorkerForm {
   bool isLashesClicked = false;
   List<String> wax = ['Wax Services'];
   bool isWaxClicked = false;
-  List<dynamic>? experiences = [];
+  List<List<String>>? experiences = [];
   String? experienceName;
   String? experienceAddress;
   String? experienceNum;

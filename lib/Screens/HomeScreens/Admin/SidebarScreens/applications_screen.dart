@@ -27,7 +27,7 @@ class _ApplicationsState extends State<Applications> {
 
   @override
   void initState() {
-    getUserDetails();
+    getUserDetails(1);
     getUsername();
     getNumberofUsers();
     super.initState();
@@ -170,11 +170,24 @@ class _ApplicationsState extends State<Applications> {
               title: Text(
                   "${userNames[index]} - ${isUserVerified[index].toUpperCase()}"),
               content: SizedBox(
-                  width: MediaQuery.of(context).size.width / 1.25,
-                  height: MediaQuery.of(context).size.height / 1.5,
-                  child: Column(
-                    children: [],
-                  )),
+                width: MediaQuery.of(context).size.width / 1.25,
+                height: MediaQuery.of(context).size.height / 1.5,
+                child: FutureBuilder(
+                    future: getUserDetails(index),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          return Text(snapshot.error.toString());
+                        } else {
+                          return Text(userNames[index]);
+                        }
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    }),
+              ),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -205,6 +218,7 @@ class _ApplicationsState extends State<Applications> {
           .collection('users')
           .where('role', isNotEqualTo: 'admin')
           .get();
+      //list of the unique document names
       List<String> documentNames =
           getDocNames.docs.map((doc) => doc.id).toList();
       getDocNames.docs.forEach((doc) {
@@ -220,26 +234,6 @@ class _ApplicationsState extends State<Applications> {
     }
   }
 
-  Future<Map<String, List<QueryDocumentSnapshot>>> getUserDetails() async {
-    try {
-      QuerySnapshot querySnapshot =
-          await _firebaseFirestore.collectionGroup('userDetails').get();
-      Map<String, List<QueryDocumentSnapshot>> results = {};
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        String firstName = data['firstName'] ?? 'Other';
-        if (!results.containsKey(firstName)) {
-          results[firstName] = [];
-        }
-        results[firstName]?.add(doc);
-      }
-      return results;
-    } catch (e) {
-      log(e.toString());
-      return {};
-    }
-  }
-
   //gets the number of freelancers/salons
   Future<int> getNumberofUsers() async {
     try {
@@ -247,7 +241,7 @@ class _ApplicationsState extends State<Applications> {
       //gets all unverified users
       var querySnapshot =
           await userCollection.where('role', isNotEqualTo: 'pending').get();
-      log(querySnapshot.size.toString());
+      log('Number of users ${querySnapshot.size.toString()}');
       return querySnapshot.size;
     } catch (e) {
       log(e.toString());
@@ -275,11 +269,38 @@ class _ApplicationsState extends State<Applications> {
           });
         }
       });
-      log(collectionUsernames.toString());
+      log('Usernames: ${collectionUsernames.toString()}');
       return collectionUsernames;
     } catch (e) {
       log('error: $e');
       return [];
     }
+  }
+
+  getUserDetails(int index) async {
+    try {
+      QuerySnapshot getDocumentName = await _firebaseFirestore
+          .collection('users')
+          .where('role', isNotEqualTo: 'pending')
+          .get();
+      //list of the unique document names
+      List<String> documentNames =
+          getDocumentName.docs.map((doc) => doc.id).toList();
+      _firebaseFirestore
+          .collection('users')
+          .doc(documentNames[index])
+          .collection('userDetails')
+          .get()
+          .then((querySnapshot) {
+        for (var documentSnapshot in querySnapshot.docs) {
+          log('${documentSnapshot.id} => ${documentSnapshot.data()}');
+          // log(details);
+        }
+      });
+    } catch (e) {
+      log(e.toString());
+      // return Text(e.toString());
+    }
+    // return Text(details);
   }
 }

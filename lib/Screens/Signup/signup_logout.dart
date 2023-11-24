@@ -23,7 +23,7 @@ class _SignupLogout extends State<SignupLogout> {
         children: [
           const Spacer(),
           const Text(
-            'Thank you for Signing up!\nYou can now proceed to selecting which provider you are by loggin in',
+            'Thank you for Signing up!\nYou can now proceed to selecting which service provider you are by loggin in.',
             style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.w700),
             textAlign: TextAlign.center,
           ),

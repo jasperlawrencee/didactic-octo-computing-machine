@@ -25,8 +25,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<String> imageUrl = [];
   String name = '';
-  String about = '';
+  String aboutUser = '';
   String barangay = '', city = '', streetAddress = '';
+  TextEditingController about = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +154,77 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: defaultPadding),
-              //custom about user
-              //Maximum of 400 characters lang dapat kay mag overflow ang widgets T_T
-              //check firestore para sa sulod sa about
-              Text(
-                about,
-                textAlign: TextAlign.left,
+              Text(aboutUser),
+              const SizedBox(height: defaultPadding),
+              InkWell(
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Edit',
+                        style: TextStyle(
+                            color: kPrimaryColor,
+                            decoration: TextDecoration.underline)),
+                    Icon(
+                      Icons.edit,
+                      color: kPrimaryColor,
+                      size: 15,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Theme(
+                          data: ThemeData(
+                              canvasColor: Colors.transparent,
+                              colorScheme:
+                                  Theme.of(context).colorScheme.copyWith(
+                                        primary: kPrimaryColor,
+                                        background: Colors.white70,
+                                        secondary: kPrimaryLightColor,
+                                      )),
+                          child: AlertDialog(
+                            title: const Text('About'),
+                            content: SizedBox(
+                              // width: MediaQuery.of(context).size.width * 0.05,
+                              height: MediaQuery.of(context).size.height / 10,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextField(
+                                    controller: about,
+                                  ),
+                                  const Text(
+                                    'Maximum of 400 characters only',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 14),
+                                    textAlign: TextAlign.left,
+                                  )
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('CANCEL')),
+                              TextButton(
+                                  onPressed: () {
+                                    addAboutUser();
+                                    setState(() {
+                                      aboutUser = about.text;
+                                    });
+                                    Navigator.of(context).pop();
+                                    log(aboutUser);
+                                  },
+                                  child: const Text('SAVE')),
+                            ],
+                          ),
+                        );
+                      });
+                },
               ),
               const SizedBox(height: defaultPadding),
             ],
@@ -209,8 +275,26 @@ class _ProfilePageState extends State<ProfilePage> {
     //grab name function
     super.initState;
     getWorkerUsername();
-    // getAboutUser();
+    getAboutUser();
     getAddress();
+  }
+
+  void addAboutUser() {
+    final aboutToFirebase = <String, String>{"about": about.text};
+    try {
+      setState(() {
+        about.text = aboutUser;
+      });
+      _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('userDetails')
+          .doc('details')
+          .set(aboutToFirebase);
+      log('added about to firebase');
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   void getWorkerUsername() {
@@ -225,23 +309,23 @@ class _ProfilePageState extends State<ProfilePage> {
     }));
   }
 
-  // void getAboutUser() {
-  //   _firestore
-  //       .collection('users')
-  //       .doc(currentUser!.uid)
-  //       .collection('userDetails')
-  //       .doc('userAbout')
-  //       .get()
-  //       .then(((DocumentSnapshot documentSnapshot) {
-  //     if (documentSnapshot != null) {
-  //       setState(() {
-  //         about = documentSnapshot.get('about');
-  //       });
-  //     } else {
-  //       log('getting about error');
-  //     }
-  //   }));
-  // }
+  void getAboutUser() {
+    _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('userDetails')
+        .doc('details')
+        .get()
+        .then(((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot != null) {
+        setState(() {
+          aboutUser = documentSnapshot.get('about');
+        });
+      } else {
+        log('getting about error');
+      }
+    }));
+  }
 
   void getAddress() {
     _firestore

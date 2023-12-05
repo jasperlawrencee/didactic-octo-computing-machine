@@ -28,7 +28,7 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.1
   image_picker: ^1.0.2
-  firebase_core: ^2.15.1
+  firebase_core: ^2.19.0
   provider: ^6.0.5
   cloud_firestore: ^4.9.1
   floating_navbar: ^2.0.2

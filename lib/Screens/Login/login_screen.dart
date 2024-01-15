@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/admin_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/salon_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/worker_screen.dart';
+import 'package:flutter_auth/Screens/SalonRegister/verification.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
 import 'package:flutter_auth/Screens/Verification/verification_page.dart';
 import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/firebase/firebase_services.dart';
@@ -68,17 +70,29 @@ class _LoginScreenState extends State<LoginScreen> {
         try {
           dynamic nested = documentSnapshot.get(FieldPath(const ['role']));
           if (documentSnapshot.exists) {
-            if (documentSnapshot.get('role') == 'freelancer') {
+            if (documentSnapshot.get('role') == 'freelancer' &&
+                documentSnapshot.get('status') == 'verified') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const WorkerScreen();
               }));
-            } else if (documentSnapshot.get('role') == 'salon') {
+            } else if (documentSnapshot.get('role') == 'salon' &&
+                documentSnapshot.get('status') == 'verified') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const SalonScreen();
               }));
             } else if (documentSnapshot.get('role') == 'admin') {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const AdminScreen();
+              }));
+            } else if (documentSnapshot.get('role') == 'freelancer' &&
+                documentSnapshot.get('status') == 'unverified') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const WorkerSummaryScreen();
+              }));
+            } else if (documentSnapshot.get('role') == 'salon' &&
+                documentSnapshot.get('status') == 'unverified') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const SalonSummaryScreen();
               }));
             }
           }

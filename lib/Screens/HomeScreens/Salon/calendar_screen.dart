@@ -66,15 +66,6 @@ class _CalendarPageState extends State<CalendarPage> {
                             appointmentDisplayMode:
                                 MonthAppointmentDisplayMode.appointment),
                       ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: FloatingActionButton(
-                            child: const Icon(
-                              Icons.add,
-                              color: kPrimaryColor,
-                            ),
-                            onPressed: () {}),
-                      ),
                     ],
                   ),
                 ),

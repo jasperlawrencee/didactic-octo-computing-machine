@@ -99,8 +99,6 @@ class _homeState extends State<home> {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step1')
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot != null) {

@@ -32,10 +32,10 @@ class _SummaryState extends State<Summary> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    imgRef = FirebaseFirestore.instance
+    imgRef = _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails');
+        .collection('portfolio');
   }
 
   @override
@@ -448,7 +448,6 @@ class _SummaryState extends State<Summary> {
                 addRoleToFireStore();
                 addStep1();
                 addStep2();
-                addStep3();
                 addStep4();
               } catch (e) {
                 log(e.toString());
@@ -462,25 +461,23 @@ class _SummaryState extends State<Summary> {
   }
 
   Map<String, dynamic> step1() => {
-        'firstName': workerForm.firstName,
-        'middleName': workerForm.middleName,
-        'lastName': workerForm.lastName,
+        'name':
+            "${workerForm.firstName} ${workerForm.middleName} ${workerForm.lastName}",
         'gender': workerForm.gender,
         'primaryPhoneNumber': workerForm.phoneNum1,
         'secondaryPhoneNumber': workerForm.phoneNum2,
-        'city': workerForm.city,
-        'barangay': workerForm.barangay,
-        'streetAddress': workerForm.stAddress,
-        'extendedStAddress': workerForm.extAddress,
+        'address':
+            "${workerForm.barangay} ${workerForm.stAddress} ${workerForm.extAddress} ${workerForm.city}",
       };
 
+//hopefully this wont throw an error
   Map<String, dynamic> step2() => {
-        if (workerForm.isHairClicked) 'hair': workerForm.hair,
-        if (workerForm.isMakeupClicked) 'makeup': workerForm.makeup,
-        if (workerForm.isSpaClicked) 'spa': workerForm.spa,
-        if (workerForm.isNailsClicked) 'nails': workerForm.nails,
-        if (workerForm.isLashesClicked) 'lashes': workerForm.lashes,
-        if (workerForm.isWaxClicked) 'wax': workerForm.wax,
+        if (workerForm.isHairClicked) 'skills': workerForm.hair,
+        if (workerForm.isMakeupClicked) 'skills': workerForm.makeup,
+        if (workerForm.isSpaClicked) 'skills': workerForm.spa,
+        if (workerForm.isNailsClicked) 'skills': workerForm.nails,
+        if (workerForm.isLashesClicked) 'skills': workerForm.lashes,
+        if (workerForm.isWaxClicked) 'skills': workerForm.wax,
       };
 
   Map<String, dynamic> step3() => {
@@ -490,40 +487,99 @@ class _SummaryState extends State<Summary> {
         'experienceDuration': workerForm.selectedDays,
       };
 
+//adds data from step1 form to user field
   addStep1() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step1')
-        .set(step1())
-        .whenComplete(() => log('added step1'))
+        .update(step1())
+        // .whenComplete(() => log('added step1'))
         .onError((error, stackTrace) => null);
   }
 
+//adds skills from step2 form to user field
   addStep2() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step2')
-        .set(step2())
-        .whenComplete(() => log('added step2'))
+        .update(step2())
+        // .whenComplete(() => log('added step2'))
         .onError((error, stackTrace) => null);
+    if (workerForm.isHairClicked) {
+      for (String documentName in workerForm.hair) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
+    if (workerForm.isMakeupClicked) {
+      for (String documentName in workerForm.makeup) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
+    if (workerForm.isSpaClicked) {
+      for (String documentName in workerForm.spa) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
+    if (workerForm.isNailsClicked) {
+      for (String documentName in workerForm.nails) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
+    if (workerForm.isLashesClicked) {
+      for (String documentName in workerForm.lashes) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
+    if (workerForm.isWaxClicked) {
+      for (String documentName in workerForm.wax) {
+        DocumentReference documentReference = _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(documentName);
+        documentReference.set({'price': '', 'description': ''});
+      }
+    }
   }
 
-  addStep3() {
-    _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step3')
-        .set(step3())
-        .whenComplete(() => log('added step3'))
-        .onError((error, stackTrace) => null);
-  }
+  // addStep3() {
+  //   _firestore
+  //       .collection('users')
+  //       .doc(currentUser!.uid)
+  //       .collection('portfolio')
+  //       .doc('step3')
+  //       .set(step3())
+  //       .whenComplete(() => log('added step3'))
+  //       .onError((error, stackTrace) => null);
+  // }
 
   addStep4() async {
+    //firebase storage references
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages =
         referenceRoot.child('freelancerImages').child(currentUser!.uid);
@@ -531,53 +587,62 @@ class _SummaryState extends State<Summary> {
     Reference vaccinationCardImage =
         referenceDirImages.child('vaccinationCard');
     Reference nbiClearanceImage = referenceDirImages.child('nbiClearance');
-    Reference certificatesImage = referenceDirImages.child('certificates');
 
-    await governmentIDImage.putFile(workerForm.governmentID!);
-    await vaccinationCardImage.putFile(workerForm.vaxCard!);
-    await nbiClearanceImage.putFile(workerForm.nbiClearance!);
-    if (workerForm.certificates!.isNotEmpty) {
-      for (int i = 0; i < workerForm.certificates!.length; i++) {
-        await certificatesImage
-            .putFile(File(workerForm.certificates![i].path))
-            .whenComplete(() async {
-          await certificatesImage.getDownloadURL().then((value) => {
-                imgRef!.doc('step4').set({'certificates': value})
-                // urlRef!
-                //     .collection('users')
-                //     .doc(currentUser!.uid)
-                //     .collection('userDetails')
-                //     .doc('step4')
-                //     .set({'url': value})
-              });
-        });
-      }
-    }
+    await governmentIDImage
+        .putFile(workerForm.governmentID!)
+        .then((p0) => log('added governmentID to storage'));
+    await vaccinationCardImage
+        .putFile(workerForm.vaxCard!)
+        .then((p0) => log('addedvaxCard to storage'));
+    await nbiClearanceImage
+        .putFile(workerForm.nbiClearance!)
+        .then((p0) => log('addednbiClearance to storage'));
 
     governmentID = await governmentIDImage.getDownloadURL();
     vaccinationCard = await vaccinationCardImage.getDownloadURL();
     nbiClearance = await nbiClearanceImage.getDownloadURL();
+
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step4')
+        .collection('portfolio')
+        .doc('requirements')
         .set({
-          'governmentID': governmentID,
-          'vaccinationCard': vaccinationCard,
-          'nbiClearance': nbiClearance,
-          'tinID': workerForm.tinID,
-        })
-        .whenComplete(() => log('added step4'))
+      'governmentID': governmentID,
+      'vaccinationCard': vaccinationCard,
+      'nbiClearance': nbiClearance,
+      'tinID': workerForm.tinID,
+    })
+        // .whenComplete(() => log('added step4'))
         .onError((error, stackTrace) => null);
-    log('added step4');
+
+    if (workerForm.certificates!.isNotEmpty) {
+      log('message for certificates');
+      for (int i = 0; i < workerForm.certificates!.length; i++) {
+        Reference certificatesImage =
+            referenceDirImages.child('certificates$i');
+        //upload certificates to firebase storage
+        await certificatesImage
+            .putFile(File(workerForm.certificates![i].path))
+            .then((p0) => log('added certificates'));
+
+        String downloadURL = await certificatesImage.getDownloadURL();
+
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('portfolio')
+            .doc('requirements')
+            .update({'certificates$i': downloadURL});
+      }
+    }
   }
 
   addRoleToFireStore() {
     var user = FirebaseAuth.instance.currentUser;
     CollectionReference ref = FirebaseFirestore.instance.collection('users');
     try {
-      ref.doc(user!.uid).update({'role': 'freelancer'});
+      ref.doc(user!.uid).update({'role': 'freelancer', 'status': 'unverified'});
       log("added salon role to firestore");
     } catch (e) {
       log("$user $ref");

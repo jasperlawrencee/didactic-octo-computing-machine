@@ -25,11 +25,11 @@ class WorkerForm {
   bool isLashesClicked = false;
   List<String> wax = ['Wax Services'];
   bool isWaxClicked = false;
-  List<dynamic>? experiences = [];
-  String? experienceName;
-  String? experienceAddress;
-  String? experienceNum;
-  String selectedDays;
+  // List<dynamic>? experiences = [];
+  List<String> experienceName = [''];
+  List<String> experienceAddress = [''];
+  List<String> experienceNum = [''];
+  List<String> selectedDays = [''];
   File? governmentID;
   File? vaxCard;
   File? nbiClearance;
@@ -54,10 +54,10 @@ class WorkerForm {
     required this.nails,
     required this.lashes,
     required this.wax,
-    this.experiences,
-    this.experienceName,
-    this.experienceAddress,
-    this.experienceNum,
+    // this.experiences,
+    required this.experienceName,
+    required this.experienceAddress,
+    required this.experienceNum,
     required this.selectedDays,
     this.governmentID,
     this.vaxCard,

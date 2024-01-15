@@ -73,6 +73,16 @@ class _SummaryState extends State<Summary> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            'Street/Road',
+                          ),
+                          Text(salonForm.streetRoad.toString()),
+                        ],
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             'Barangay',
                           ),
                           Text(salonForm.barangay.toString()),
@@ -291,9 +301,7 @@ class _SummaryState extends State<Summary> {
                                         await _firestore
                                             .collection('users')
                                             .doc(currentUser!.uid)
-                                            .collection('userDetails')
-                                            .doc('step1')
-                                            .set(step1());
+                                            .update(step1());
                                         //adds imageUrl to firebase storage and step1 document in firebase cloud
                                         addStep1Image();
                                         //adds images to firebase storage
@@ -316,10 +324,8 @@ class _SummaryState extends State<Summary> {
 
   Map<String, dynamic> step1() => {
         'salonName': salonForm.salonName,
-        'roomBuilding': salonForm.roomBuilding,
-        'streetRoad': salonForm.streetRoad,
-        'barangay': salonForm.barangay,
-        'city': salonForm.city,
+        'address':
+            "${salonForm.roomBuilding} ${salonForm.barangay} ${salonForm.streetRoad} ${salonForm.city}",
         'salonOwner': salonForm.salonOwner,
         'salonNumber': salonForm.salonNumber,
         'salonRepresentative': salonForm.salonRepresentative,
@@ -348,10 +354,7 @@ class _SummaryState extends State<Summary> {
     await _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step1')
         .update({'representativeID': representativeID});
-    log('added image(s) in step1');
   }
 
   addStep2Image() async {
@@ -377,22 +380,22 @@ class _SummaryState extends State<Summary> {
     await _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step2')
+        .collection('portfolio')
+        .doc('requirements')
         .set({
       'businessPermit': businessPermit,
       'secondaryLicense': secondaryLicense,
       'outsideSalon': outsideSalon,
       'insideSalon': insideSalon,
     });
-    log('added image(s) in step2');
+    log('added portfolio');
   }
 
   addRoleToFireStore() {
     var user = FirebaseAuth.instance.currentUser;
     CollectionReference ref = FirebaseFirestore.instance.collection('users');
     try {
-      ref.doc(user!.uid).update({'role': 'salon'});
+      ref.doc(user!.uid).update({'role': 'salon', 'status': 'unverified'});
       log("added salon role to firestore");
     } catch (e) {
       log("$user $ref");

@@ -33,6 +33,7 @@ dependencies:
   syncfusion_flutter_calendar: ^23.1.36
   time_range_picker: ^2.2.0
   path: ^1.8.3
+  badges: ^3.1.2
   
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6

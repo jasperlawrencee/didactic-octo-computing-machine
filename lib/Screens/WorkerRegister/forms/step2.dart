@@ -37,12 +37,12 @@ class _secondStepState extends State<secondStep> {
   String selectedLashesValue = '';
   String selectedWaxValue = '';
 
-  List<String> hairValues = [''];
-  List<String> makeupValues = [''];
-  List<String> spaValues = [''];
-  List<String> nailsValues = [''];
-  List<String> lashesValues = [''];
-  List<String> waxValues = [''];
+  List<String> hairValues = [];
+  List<String> makeupValues = [];
+  List<String> spaValues = [];
+  List<String> nailsValues = [];
+  List<String> lashesValues = [];
+  List<String> waxValues = [];
 
   @override
   Widget build(BuildContext context) {

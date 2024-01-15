@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
+import 'package:intl/intl.dart';
 
 import '../../../components/widgets.dart';
 import '../../../constants.dart';
@@ -17,6 +18,7 @@ class firstStep extends StatefulWidget {
 
 class _firstStepState extends State<firstStep> {
   String? genderValue;
+  String birthday = "Birthday";
   TextEditingController firstName = TextEditingController();
   TextEditingController middleName = TextEditingController();
   TextEditingController lastName = TextEditingController();
@@ -79,27 +81,67 @@ class _firstStepState extends State<firstStep> {
         flatTextField("First Name*", firstName),
         flatTextField("Middle Name", middleName),
         flatTextField("Last Name*", lastName),
-        Align(
-          alignment: Alignment.topLeft,
-          child: Theme(
-            data: ThemeData(canvasColor: Colors.white),
-            child: DropdownButton<String>(
-              hint: const Text("Gender"),
-              value: genderValue,
-              icon: const Icon(Icons.arrow_drop_down),
-              // elevation: 16,
-              style: const TextStyle(fontSize: 13, color: Colors.black),
-              underline: Container(
-                color: kPrimaryColor,
-                height: 2,
+        Row(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Theme(
+                data: ThemeData(canvasColor: Colors.white),
+                child: DropdownButton<String>(
+                  hint: const Text("Gender"),
+                  value: genderValue,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  // elevation: 16,
+                  style: const TextStyle(fontSize: 13, color: Colors.black),
+                  underline: Container(
+                    color: kPrimaryColor,
+                    height: 2,
+                  ),
+                  onChanged: (value) => setState(() => {
+                        genderValue = value,
+                        workerForm.gender = genderValue,
+                      }),
+                  items: gender.map(buildMenuItem).toList(),
+                ),
               ),
-              onChanged: (value) => setState(() => {
-                    genderValue = value,
-                    workerForm.gender = genderValue,
-                  }),
-              items: gender.map(buildMenuItem).toList(),
             ),
-          ),
+            const SizedBox(width: defaultPadding),
+            InkWell(
+              child: Text(
+                birthday,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: kPrimaryColor,
+                    decoration: TextDecoration.underline),
+              ),
+              onTap: () {
+                showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2500))
+                    .then((value) {
+                  try {
+                    if (value == null) {
+                      setState(() {
+                        birthday = "Birthdate is required";
+                      });
+                    } else {
+                      setState(() {
+                        setState(() {
+                          birthday = DateFormat.yMMMd().format(value);
+                          workerForm.birthday =
+                              DateFormat.yMMMd().format(value);
+                        });
+                      });
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                });
+              },
+            )
+          ],
         ),
         const SizedBox(height: defaultPadding),
         const Text(

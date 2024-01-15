@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/certificate_screen.dart';
 import 'package:flutter_auth/components/background.dart';
+import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -25,8 +26,10 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<String> imageUrl = [];
   String name = '';
+  String addAbout = 'Add About+';
   String about = '';
-  String barangay = '', city = '', streetAddress = '';
+  String address = '';
+  TextEditingController userAbout = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 // padding: const EdgeInsets.only(right: defaultPadding),
                 child: Row(
                   children: [
-                    profileStats('Address', body: '$streetAddress, $barangay'),
+                    profileStats('Address', body: address),
                     const SizedBox(width: defaultPadding),
                     profileStats('Transactions\nDone', body: '123'),
                     const SizedBox(width: defaultPadding),
@@ -153,14 +156,51 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: defaultPadding),
+              Text(about),
+              InkWell(
+                child: Text(
+                  addAbout,
+                  style: const TextStyle(
+                      color: kPrimaryColor,
+                      decoration: TextDecoration.underline),
+                ),
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('About'),
+                          content: flatTextField(
+                              'Maximum of 400 characters only', userAbout),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                _firestore
+                                    .collection('users')
+                                    .doc(currentUser!.uid)
+                                    .update({
+                                  'about': userAbout.text,
+                                });
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('SUBMIT'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('CLOSE'),
+                            ),
+                          ],
+                        );
+                      });
+                },
+              ),
+
+              const SizedBox(height: defaultPadding),
               //custom about user
               //Maximum of 400 characters lang dapat kay mag overflow ang widgets T_T
               //check firestore para sa sulod sa about
-              Text(
-                about,
-                textAlign: TextAlign.left,
-              ),
-              const SizedBox(height: defaultPadding),
             ],
           ),
         ),
@@ -209,8 +249,8 @@ class _ProfilePageState extends State<ProfilePage> {
     //grab name function
     super.initState;
     getWorkerUsername();
-    getAboutUser();
-    getAddress();
+    getWorkerAddress();
+    getWorkerAbout();
   }
 
   void getWorkerUsername() {
@@ -225,39 +265,27 @@ class _ProfilePageState extends State<ProfilePage> {
     }));
   }
 
-  void getAboutUser() {
+  void getWorkerAddress() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('userAbout')
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot != null) {
-        setState(() {
-          about = documentSnapshot.get('about');
-        });
-      } else {
-        log('getting about error');
-      }
+      setState(() {
+        address = documentSnapshot.get('address');
+      });
     }));
   }
 
-  void getAddress() {
+  void getWorkerAbout() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
-        .collection('userDetails')
-        .doc('step1')
         .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot != null) {
-        setState(() {
-          barangay = documentSnapshot.get('barangay');
-          city = documentSnapshot.get('city');
-          streetAddress = documentSnapshot.get('streetAddress');
-        });
-      }
-    });
+        .then(((DocumentSnapshot documentSnapshot) {
+      setState(() {
+        about = documentSnapshot.get('about');
+      });
+    }));
   }
 }

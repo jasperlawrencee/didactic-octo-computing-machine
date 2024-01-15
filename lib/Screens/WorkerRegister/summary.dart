@@ -27,6 +27,7 @@ class _SummaryState extends State<Summary> {
   String vaccinationCard = '';
   String nbiClearance = '';
   List<String> certificates = [];
+  List skills = [];
 
   @override
   void initState() {
@@ -94,6 +95,16 @@ class _SummaryState extends State<Summary> {
                   'Gender',
                 ),
                 Text(workerForm.gender.toString()),
+              ],
+            ),
+            const SizedBox(height: defaultPadding),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Birthday',
+                ),
+                Text(workerForm.birthday.toString()),
               ],
             ),
             const SizedBox(height: defaultPadding),
@@ -438,15 +449,28 @@ class _SummaryState extends State<Summary> {
             ),
             const SizedBox(height: defaultPadding),
             nextButton(context, () async {
-              Navigator.of(context).pop();
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const WorkerSummaryScreen();
-              }));
-
               try {
                 //adds "freelancer" to firebase cloud storage
                 addRoleToFireStore();
                 addStep1();
+                if (workerForm.isHairClicked) {
+                  skills.addAll(workerForm.hair);
+                }
+                if (workerForm.isMakeupClicked) {
+                  skills.addAll(workerForm.makeup);
+                }
+                if (workerForm.isSpaClicked) {
+                  skills.addAll(workerForm.spa);
+                }
+                if (workerForm.isNailsClicked) {
+                  skills.addAll(workerForm.nails);
+                }
+                if (workerForm.isLashesClicked) {
+                  skills.addAll(workerForm.lashes);
+                }
+                if (workerForm.isWaxClicked) {
+                  skills.addAll(workerForm.wax);
+                }
                 addStep2();
                 addStep4();
               } catch (e) {
@@ -468,16 +492,17 @@ class _SummaryState extends State<Summary> {
         'secondaryPhoneNumber': workerForm.phoneNum2,
         'address':
             "${workerForm.barangay} ${workerForm.stAddress} ${workerForm.extAddress} ${workerForm.city}",
+        'birthday': '${workerForm.birthday}'
       };
 
-//hopefully this wont throw an error
+//logic error dapat mu add tanan skills
   Map<String, dynamic> step2() => {
-        if (workerForm.isHairClicked) 'skills': workerForm.hair,
-        if (workerForm.isMakeupClicked) 'skills': workerForm.makeup,
-        if (workerForm.isSpaClicked) 'skills': workerForm.spa,
-        if (workerForm.isNailsClicked) 'skills': workerForm.nails,
-        if (workerForm.isLashesClicked) 'skills': workerForm.lashes,
-        if (workerForm.isWaxClicked) 'skills': workerForm.wax,
+        if (workerForm.isHairClicked) 'skills': skills,
+        if (workerForm.isMakeupClicked) 'skills': skills,
+        if (workerForm.isSpaClicked) 'skills': skills,
+        if (workerForm.isNailsClicked) 'skills': skills,
+        if (workerForm.isLashesClicked) 'skills': skills,
+        if (workerForm.isWaxClicked) 'skills': skills,
       };
 
   Map<String, dynamic> step3() => {

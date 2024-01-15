@@ -15,7 +15,7 @@ class DisplayCertificates extends StatefulWidget {
 
 class _DisplayCertificatesState extends State<DisplayCertificates> {
   User? currentUser = FirebaseAuth.instance.currentUser;
-  List<String> imageUrls = [];
+  Iterable imageUrls = [];
 
   @override
   void initState() {
@@ -30,13 +30,19 @@ class _DisplayCertificatesState extends State<DisplayCertificates> {
       DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser!.uid)
-          .collection('userDetails')
-          .doc('step4')
+          .collection('portfolio')
+          .doc('requirements')
           .get();
       if (documentSnapshot.exists) {
-        List<dynamic> imageUrlArray = documentSnapshot['certificates'];
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+
+        Map<String, dynamic> certificates = Map.fromEntries(data.entries
+            .where((element) => element.key.contains("certificates")));
+        log(certificates.values.toString());
+        Iterable certUrls = certificates.values;
         setState(() {
-          imageUrls = imageUrlArray.map((item) => item as String).toList();
+          imageUrls = certUrls;
         });
       } else {
         log('document not exist');

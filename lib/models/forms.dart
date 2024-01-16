@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_auth/models/experience.dart';
 import 'package:image_picker/image_picker.dart';
 
 class WorkerForm {
@@ -26,11 +27,7 @@ class WorkerForm {
   bool isLashesClicked = false;
   List<String> wax = ['Wax Services'];
   bool isWaxClicked = false;
-  // List<dynamic>? experiences = [];
-  List<String> experienceName = [''];
-  List<String> experienceAddress = [''];
-  List<String> experienceNum = [''];
-  List<String> selectedDays = [''];
+  List<Experience> experiences = [];
   File? governmentID;
   File? vaxCard;
   File? nbiClearance;
@@ -56,11 +53,6 @@ class WorkerForm {
     required this.nails,
     required this.lashes,
     required this.wax,
-    // this.experiences,
-    required this.experienceName,
-    required this.experienceAddress,
-    required this.experienceNum,
-    required this.selectedDays,
     this.governmentID,
     this.vaxCard,
     this.nbiClearance,
@@ -80,6 +72,18 @@ class SalonForm {
   String salonRepresentative;
   String representativeEmail;
   String representativeNum;
+  List<String> hair = ['Hair Services'];
+  bool isHairClicked = false;
+  List<String> makeup = ['Makeup Services'];
+  bool isMakeupClicked = false;
+  List<String> spa = ['Spa Services'];
+  bool isSpaClicked = false;
+  List<String> nails = ['Nails Services'];
+  bool isNailsClicked = false;
+  List<String> lashes = ['Lashes Services'];
+  bool isLashesClicked = false;
+  List<String> wax = ['Wax Services'];
+  bool isWaxClicked = false;
   File? representativeID;
   File? businessPermit;
   File? secondaryLicense;

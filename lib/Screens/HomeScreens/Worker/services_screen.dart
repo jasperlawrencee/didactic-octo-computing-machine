@@ -16,13 +16,12 @@ class ServicesPage extends StatefulWidget {
 class _ServicesPageState extends State<ServicesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
-  List<Map<String, dynamic>> arrayData = [];
-  List<List<Map<String, dynamic>>> arrayOfArrays = [];
+  List<String> serviceNames = [];
 
   @override
   void initState() {
     super.initState();
-    getAllInDocument();
+    getServiceName();
   }
 
   @override
@@ -48,12 +47,10 @@ class _ServicesPageState extends State<ServicesPage> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
+              //listview builder dapat ni
               Expanded(
                 child: ListView(children: [
-                  for (var arrayData in arrayOfArrays)
-                    for (var item in arrayData)
-                      serviceCard('${item['name']}'.toUpperCase(),
-                          '${item['value']}', '(priceRange)')
+                  serviceCard("serviceNames", "description", "₱100")
                 ]),
               ),
             ],
@@ -91,7 +88,7 @@ class _ServicesPageState extends State<ServicesPage> {
           Align(
             alignment: Alignment.bottomRight,
             child: InkWell(
-              onTap: () => editServiceCard(serviceName, serviceType, context),
+              onTap: () => {},
               child: const Text(
                 'Edit',
                 style: TextStyle(
@@ -104,81 +101,21 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-  String? editValue;
-  Future<void> editServiceCard(
-      String title, String service, BuildContext context) {
-    //dapat naa diri tong gikan sa firebase
-    List<String> serviceName = [];
-    return showDialog(
-        context: context,
-        builder: ((context) {
-          return Theme(
-            data: ThemeData(
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: kPrimaryColor,
-                      background: Colors.white70,
-                      secondary: kPrimaryLightColor,
-                    )),
-            child: AlertDialog(
-              title: Text('Edit $title - $service'),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('No')),
-                TextButton(
-                    onPressed: () {
-                      Column(
-                        children: [
-                          DropdownButton<String>(
-                            items: serviceName.map(buildMenuItem).toList(),
-                            onChanged: (value) => setState(() {
-                              editValue = value;
-                            }),
-                          )
-                        ],
-                      );
-                    },
-                    child: const Text('Edit')),
-              ],
-            ),
-          );
-        }));
-  }
-
-  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(item),
-      );
-
-  getAllInDocument() async {
+  void getServiceName() async {
     try {
-      DocumentSnapshot documentSnapshot = await _firestore
+      QuerySnapshot querySnapshot = await _firestore
           .collection('users')
           .doc(currentUser!.uid)
-          .collection('userDetails')
-          .doc('step2')
+          .collection('services')
           .get();
-      if (documentSnapshot.exists) {
-        Map<String, dynamic> documentData =
-            documentSnapshot.data() as Map<String, dynamic>;
-        documentData.forEach((fieldName, fieldValue) {
-          if (fieldValue is List) {
-            //convert array to a list of maps with label
-            setState(() {
-              arrayData = fieldValue.map((item) {
-                return {'name': fieldName, 'value': item};
-              }).toList();
-              arrayOfArrays.add(arrayData);
-            });
-          }
-        });
-      } else {
-        return [];
-      }
+      List<String> documentNames =
+          querySnapshot.docs.map((doc) => doc.id).toList();
+      setState(() {
+        serviceNames = documentNames;
+      });
+      log(serviceNames.toString());
     } catch (e) {
-      log('error: $e');
+      log(e.toString());
     }
   }
 }

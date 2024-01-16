@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/SalonRegister/forms/step2.dart';
+import 'package:flutter_auth/Screens/SalonRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/SalonRegister/summary.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -60,6 +61,10 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
             title: const Text(''),
             content: const step2(),
           ),
+          Step(
+              isActive: currentStep >= 2,
+              title: const Text(''),
+              content: const step3())
         ];
 
     return Background(
@@ -94,11 +99,15 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
                       ),
                     if (currentStep == 1)
                       ElevatedButton(
-                        onPressed: () {
-                          _dialogBuilder(context);
-                        },
+                        onPressed: controls.onStepContinue,
                         child: const Text("NEXT"),
                       ),
+                    if (currentStep == 2)
+                      ElevatedButton(
+                          onPressed: () {
+                            _dialogBuilder(context);
+                          },
+                          child: const Text("NEXT"))
                   ],
                 ),
               );
@@ -121,7 +130,7 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
   }
 
   continued() {
-    currentStep < 1 ? setState(() => currentStep += 1) : null;
+    currentStep < 2 ? setState(() => currentStep += 1) : null;
   }
 
   cancel() {

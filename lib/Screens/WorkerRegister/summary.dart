@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -10,6 +12,7 @@ import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/models/experience.dart';
 
 class Summary extends StatefulWidget {
   const Summary({Key? key}) : super(key: key);
@@ -270,45 +273,51 @@ class _SummaryState extends State<Summary> {
               'Experiences',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Salon Name',
-                ),
-                Text(workerForm.experienceName.toString()),
-              ],
-            ),
-            const SizedBox(height: defaultPadding),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Salon Address',
-                ),
-                Text(workerForm.experienceAddress.toString()),
-              ],
-            ),
-            const SizedBox(height: defaultPadding),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Salon Contact Number',
-                ),
-                Text(workerForm.experienceNum.toString()),
-              ],
-            ),
-            const SizedBox(height: defaultPadding),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Duration',
-                ),
-                Text(workerForm.selectedDays.toString()),
-              ],
-            ),
+            for (Experience exp in workerForm.experiences)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Salon Name',
+                      ),
+                      Text(exp.name!),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Salon Address',
+                      ),
+                      Text(exp.address!),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Salon Contact Number',
+                      ),
+                      Text(exp.contactNum!),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Duration',
+                      ),
+                      Text(exp.date!),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
             const SizedBox(height: defaultPadding),
             const Text(
               'Requirements',
@@ -454,25 +463,120 @@ class _SummaryState extends State<Summary> {
                 addRoleToFireStore();
                 addStep1();
                 if (workerForm.isHairClicked) {
+                  Map<String, dynamic> hairFields = {};
+                  try {
+                    for (String fieldNames in workerForm.hair) {
+                      hairFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Hair')
+                      .set(hairFields, SetOptions(merge: true));
                   skills.addAll(workerForm.hair);
                 }
                 if (workerForm.isMakeupClicked) {
+                  Map<String, dynamic> makeupFields = {};
+                  try {
+                    for (String fieldNames in workerForm.makeup) {
+                      makeupFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Makeup')
+                      .set(makeupFields, SetOptions(merge: true));
                   skills.addAll(workerForm.makeup);
                 }
                 if (workerForm.isSpaClicked) {
+                  Map<String, dynamic> spaFields = {};
+                  try {
+                    for (String fieldNames in workerForm.spa) {
+                      spaFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Spa')
+                      .set(spaFields, SetOptions(merge: true));
                   skills.addAll(workerForm.spa);
                 }
                 if (workerForm.isNailsClicked) {
+                  Map<String, dynamic> nailsFields = {};
+                  try {
+                    for (String fieldNames in workerForm.nails) {
+                      nailsFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Nails')
+                      .set(nailsFields, SetOptions(merge: true));
                   skills.addAll(workerForm.nails);
                 }
                 if (workerForm.isLashesClicked) {
+                  Map<String, dynamic> lashesFields = {};
+                  try {
+                    for (String fieldNames in workerForm.lashes) {
+                      lashesFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Lashes')
+                      .set(lashesFields, SetOptions(merge: true));
                   skills.addAll(workerForm.lashes);
                 }
                 if (workerForm.isWaxClicked) {
+                  Map<String, dynamic> waxFields = {};
+                  try {
+                    for (String fieldNames in workerForm.wax) {
+                      waxFields[fieldNames] = [];
+                    }
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                  await _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('categories')
+                      .doc('Wax')
+                      .set(waxFields, SetOptions(merge: true));
                   skills.addAll(workerForm.wax);
                 }
                 addStep2();
                 addStep4();
+                for (Experience exp in workerForm.experiences) {
+                  _firestore
+                      .collection('users')
+                      .doc(currentUser!.uid)
+                      .collection('experiences')
+                      .add(exp.toFirebase());
+                }
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const WorkerSummaryScreen();
+                }));
+                log('ez');
               } catch (e) {
                 log(e.toString());
               }
@@ -492,7 +596,8 @@ class _SummaryState extends State<Summary> {
         'secondaryPhoneNumber': workerForm.phoneNum2,
         'address':
             "${workerForm.barangay} ${workerForm.stAddress} ${workerForm.extAddress} ${workerForm.city}",
-        'birthday': '${workerForm.birthday}'
+        'birthday': '${workerForm.birthday}',
+        'about': ''
       };
 
 //logic error dapat mu add tanan skills
@@ -503,13 +608,6 @@ class _SummaryState extends State<Summary> {
         if (workerForm.isNailsClicked) 'skills': skills,
         if (workerForm.isLashesClicked) 'skills': skills,
         if (workerForm.isWaxClicked) 'skills': skills,
-      };
-
-  Map<String, dynamic> step3() => {
-        'salonName': workerForm.experienceName,
-        'salonAddress': workerForm.experienceAddress,
-        'salonContactNumber': workerForm.experienceNum,
-        'experienceDuration': workerForm.selectedDays,
       };
 
 //adds data from step1 form to user field
@@ -591,17 +689,6 @@ class _SummaryState extends State<Summary> {
       }
     }
   }
-
-  // addStep3() {
-  //   _firestore
-  //       .collection('users')
-  //       .doc(currentUser!.uid)
-  //       .collection('portfolio')
-  //       .doc('step3')
-  //       .set(step3())
-  //       .whenComplete(() => log('added step3'))
-  //       .onError((error, stackTrace) => null);
-  // }
 
   addStep4() async {
     //firebase storage references

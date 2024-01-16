@@ -39,7 +39,6 @@ class _DisplayCertificatesState extends State<DisplayCertificates> {
 
         Map<String, dynamic> certificates = Map.fromEntries(data.entries
             .where((element) => element.key.contains("certificates")));
-        log(certificates.values.toString());
         Iterable certUrls = certificates.values;
         setState(() {
           imageUrls = certUrls;

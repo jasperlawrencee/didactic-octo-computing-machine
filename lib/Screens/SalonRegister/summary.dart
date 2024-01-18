@@ -518,7 +518,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }
@@ -533,7 +534,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }
@@ -548,7 +550,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }
@@ -563,7 +566,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }
@@ -578,7 +582,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }
@@ -593,7 +598,8 @@ class _SummaryState extends State<Summary> {
                                                     .doc(documentName);
                                             documentReference.set({
                                               'price': '',
-                                              'description': ''
+                                              'description': '',
+                                              'duration': ''
                                             });
                                           }
                                         }

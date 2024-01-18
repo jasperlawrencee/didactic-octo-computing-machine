@@ -358,15 +358,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         services[index],
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      Text(" - ${serviceDuration[index]}"),
+                      Text(" - ${"serviceDuration"[index]}"),
                     ],
                   ),
                   const Spacer(),
-                  Text(serviceDescription[index]),
+                  Text("serviceDescription"[index]),
                 ],
               ),
               Column(
-                children: [Text("${servicePrice[index]} Php")],
+                children: [Text("${"servicePrice"[index]} Php")],
               )
             ],
           )),

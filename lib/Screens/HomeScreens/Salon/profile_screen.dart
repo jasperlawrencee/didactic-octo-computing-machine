@@ -78,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
       querySnapshot.docs.forEach((doc) {
         priceList.add(doc['price']);
         descriptionList.add(doc['description']);
-        nameList.add(doc['serviceName']);
+        // nameList.add(doc['serviceName']);
         durationList.add(doc['duration']);
       });
       setState(() {
@@ -320,10 +320,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             .doc(currentUser!.uid)
                             .collection('services')
                             .doc(services[index])
-                            .delete()
-                            .then((value) {
-                          setState(() {});
-                        });
+                            .delete();
                       },
                       child: const Text('Yes')),
                   TextButton(
@@ -340,36 +337,86 @@ class _ProfilePageState extends State<ProfilePage> {
         color: Colors.white,
         size: 15,
       ),
-      child: Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.only(bottom: defaultPadding),
-          color: kPrimaryLightColor,
-          width: double.infinity,
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      Text(
-                        services[index],
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      Text(" - ${"serviceDuration"[index]}"),
-                    ],
+      child: InkWell(
+        child: Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: defaultPadding),
+            color: kPrimaryLightColor,
+            width: double.infinity,
+            height: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: [
+                        Text(
+                          services[index],
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        serviceDuration.isEmpty
+                            ? const Text(' - TBD')
+                            : Text(" - ${serviceDuration[index]}"),
+                      ],
+                    ),
+                    const Spacer(),
+                    serviceDescription.isEmpty
+                        ? const Text('No Description')
+                        : Text(serviceDescription[index]),
+                  ],
+                ),
+                Column(
+                  children: [
+                    servicePrice.isEmpty
+                        ? const Text("No price")
+                        : Text("${servicePrice[index]} Php"),
+                  ],
+                )
+              ],
+            )),
+        onTap: () => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text("Edit ${services[index]}"),
+                  content: SizedBox.square(
+                    dimension: 280,
+                    child: Column(
+                      children: [
+                        flatTextField("Service Name", _serviceName),
+                        flatTextField("Duration", _serviceDuration),
+                        flatTextField("Description", _serviceDescription),
+                        flatTextField("Price", _servicePrice),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
-                  Text("serviceDescription"[index]),
-                ],
-              ),
-              Column(
-                children: [Text("${"servicePrice"[index]} Php")],
-              )
-            ],
-          )),
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        try {
+                          QuerySnapshot querySnapshot = await _firestore
+                              .collection('users')
+                              .doc(currentUser!.uid)
+                              .collection('services')
+                              .where(services[index], isEqualTo: "")
+                              .get();
+                          log(querySnapshot.size.toString());
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      },
+                      child: const Text('Edit'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Close'),
+                    ),
+                  ],
+                )),
+      ),
     );
   }
 

@@ -463,108 +463,135 @@ class _SummaryState extends State<Summary> {
                 addRoleToFireStore();
                 addStep1();
                 if (workerForm.isHairClicked) {
-                  Map<String, dynamic> hairFields = {};
                   try {
                     for (String fieldNames in workerForm.hair) {
-                      hairFields[fieldNames] = [];
+                      Map<String, dynamic> hairFields = {
+                        'price': '',
+                        'duration': '',
+                        'description': '',
+                      };
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Hair')
+                          .collection('details')
+                          .doc(fieldNames)
+                          .set(hairFields);
                     }
                   } catch (e) {
                     log(e.toString());
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Hair')
-                      .set(hairFields, SetOptions(merge: true));
                   skills.addAll(workerForm.hair);
                 }
                 if (workerForm.isMakeupClicked) {
-                  Map<String, dynamic> makeupFields = {};
                   try {
                     for (String fieldNames in workerForm.makeup) {
-                      makeupFields[fieldNames] = [];
+                      Map<String, dynamic> makeupFields = {
+                        'price': '',
+                        'duration': '',
+                        'description': '',
+                      };
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Makeup')
+                          .collection('details')
+                          .doc(fieldNames)
+                          .set(makeupFields);
                     }
                   } catch (e) {
                     log(e.toString());
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Makeup')
-                      .set(makeupFields, SetOptions(merge: true));
                   skills.addAll(workerForm.makeup);
                 }
                 if (workerForm.isSpaClicked) {
-                  Map<String, dynamic> spaFields = {};
-                  try {
-                    for (String fieldNames in workerForm.spa) {
-                      spaFields[fieldNames] = [];
-                    }
-                  } catch (e) {
-                    log(e.toString());
+                  for (String fields in workerForm.spa) {
+                    Map<String, dynamic> spaFields = {
+                      'price': '',
+                      'duration': '',
+                      'description': '',
+                    };
+
+                    await _firestore
+                        .collection('users')
+                        .doc(currentUser!.uid)
+                        .collection('categories')
+                        .doc('Spa')
+                        .collection('details')
+                        .doc(fields)
+                        .set(spaFields);
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Spa')
-                      .set(spaFields, SetOptions(merge: true));
                   skills.addAll(workerForm.spa);
                 }
                 if (workerForm.isNailsClicked) {
-                  Map<String, dynamic> nailsFields = {};
                   try {
                     for (String fieldNames in workerForm.nails) {
-                      nailsFields[fieldNames] = [];
+                      Map<String, dynamic> nailsFields = {
+                        'price': '',
+                        'duration': '',
+                        'description': '',
+                      };
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Nails')
+                          .collection('details')
+                          .doc(fieldNames)
+                          .set(nailsFields);
                     }
                   } catch (e) {
                     log(e.toString());
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Nails')
-                      .set(nailsFields, SetOptions(merge: true));
                   skills.addAll(workerForm.nails);
                 }
                 if (workerForm.isLashesClicked) {
-                  Map<String, dynamic> lashesFields = {};
                   try {
                     for (String fieldNames in workerForm.lashes) {
-                      lashesFields[fieldNames] = [];
+                      Map<String, dynamic> lashesFields = {
+                        'price': '',
+                        'duration': '',
+                        'description': '',
+                      };
+
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Lashes')
+                          .collection('details')
+                          .doc(fieldNames)
+                          .set(lashesFields);
                     }
                   } catch (e) {
                     log(e.toString());
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Lashes')
-                      .set(lashesFields, SetOptions(merge: true));
                   skills.addAll(workerForm.lashes);
                 }
                 if (workerForm.isWaxClicked) {
-                  Map<String, dynamic> waxFields = {};
                   try {
                     for (String fieldNames in workerForm.wax) {
-                      waxFields[fieldNames] = [];
+                      Map<String, dynamic> waxFields = {
+                        'price': '',
+                        'duration': '',
+                        'description': '',
+                      };
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Wax')
+                          .collection('details')
+                          .doc(fieldNames)
+                          .set(waxFields);
                     }
                   } catch (e) {
                     log(e.toString());
                   }
-                  await _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('categories')
-                      .doc('Wax')
-                      .set(waxFields, SetOptions(merge: true));
                   skills.addAll(workerForm.wax);
                 }
-                addStep2();
                 addStep4();
                 for (Experience exp in workerForm.experiences) {
                   _firestore
@@ -618,76 +645,6 @@ class _SummaryState extends State<Summary> {
         .update(step1())
         // .whenComplete(() => log('added step1'))
         .onError((error, stackTrace) => null);
-  }
-
-//adds skills from step2 form to user field
-  addStep2() {
-    _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .update(step2())
-        // .whenComplete(() => log('added step2'))
-        .onError((error, stackTrace) => null);
-    if (workerForm.isHairClicked) {
-      for (String documentName in workerForm.hair) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
-    if (workerForm.isMakeupClicked) {
-      for (String documentName in workerForm.makeup) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
-    if (workerForm.isSpaClicked) {
-      for (String documentName in workerForm.spa) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
-    if (workerForm.isNailsClicked) {
-      for (String documentName in workerForm.nails) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
-    if (workerForm.isLashesClicked) {
-      for (String documentName in workerForm.lashes) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
-    if (workerForm.isWaxClicked) {
-      for (String documentName in workerForm.wax) {
-        DocumentReference documentReference = _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(documentName);
-        documentReference.set({'price': '', 'description': ''});
-      }
-    }
   }
 
   addStep4() async {

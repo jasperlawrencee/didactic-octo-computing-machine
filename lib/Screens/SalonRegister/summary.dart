@@ -382,236 +382,34 @@ class _SummaryState extends State<Summary> {
                                     child: const Text('No')),
                                 TextButton(
                                     onPressed: () async {
-                                      Navigator.of(context).pop();
                                       try {
-                                        //adds "salon" to firebase cloud storage
-                                        addRoleToFireStore();
-                                        //adds all singup text "String" data to firebase cloud storage
-                                        await _firestore
-                                            .collection('users')
-                                            .doc(currentUser!.uid)
-                                            .update(step1());
-                                        if (salonForm.isHairClicked) {
-                                          Map<String, dynamic> hairFields = {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.hair) {
-                                              hairFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Hair')
-                                              .set(hairFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.hair);
+                                        Navigator.of(context).pop();
+                                        if (doEverything() ==
+                                            ConnectionState.waiting) {
+                                          const AlertDialog(
+                                            content: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: 150,
+                                                  height: 150,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: kPrimaryColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return const SalonSummaryScreen();
+                                          }));
                                         }
-                                        if (salonForm.isMakeupClicked) {
-                                          Map<String, dynamic> makeupFields =
-                                              {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.makeup) {
-                                              makeupFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Makeup')
-                                              .set(makeupFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.makeup);
-                                        }
-                                        if (salonForm.isSpaClicked) {
-                                          Map<String, dynamic> spaFields = {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.spa) {
-                                              spaFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Spa')
-                                              .set(spaFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.spa);
-                                        }
-                                        if (salonForm.isNailsClicked) {
-                                          Map<String, dynamic> nailsFields = {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.nails) {
-                                              nailsFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Nails')
-                                              .set(nailsFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.nails);
-                                        }
-                                        if (salonForm.isLashesClicked) {
-                                          Map<String, dynamic> lashesFields =
-                                              {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.lashes) {
-                                              lashesFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Lashes')
-                                              .set(lashesFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.lashes);
-                                        }
-                                        if (salonForm.isWaxClicked) {
-                                          Map<String, dynamic> waxFields = {};
-                                          try {
-                                            for (String fieldNames
-                                                in salonForm.wax) {
-                                              waxFields[fieldNames] = [];
-                                            }
-                                          } catch (e) {
-                                            log(e.toString());
-                                          }
-                                          await _firestore
-                                              .collection('users')
-                                              .doc(currentUser!.uid)
-                                              .collection('categories')
-                                              .doc('Wax')
-                                              .set(waxFields,
-                                                  SetOptions(merge: true));
-                                          skills.addAll(salonForm.wax);
-                                        }
-                                        if (salonForm.isHairClicked) {
-                                          for (String documentName
-                                              in salonForm.hair) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        if (salonForm.isMakeupClicked) {
-                                          for (String documentName
-                                              in salonForm.makeup) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        if (salonForm.isSpaClicked) {
-                                          for (String documentName
-                                              in salonForm.spa) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        if (salonForm.isNailsClicked) {
-                                          for (String documentName
-                                              in salonForm.nails) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        if (salonForm.isLashesClicked) {
-                                          for (String documentName
-                                              in salonForm.lashes) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        if (salonForm.isWaxClicked) {
-                                          for (String documentName
-                                              in salonForm.wax) {
-                                            DocumentReference
-                                                documentReference = _firestore
-                                                    .collection('users')
-                                                    .doc(currentUser!.uid)
-                                                    .collection('services')
-                                                    .doc(documentName);
-                                            documentReference.set({
-                                              'price': '',
-                                              'description': '',
-                                              'duration': ''
-                                            });
-                                          }
-                                        }
-                                        //adds imageUrl to firebase storage and step1 document in firebase cloud
-                                        addStep1Image();
-                                        //adds images to firebase storage
-                                        addStep2Image();
-                                        Navigator.push(context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                          return const SalonSummaryScreen();
-                                        }));
                                       } catch (e) {
                                         log(e.toString());
                                       }
@@ -668,6 +466,148 @@ class _SummaryState extends State<Summary> {
             color: kPrimaryColor, decoration: TextDecoration.underline),
       ),
     );
+  }
+
+  doEverything() async {
+    await Future.delayed(const Duration(seconds: 10));
+    //adds "salon" to firebase cloud storage
+    addRoleToFireStore();
+    //adds all singup text "String" data to firebase cloud storage
+    await _firestore.collection('users').doc(currentUser!.uid).update(step1());
+    if (salonForm.isHairClicked) {
+      try {
+        for (String fieldNames in salonForm.hair) {
+          Map<String, dynamic> hairFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc('Hair')
+              .collection('details')
+              .doc(fieldNames)
+              .set(hairFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+      skills.addAll(salonForm.hair);
+    }
+    if (salonForm.isMakeupClicked) {
+      try {
+        for (String fieldNames in salonForm.makeup) {
+          Map<String, dynamic> makeupFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc('Makeup')
+              .collection('details')
+              .doc(fieldNames)
+              .set(makeupFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+      skills.addAll(salonForm.makeup);
+    }
+    if (salonForm.isSpaClicked) {
+      for (String fields in salonForm.spa) {
+        Map<String, dynamic> spaFields = {
+          'price': '',
+          'duration': '',
+          'description': '',
+        };
+
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('categories')
+            .doc('Spa')
+            .collection('details')
+            .doc(fields)
+            .set(spaFields);
+      }
+      skills.addAll(salonForm.spa);
+    }
+    if (salonForm.isNailsClicked) {
+      try {
+        for (String fieldNames in salonForm.nails) {
+          Map<String, dynamic> nailsFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc('Nails')
+              .collection('details')
+              .doc(fieldNames)
+              .set(nailsFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+      skills.addAll(salonForm.nails);
+    }
+    if (salonForm.isLashesClicked) {
+      try {
+        for (String fieldNames in salonForm.lashes) {
+          Map<String, dynamic> lashesFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc('Lashes')
+              .collection('details')
+              .doc(fieldNames)
+              .set(lashesFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+      skills.addAll(salonForm.lashes);
+    }
+    if (salonForm.isWaxClicked) {
+      try {
+        for (String fieldNames in salonForm.wax) {
+          Map<String, dynamic> waxFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc('Wax')
+              .collection('details')
+              .doc(fieldNames)
+              .set(waxFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+      skills.addAll(salonForm.wax);
+    }
+    //adds imageUrl to firebase storage and step1 document in firebase cloud
+    addStep1Image();
+    //adds images to firebase storage
+    addStep2Image();
   }
 
   Map<String, dynamic> step1() => {

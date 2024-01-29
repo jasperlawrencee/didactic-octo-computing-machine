@@ -70,11 +70,11 @@ class _thirdStepState extends State<thirdStep> {
             ),
           ],
         ),
-        TextButton(
-            onPressed: () {
-              log(workerForm.experiences.map((e) => e.log()).join("\n \n"));
-            },
-            child: Text('data'))
+        // TextButton(
+        //     onPressed: () {
+        //       log(workerForm.experiences.map((e) => e.log()).join("\n \n"));
+        //     },
+        //     child: Text('data'))
       ],
     );
   }

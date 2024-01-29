@@ -44,7 +44,6 @@ class _ProfilePageState extends State<ProfilePage> {
     getSalonAddress();
     getSalonService();
     getServiceCount();
-    getServiceDetails();
   }
 
   void getSalonService() async {
@@ -64,35 +63,30 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  getServiceDetails() async {
+  void getServiceDetails() async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('users')
           .doc(currentUser!.uid)
           .collection('services')
           .get();
-      List<String> priceList = [];
-      List<String> descriptionList = [];
-      List<String> nameList = [];
-      List<String> durationList = [];
-      querySnapshot.docs.forEach((doc) {
-        priceList.add(doc['price']);
-        descriptionList.add(doc['description']);
-        nameList.add(doc['serviceName']);
-        durationList.add(doc['duration']);
-      });
-      setState(() {
-        servicePrice = priceList;
-        serviceName = nameList;
-        serviceDescription = descriptionList;
-        serviceDuration = durationList;
-      });
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        if (data.containsKey('description') &&
+            data.containsKey('duration') &&
+            data.containsKey('price')) {
+          serviceDescription.add(data['duration'].toString());
+          servicePrice.add(data['price'].toString());
+          serviceDuration.add(data['duration'].toString());
+        }
+      }
     } catch (e) {
       log(e.toString());
     }
   }
 
-  getServiceCount() async {
+  void getServiceCount() async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('users')
@@ -210,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: const EdgeInsets.all(8),
                       itemCount: serviceCount,
                       itemBuilder: (context, index) {
-                        return salonServiceCard(index);
+                        return ServiceCard(index);
                       }),
                   Align(
                       alignment: Alignment.bottomRight,
@@ -301,7 +295,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget salonServiceCard(int index) {
+  // ignore: non_constant_identifier_names
+  Widget ServiceCard(int index) {
     return badges.Badge(
       position: badges.BadgePosition.topEnd(),
       showBadge: true,
@@ -358,15 +353,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         services[index],
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      Text(" - ${"serviceDuration"[index]}"),
+                      serviceDescription.isEmpty
+                          ? Text(" - Edit")
+                          : Text(" - ${serviceDescription[index]}"),
                     ],
                   ),
                   const Spacer(),
-                  Text("serviceDescription"[index]),
+                  serviceDescription.isEmpty
+                      ? Text('Edit')
+                      : Text(serviceDescription[index]),
                 ],
               ),
               Column(
-                children: [Text("${"servicePrice"[index]} Php")],
+                children: [
+                  servicePrice.isEmpty
+                      ? Text('Edit')
+                      : Text("${servicePrice[index]} Php")
+                ],
               )
             ],
           )),

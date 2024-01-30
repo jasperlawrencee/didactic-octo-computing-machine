@@ -31,7 +31,7 @@ class _SummaryState extends State<Summary> {
   String nbiClearance = '';
   List<String> certificates = [];
   List skills = [];
-
+  Map<String, dynamic> existDoc = {'field': ''};
   @override
   void initState() {
     // TODO: implement initState
@@ -475,9 +475,15 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Hair')
+                          .set(existDoc);
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Hair')
                           .collection('details')
                           .doc(fieldNames)
-                          .set(hairFields);
+                          .update(hairFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -497,9 +503,15 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Makeup')
+                          .set(existDoc);
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Makeup')
                           .collection('details')
                           .doc(fieldNames)
-                          .set(makeupFields);
+                          .update(makeupFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -513,7 +525,12 @@ class _SummaryState extends State<Summary> {
                       'duration': '',
                       'description': '',
                     };
-
+                    await _firestore
+                        .collection('users')
+                        .doc(currentUser!.uid)
+                        .collection('categories')
+                        .doc('Spa')
+                        .set(existDoc);
                     await _firestore
                         .collection('users')
                         .doc(currentUser!.uid)
@@ -521,7 +538,7 @@ class _SummaryState extends State<Summary> {
                         .doc('Spa')
                         .collection('details')
                         .doc(fields)
-                        .set(spaFields);
+                        .update(spaFields);
                   }
                   skills.addAll(workerForm.spa);
                 }
@@ -538,9 +555,15 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Nails')
+                          .set(existDoc);
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Nails')
                           .collection('details')
                           .doc(fieldNames)
-                          .set(nailsFields);
+                          .update(nailsFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -555,7 +578,12 @@ class _SummaryState extends State<Summary> {
                         'duration': '',
                         'description': '',
                       };
-
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Lashes')
+                          .set(existDoc);
                       await _firestore
                           .collection('users')
                           .doc(currentUser!.uid)
@@ -563,7 +591,7 @@ class _SummaryState extends State<Summary> {
                           .doc('Lashes')
                           .collection('details')
                           .doc(fieldNames)
-                          .set(lashesFields);
+                          .update(lashesFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -583,9 +611,15 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Wax')
+                          .set(existDoc);
+                      await _firestore
+                          .collection('users')
+                          .doc(currentUser!.uid)
+                          .collection('categories')
+                          .doc('Wax')
                           .collection('details')
                           .doc(fieldNames)
-                          .set(waxFields);
+                          .update(waxFields);
                     }
                   } catch (e) {
                     log(e.toString());

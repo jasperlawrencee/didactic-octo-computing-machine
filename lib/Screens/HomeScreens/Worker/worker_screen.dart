@@ -116,7 +116,7 @@ class _homeState extends State<home> {
         .doc(currentUser!.uid)
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
-      log(documentSnapshot.get('username'));
+      // log(documentSnapshot.get('username'));
       setState(() {
         name = documentSnapshot.get('username');
       });

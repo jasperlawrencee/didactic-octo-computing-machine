@@ -4,7 +4,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/register_stepper.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 
 import '../../../constants.dart';
 

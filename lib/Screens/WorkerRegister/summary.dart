@@ -481,9 +481,9 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Hair')
-                          .collection('details')
+                          .collection('${currentUser!.uid}services')
                           .doc(fieldNames)
-                          .update(hairFields);
+                          .set(hairFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -509,9 +509,9 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Makeup')
-                          .collection('details')
+                          .collection('${currentUser!.uid}services')
                           .doc(fieldNames)
-                          .update(makeupFields);
+                          .set(makeupFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -536,9 +536,9 @@ class _SummaryState extends State<Summary> {
                         .doc(currentUser!.uid)
                         .collection('categories')
                         .doc('Spa')
-                        .collection('details')
+                        .collection('${currentUser!.uid}services')
                         .doc(fields)
-                        .update(spaFields);
+                        .set(spaFields);
                   }
                   skills.addAll(workerForm.spa);
                 }
@@ -561,9 +561,9 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Nails')
-                          .collection('details')
+                          .collection('${currentUser!.uid}services')
                           .doc(fieldNames)
-                          .update(nailsFields);
+                          .set(nailsFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -589,9 +589,9 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Lashes')
-                          .collection('details')
+                          .collection('${currentUser!.uid}services')
                           .doc(fieldNames)
-                          .update(lashesFields);
+                          .set(lashesFields);
                     }
                   } catch (e) {
                     log(e.toString());
@@ -617,9 +617,9 @@ class _SummaryState extends State<Summary> {
                           .doc(currentUser!.uid)
                           .collection('categories')
                           .doc('Wax')
-                          .collection('details')
+                          .collection('${currentUser!.uid}services')
                           .doc(fieldNames)
-                          .update(waxFields);
+                          .set(waxFields);
                     }
                   } catch (e) {
                     log(e.toString());

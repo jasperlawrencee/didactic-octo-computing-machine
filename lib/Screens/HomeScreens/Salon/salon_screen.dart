@@ -91,8 +91,8 @@ class _homeState extends State<home> {
 
   @override
   void initState() {
-    super.initState();
     getSalonName();
+    super.initState();
   }
 
   void getSalonName() {
@@ -103,7 +103,7 @@ class _homeState extends State<home> {
         .then(((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot != null) {
         setState(() {
-          salonName = documentSnapshot.get('salonName');
+          salonName = documentSnapshot.get('name');
         });
       }
     }));

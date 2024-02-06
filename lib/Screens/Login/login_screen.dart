@@ -47,10 +47,13 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       User? user =
           await _authService.signInWithEmailAndPassword(email, password);
-      route();
       if (user != null) {
+        route();
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sucessfully Logged In')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email or password invalid')));
       }
     } catch (e) {
       log(e.toString());

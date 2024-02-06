@@ -470,10 +470,8 @@ class _SummaryState extends State<Summary> {
 
   doEverything() async {
     await Future.delayed(const Duration(seconds: 10));
-    //adds "salon" to firebase cloud storage
-    addRoleToFireStore();
     //adds all singup text "String" data to firebase cloud storage
-    await _firestore.collection('users').doc(currentUser!.uid).update(step1());
+    await _firestore.collection('users').doc(currentUser!.uid).set(step1());
     if (salonForm.isHairClicked) {
       try {
         for (String fieldNames in salonForm.hair) {
@@ -493,9 +491,9 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('categories')
               .doc('Hair')
-              .collection('details')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
-              .update(hairFields);
+              .set(hairFields);
         }
       } catch (e) {
         log(e.toString());
@@ -521,9 +519,9 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('categories')
               .doc('Makeup')
-              .collection('details')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
-              .update(makeupFields);
+              .set(makeupFields);
         }
       } catch (e) {
         log(e.toString());
@@ -548,9 +546,9 @@ class _SummaryState extends State<Summary> {
             .doc(currentUser!.uid)
             .collection('categories')
             .doc('Spa')
-            .collection('details')
+            .collection('${currentUser!.uid}services')
             .doc(fields)
-            .update(spaFields);
+            .set(spaFields);
       }
       skills.addAll(salonForm.spa);
     }
@@ -573,9 +571,9 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('categories')
               .doc('Nails')
-              .collection('details')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
-              .update(nailsFields);
+              .set(nailsFields);
         }
       } catch (e) {
         log(e.toString());
@@ -601,9 +599,9 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('categories')
               .doc('Lashes')
-              .collection('details')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
-              .update(lashesFields);
+              .set(lashesFields);
         }
       } catch (e) {
         log(e.toString());
@@ -629,15 +627,17 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('categories')
               .doc('Wax')
-              .collection('details')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
-              .update(waxFields);
+              .set(waxFields);
         }
       } catch (e) {
         log(e.toString());
       }
       skills.addAll(salonForm.wax);
     }
+    //adds "salon" to firebase cloud storage
+    addRoleToFireStore();
     //adds imageUrl to firebase storage and step1 document in firebase cloud
     addStep1Image();
     //adds images to firebase storage
@@ -719,7 +719,6 @@ class _SummaryState extends State<Summary> {
       'outsideSalon': outsideSalon,
       'insideSalon': insideSalon,
     });
-    log('$businessPermit $secondaryLicense $outsideSalon $insideSalon');
   }
 
   addRoleToFireStore() {

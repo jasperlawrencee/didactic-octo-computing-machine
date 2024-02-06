@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:badges/badges.dart' as badges;
@@ -53,8 +55,13 @@ class _ServicesPageState extends State<ServicesPage> {
     super.dispose();
   }
 
+  Future<void> _refresh() {
+    return Future.delayed(const Duration(seconds: 2));
+  }
+
   Future<List<String>> getServices() async {
-    var collectionGroup = _firestore.collectionGroup('details');
+    var collectionGroup =
+        _firestore.collectionGroup('${currentUser!.uid}services');
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
@@ -110,11 +117,14 @@ class _ServicesPageState extends State<ServicesPage> {
                           ),
                         );
                       } else {
-                        return ListView.builder(
-                          itemCount: snapshot.data?.length,
-                          itemBuilder: (context, index) {
-                            return ServiceCard(index);
-                          },
+                        return RefreshIndicator(
+                          onRefresh: _refresh,
+                          child: ListView.builder(
+                            itemCount: snapshot.data?.length,
+                            itemBuilder: (context, index) {
+                              return ServiceCard(index);
+                            },
+                          ),
                         );
                       }
                     },
@@ -181,6 +191,10 @@ class _ServicesPageState extends State<ServicesPage> {
               actions: <Widget>[
                 TextButton(
                     onPressed: () {
+                      _serviceName.clear();
+                      _servicePrice.clear();
+                      _serviceDescription.clear();
+                      _serviceDuration.clear();
                       Navigator.pop(context);
                     },
                     child: const Text('Close')),
@@ -192,7 +206,13 @@ class _ServicesPageState extends State<ServicesPage> {
                             .doc(currentUser!.uid)
                             .collection('categories')
                             .doc(_serviceType.text)
-                            .collection('details')
+                            .set({'field': ''});
+                        _firestore
+                            .collection('users')
+                            .doc(currentUser!.uid)
+                            .collection('categories')
+                            .doc(_serviceType.text)
+                            .collection('${currentUser!.uid}services')
                             .doc(_serviceName.text)
                             .set({
                           'price': _servicePrice.text,
@@ -201,6 +221,10 @@ class _ServicesPageState extends State<ServicesPage> {
                         }).then((value) {
                           setState(() {});
                         });
+                        _serviceName.clear();
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
                         Navigator.of(context).pop();
                       } catch (e) {
                         log(e.toString());
@@ -301,7 +325,8 @@ class _ServicesPageState extends State<ServicesPage> {
   }
 
   Future<void> deleteDocumentInCollectionGroup(String documentId) async {
-    var collectionGroup = FirebaseFirestore.instance.collectionGroup('details');
+    var collectionGroup = FirebaseFirestore.instance
+        .collectionGroup('${currentUser!.uid}services');
 
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();
@@ -356,14 +381,18 @@ class _ServicesPageState extends State<ServicesPage> {
                 actions: [
                   TextButton(
                       onPressed: () {
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
                         Navigator.pop(context);
                       },
                       child: const Text('Close')),
                   TextButton(
                       onPressed: () async {
                         try {
-                          QuerySnapshot querySnapshot =
-                              await _firestore.collectionGroup('details').get();
+                          QuerySnapshot querySnapshot = await _firestore
+                              .collectionGroup('${currentUser!.uid}services')
+                              .get();
                           QueryDocumentSnapshot? targetDocument;
                           //Grabs document in collection group
                           for (QueryDocumentSnapshot doc
@@ -387,6 +416,9 @@ class _ServicesPageState extends State<ServicesPage> {
                         } catch (e) {
                           log(e.toString());
                         }
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
                         Navigator.pop(context);
                       },
                       child: const Text('Edit'))

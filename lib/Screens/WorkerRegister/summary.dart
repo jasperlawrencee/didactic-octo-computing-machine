@@ -13,6 +13,7 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/experience.dart';
+import '../../features/firebase/firebase_services.dart';
 
 class Summary extends StatefulWidget {
   const Summary({Key? key}) : super(key: key);
@@ -31,7 +32,6 @@ class _SummaryState extends State<Summary> {
   String nbiClearance = '';
   List<String> certificates = [];
   List skills = [];
-  Map<String, dynamic> existDoc = {'field': ''};
   @override
   void initState() {
     // TODO: implement initState
@@ -461,172 +461,27 @@ class _SummaryState extends State<Summary> {
               try {
                 //adds "freelancer" to firebase cloud storage
                 addRoleToFireStore();
+                //adds details from step1
                 addStep1();
-                if (workerForm.isHairClicked) {
-                  try {
-                    for (String fieldNames in workerForm.hair) {
-                      Map<String, dynamic> hairFields = {
-                        'price': '',
-                        'duration': '',
-                        'description': '',
-                      };
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Hair')
-                          .set(existDoc);
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Hair')
-                          .collection('${currentUser!.uid}services')
-                          .doc(fieldNames)
-                          .set(hairFields);
-                    }
-                  } catch (e) {
-                    log(e.toString());
-                  }
-                  skills.addAll(workerForm.hair);
-                }
-                if (workerForm.isMakeupClicked) {
-                  try {
-                    for (String fieldNames in workerForm.makeup) {
-                      Map<String, dynamic> makeupFields = {
-                        'price': '',
-                        'duration': '',
-                        'description': '',
-                      };
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Makeup')
-                          .set(existDoc);
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Makeup')
-                          .collection('${currentUser!.uid}services')
-                          .doc(fieldNames)
-                          .set(makeupFields);
-                    }
-                  } catch (e) {
-                    log(e.toString());
-                  }
-                  skills.addAll(workerForm.makeup);
-                }
-                if (workerForm.isSpaClicked) {
-                  for (String fields in workerForm.spa) {
-                    Map<String, dynamic> spaFields = {
-                      'price': '',
-                      'duration': '',
-                      'description': '',
-                    };
-                    await _firestore
-                        .collection('users')
-                        .doc(currentUser!.uid)
-                        .collection('categories')
-                        .doc('Spa')
-                        .set(existDoc);
-                    await _firestore
-                        .collection('users')
-                        .doc(currentUser!.uid)
-                        .collection('categories')
-                        .doc('Spa')
-                        .collection('${currentUser!.uid}services')
-                        .doc(fields)
-                        .set(spaFields);
-                  }
-                  skills.addAll(workerForm.spa);
-                }
-                if (workerForm.isNailsClicked) {
-                  try {
-                    for (String fieldNames in workerForm.nails) {
-                      Map<String, dynamic> nailsFields = {
-                        'price': '',
-                        'duration': '',
-                        'description': '',
-                      };
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Nails')
-                          .set(existDoc);
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Nails')
-                          .collection('${currentUser!.uid}services')
-                          .doc(fieldNames)
-                          .set(nailsFields);
-                    }
-                  } catch (e) {
-                    log(e.toString());
-                  }
-                  skills.addAll(workerForm.nails);
-                }
-                if (workerForm.isLashesClicked) {
-                  try {
-                    for (String fieldNames in workerForm.lashes) {
-                      Map<String, dynamic> lashesFields = {
-                        'price': '',
-                        'duration': '',
-                        'description': '',
-                      };
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Lashes')
-                          .set(existDoc);
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Lashes')
-                          .collection('${currentUser!.uid}services')
-                          .doc(fieldNames)
-                          .set(lashesFields);
-                    }
-                  } catch (e) {
-                    log(e.toString());
-                  }
-                  skills.addAll(workerForm.lashes);
-                }
-                if (workerForm.isWaxClicked) {
-                  try {
-                    for (String fieldNames in workerForm.wax) {
-                      Map<String, dynamic> waxFields = {
-                        'price': '',
-                        'duration': '',
-                        'description': '',
-                      };
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Wax')
-                          .set(existDoc);
-                      await _firestore
-                          .collection('users')
-                          .doc(currentUser!.uid)
-                          .collection('categories')
-                          .doc('Wax')
-                          .collection('${currentUser!.uid}services')
-                          .doc(fieldNames)
-                          .set(waxFields);
-                    }
-                  } catch (e) {
-                    log(e.toString());
-                  }
-                  skills.addAll(workerForm.wax);
-                }
-                addStep4();
+                //hair
+                addServicesToFirebase(
+                    workerForm.isHairClicked, workerForm.hair, 'Hair');
+                //makeup
+                addServicesToFirebase(
+                    workerForm.isMakeupClicked, workerForm.makeup, 'Makeup');
+                //spa
+                addServicesToFirebase(
+                    workerForm.isSpaClicked, workerForm.spa, 'Spa');
+                //nails
+                addServicesToFirebase(
+                    workerForm.isNailsClicked, workerForm.nails, 'Nails');
+                //lashes
+                addServicesToFirebase(
+                    workerForm.isLashesClicked, workerForm.lashes, 'Lashes');
+                //wax
+                addServicesToFirebase(
+                    workerForm.isWaxClicked, workerForm.wax, 'Wax');
+                //add tanan experiences from step3
                 for (Experience exp in workerForm.experiences) {
                   _firestore
                       .collection('users')
@@ -634,6 +489,8 @@ class _SummaryState extends State<Summary> {
                       .collection('experiences')
                       .add(exp.toFirebase());
                 }
+                //adds mga ids sa firebase from step4
+                addStep4();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const WorkerSummaryScreen();
                 }));
@@ -661,7 +518,6 @@ class _SummaryState extends State<Summary> {
         'about': ''
       };
 
-//logic error dapat mu add tanan skills
   Map<String, dynamic> step2() => {
         if (workerForm.isHairClicked) 'skills': skills,
         if (workerForm.isMakeupClicked) 'skills': skills,
@@ -677,8 +533,51 @@ class _SummaryState extends State<Summary> {
         .collection('users')
         .doc(currentUser!.uid)
         .update(step1())
-        // .whenComplete(() => log('added step1'))
         .onError((error, stackTrace) => null);
+  }
+
+  addServicesToFirebase(
+      bool serviceClicked, List servicesList, String serviceType) async {
+    if (serviceClicked) {
+      try {
+        for (String fieldNames in servicesList) {
+          Map<String, dynamic> serviceFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          Map<String, dynamic> addFields = {};
+          //add services to categories collection para kuhaon lang sa frontend ang names sa services in an array-like
+          for (String fieldNames in servicesList) {
+            addFields[fieldNames] = '';
+          }
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .set(addFields, SetOptions(merge: true));
+          //??way buot firebase
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .set({'doc': ''});
+          //add services to services dapat naa na tanan shit
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${serviceType}services')
+              .doc(fieldNames)
+              .set(serviceFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+    }
   }
 
   addStep4() async {

@@ -60,8 +60,7 @@ class _ServicesPageState extends State<ServicesPage> {
   }
 
   Future<List<String>> getServices() async {
-    var collectionGroup =
-        _firestore.collectionGroup('${currentUser!.uid}services');
+    var collectionGroup = _firestore.collectionGroup('Hairservices');
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
@@ -164,7 +163,7 @@ class _ServicesPageState extends State<ServicesPage> {
                 canvasColor: Colors.transparent,
                 colorScheme: Theme.of(context).colorScheme.copyWith(
                       primary: kPrimaryColor,
-                      background: Colors.white70,
+                      background: Colors.white,
                       secondary: kPrimaryLightColor,
                     )),
             child: AlertDialog(
@@ -198,39 +197,7 @@ class _ServicesPageState extends State<ServicesPage> {
                       Navigator.pop(context);
                     },
                     child: const Text('Close')),
-                TextButton(
-                    onPressed: () {
-                      try {
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .set({'field': ''});
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .collection('${currentUser!.uid}services')
-                            .doc(_serviceName.text)
-                            .set({
-                          'price': _servicePrice.text,
-                          'description': _serviceDescription.text,
-                          'duration': _serviceDuration.text
-                        }).then((value) {
-                          setState(() {});
-                        });
-                        _serviceName.clear();
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    },
-                    child: const Text('Add')),
+                TextButton(onPressed: () {}, child: const Text('Add')),
               ],
             ),
           );
@@ -251,7 +218,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     canvasColor: Colors.transparent,
                     colorScheme: Theme.of(context).colorScheme.copyWith(
                           primary: kPrimaryColor,
-                          background: Colors.white70,
+                          background: Colors.white,
                           secondary: kPrimaryLightColor,
                         )),
                 child: AlertDialog(
@@ -259,7 +226,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   actions: [
                     TextButton(
                         onPressed: () {
-                          deleteDocumentInCollectionGroup(serviceNames[index]);
+                          // deleteDocumentInCollectionGroup(serviceNames[index]);
                           Navigator.of(context).pop();
                         },
                         child: const Text('Yes')),
@@ -363,7 +330,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   canvasColor: Colors.transparent,
                   colorScheme: Theme.of(context).colorScheme.copyWith(
                         primary: kPrimaryColor,
-                        background: Colors.white70,
+                        background: Colors.white,
                         secondary: kPrimaryLightColor,
                       )),
               child: AlertDialog(

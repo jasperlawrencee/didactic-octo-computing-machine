@@ -7,6 +7,8 @@ DocumentReference docRef = users.doc('document_id');
 
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   Future<User?> signUpWithEmailAndPassword(
       String email, String password) async {
@@ -86,6 +88,50 @@ class FirebaseService {
       return user.uid;
     } else {
       return 'No User';
+    }
+  }
+
+  void addServicesToFirebase(
+      bool serviceClicked, List servicesList, String serviceType) async {
+    if (serviceClicked) {
+      try {
+        for (String fieldNames in servicesList) {
+          Map<String, dynamic> serviceFields = {
+            'price': '',
+            'duration': '',
+            'description': '',
+          };
+          Map<String, dynamic> addFields = {};
+          //add services to categories collection para kuhaon lang sa frontend ang names sa services in an array-like
+          for (String fieldNames in servicesList) {
+            addFields[fieldNames] = '';
+          }
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .set(addFields, SetOptions(merge: true));
+          //??way buot firebase
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .set({'doc': ''});
+          //add services to services dapat naa na tanan shit
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${serviceType}services')
+              .doc(fieldNames)
+              .set(serviceFields);
+        }
+      } catch (e) {
+        log(e.toString());
+      }
     }
   }
 }

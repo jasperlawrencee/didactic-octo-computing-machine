@@ -2,10 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_auth/components/widgets.dart';
+import 'package:flutter_auth/constants.dart';
+
 CollectionReference users = FirebaseFirestore.instance.collection('users');
 DocumentReference docRef = users.doc('document_id');
 
 class FirebaseService {
+  final TextEditingController _serviceName = TextEditingController();
+  final TextEditingController _servicePrice = TextEditingController();
+  final TextEditingController _serviceDescription = TextEditingController();
+  final TextEditingController _serviceDuration = TextEditingController();
+  final TextEditingController _serviceType = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
@@ -133,5 +142,81 @@ class FirebaseService {
         log(e.toString());
       }
     }
+  }
+
+  Future<dynamic> editServiceDialog(
+      BuildContext context, int index, List serviceNames) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Theme(
+              data: ThemeData(
+                  canvasColor: Colors.transparent,
+                  colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: kPrimaryColor,
+                        background: Colors.white,
+                        secondary: kPrimaryLightColor,
+                      )),
+              child: AlertDialog(
+                title: Text('Edit ${serviceNames[index]}'),
+                content: SizedBox.square(
+                  dimension: 300,
+                  child: Column(
+                    children: [
+                      flatTextField('Price', _servicePrice),
+                      flatTextField('Duration', _serviceDuration),
+                      flatTextField('Description', _serviceDescription),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Close')),
+                  TextButton(
+                      onPressed: () async {
+                        try {
+                          QuerySnapshot querySnapshot = await _firestore
+                              .collectionGroup('${currentUser!.uid}services')
+                              .get();
+                          QueryDocumentSnapshot? targetDocument;
+                          //Grabs document in collection group
+                          for (QueryDocumentSnapshot doc
+                              in querySnapshot.docs) {
+                            if (doc.id == serviceNames[index]) {
+                              targetDocument = doc;
+                              break;
+                            }
+                          }
+                          //Update document if found
+                          if (targetDocument != null) {
+                            await targetDocument.reference.update({
+                              'price': _servicePrice.text,
+                              'description': _serviceDescription.text,
+                              'duration': _serviceDuration.text,
+                            });
+                            log('updated ${targetDocument.id}');
+                          } else {
+                            log('no document found');
+                          }
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('Edit'))
+                ],
+              ));
+        });
   }
 }

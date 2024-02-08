@@ -35,7 +35,10 @@ class _SignupLogout extends State<SignupLogout> {
                 return const WelcomeScreen();
               }));
             },
-            child: const Text("Back to Home Screen"),
+            child: const Text(
+              "Back to Home Screen",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           const SizedBox(height: defaultPadding),
         ],

@@ -139,10 +139,9 @@ class _step1State extends State<step1> {
                     builder: ((context) {
                       return Theme(
                         data: ThemeData(
-                            canvasColor: Colors.transparent,
                             colorScheme: Theme.of(context).colorScheme.copyWith(
                                   primary: kPrimaryColor,
-                                  background: Colors.white70,
+                                  background: Colors.white,
                                   secondary: kPrimaryLightColor,
                                 )),
                         child: AlertDialog(

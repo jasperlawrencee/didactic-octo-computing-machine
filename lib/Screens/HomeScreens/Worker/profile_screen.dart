@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
 
 import 'dart:developer';
 
@@ -6,8 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/certificate_screen.dart';
+import 'package:flutter_auth/Screens/Login/login_screen.dart';
+import 'package:flutter_auth/Screens/Signup/signup_logout.dart';
 import 'package:flutter_auth/components/background.dart';
-import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -26,15 +27,12 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<String> imageUrl = [];
   String name = '';
-  String addAbout = 'Add About+';
-  String about = '';
   String address = '';
+  String fullName = '';
   TextEditingController userAbout = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Background(
         child: Container(
@@ -51,79 +49,38 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: defaultPadding),
-              Expanded(
-                child: Container(
-                  height: height * 0.4,
-                  color: Colors.transparent,
-                  child: LayoutBuilder(builder: (contex, constraints) {
-                    double innerHeight = constraints.maxHeight;
-                    double innerWidth = constraints.maxWidth;
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: innerHeight * 0.65,
-                            width: innerWidth,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: kPrimaryLightColor,
-                            ),
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 65),
-                                Text(
-                                  name,
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
-                                ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  child: RatingBar.builder(
-                                    ignoreGestures: true,
-                                    initialRating: 3,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: true,
-                                    itemCount: 5,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      log(rating.toString());
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: SizedBox(
-                              width: innerWidth * 0.35,
-                              child: ClipOval(
-                                  child: Image.asset('assets/avatars/2.jpg')),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
+              SizedBox(
+                height: 85,
+                width: 85,
+                child: ClipOval(
+                  child: Image.asset('assets/avatars/2.jpg'),
                 ),
               ),
+              const SizedBox(height: defaultPadding),
+              SizedBox(
+                child: RatingBar.builder(
+                  itemSize: 30,
+                  ignoreGestures: true,
+                  initialRating: 4.2,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    return const Icon(
+                      Icons.star_rate_rounded,
+                      color: Colors.amber,
+                    );
+                  },
+                  onRatingUpdate: (value) {},
+                ),
+              ),
+              const SizedBox(height: defaultPadding),
+              Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 2),
+              Text(fullName),
               const SizedBox(height: defaultPadding),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -134,8 +91,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(width: defaultPadding),
                     profileStats('Transactions\nDone', body: '123'),
                     const SizedBox(width: defaultPadding),
-                    profileStats('Last\nTransaction', body: 'Jasper'),
-                    const SizedBox(width: defaultPadding),
                     InkWell(
                         child: profileStats('Credentials',
                             body: 'View', underline: true),
@@ -145,67 +100,90 @@ class _ProfilePageState extends State<ProfilePage> {
                             return const DisplayCertificates();
                           }));
                         }),
-                    const SizedBox(width: defaultPadding),
-                    profileStats('Profile Visits', body: '123'),
                   ],
                 ),
               ),
               const SizedBox(height: defaultPadding),
-              const Text(
-                'About',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
+              profileButton(() => null, Icons.person, 'Personal Details'),
               const SizedBox(height: defaultPadding),
-              Text(about),
-              InkWell(
-                child: Text(
-                  addAbout,
-                  style: const TextStyle(
-                      color: kPrimaryColor,
-                      decoration: TextDecoration.underline),
-                ),
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('About'),
-                          content: flatTextField(
-                              'Maximum of 400 characters only', userAbout),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                _firestore
-                                    .collection('users')
-                                    .doc(currentUser!.uid)
-                                    .update({
-                                  'about': userAbout.text,
-                                });
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('SUBMIT'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('CLOSE'),
-                            ),
-                          ],
-                        );
-                      });
-                },
-              ),
-
+              profileButton(() => null, Icons.event_repeat, 'History'),
               const SizedBox(height: defaultPadding),
-              //custom about user
-              //Maximum of 400 characters lang dapat kay mag overflow ang widgets T_T
-              //check firestore para sa sulod sa about
+              profileButton(() => logout(), Icons.logout_outlined, 'Logout')
             ],
           ),
         ),
       ),
     );
+  }
+
+  logout() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+              data: ThemeData(
+                  canvasColor: Colors.transparent,
+                  colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: kPrimaryColor,
+                        background: Colors.white,
+                        secondary: kPrimaryLightColor,
+                      )),
+              child: AlertDialog(
+                title: const Text("Confirm Logout?"),
+                actions: <Widget>[
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('No'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    onPressed: () async {
+                      try {
+                        if (context.mounted) {
+                          await FirebaseAuth.instance.signOut();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Logged Out")));
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const LoginScreen();
+                          }));
+                        }
+                      } catch (e) {
+                        log('error: $e');
+                      }
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
+              ));
+        });
+  }
+
+  InkWell profileButton(Function() goTo, IconData icon, String text) {
+    return InkWell(
+        onTap: goTo,
+        child: SizedBox(
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: kPrimaryColor,
+              ),
+              const SizedBox(width: defaultPadding / 2),
+              Text(
+                text,
+                style: const TextStyle(color: kPrimaryColor),
+              )
+            ],
+          ),
+        ));
   }
 
   Container profileStats(String title, {String? body, bool underline = false}) {
@@ -246,11 +224,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    //grab name function
     super.initState;
     getWorkerUsername();
     getWorkerAddress();
-    getWorkerAbout();
+    getFullName();
   }
 
   void getWorkerUsername() {
@@ -277,14 +254,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }));
   }
 
-  void getWorkerAbout() {
+  void getFullName() {
     _firestore
         .collection('users')
         .doc(currentUser!.uid)
         .get()
         .then(((DocumentSnapshot documentSnapshot) {
       setState(() {
-        about = documentSnapshot.get('about');
+        fullName = documentSnapshot.get('name');
       });
     }));
   }

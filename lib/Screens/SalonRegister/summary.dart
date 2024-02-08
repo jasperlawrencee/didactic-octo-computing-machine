@@ -414,6 +414,11 @@ class _SummaryState extends State<Summary> {
                                             salonForm.isWaxClicked,
                                             salonForm.wax,
                                             'Wax');
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return const SalonSummaryScreen();
+                                        }));
                                       } catch (e) {
                                         log(e.toString());
                                       }
@@ -518,7 +523,7 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('services')
               .doc(serviceType)
-              .collection('${serviceType}services')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
               .set(serviceFields);
         }

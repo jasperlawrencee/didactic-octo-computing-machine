@@ -66,7 +66,7 @@ class _MobileVerificationState extends State<MobileVerification> {
                                           .colorScheme
                                           .copyWith(
                                             primary: kPrimaryColor,
-                                            background: Colors.white70,
+                                            background: Colors.white,
                                             secondary: kPrimaryLightColor,
                                           )),
                                   child: AlertDialog(
@@ -114,7 +114,7 @@ class _MobileVerificationState extends State<MobileVerification> {
                                           .colorScheme
                                           .copyWith(
                                             primary: kPrimaryColor,
-                                            background: Colors.white70,
+                                            background: Colors.white,
                                             secondary: kPrimaryLightColor,
                                           )),
                                   child: AlertDialog(

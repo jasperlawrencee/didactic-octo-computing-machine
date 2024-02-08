@@ -36,7 +36,10 @@ class _SalonSummaryScreenState extends State<SalonSummaryScreen> {
                     MaterialPageRoute(
                         builder: (context) => const WelcomeScreen()));
               },
-              child: const Text("Proceed to Home")),
+              child: const Text(
+                "Proceed to Home",
+                style: TextStyle(color: Colors.white),
+              )),
           const SizedBox(height: defaultPadding),
         ],
       ),

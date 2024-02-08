@@ -39,6 +39,7 @@ class _WorkerSummaryScreenState extends State<WorkerSummaryScreen> {
               child: const Text(
                 "Proceed to Home",
                 selectionColor: Colors.white,
+                style: TextStyle(color: Colors.white),
               )),
           const SizedBox(height: defaultPadding),
         ],

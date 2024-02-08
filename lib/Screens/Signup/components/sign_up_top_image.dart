@@ -23,8 +23,8 @@ class SignUpScreenTopImage extends StatelessWidget {
               flex: 8,
               child: SvgPicture.asset(
                 'assets/icons/enter.svg',
-                height: 260,
-                width: 316,
+                height: 220,
+                width: 300,
               ),
             ),
           ],

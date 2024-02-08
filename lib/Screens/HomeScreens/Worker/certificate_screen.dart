@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
+import 'package:badges/badges.dart' as badges;
+import 'package:flutter_auth/features/firebase/firebase_services.dart';
+
 class DisplayCertificates extends StatefulWidget {
   const DisplayCertificates({Key? key}) : super(key: key);
 
@@ -21,6 +24,24 @@ class _DisplayCertificatesState extends State<DisplayCertificates> {
   void initState() {
     super.initState();
     getUserCertificates();
+  }
+
+  void deleteCertificate(var image) async {
+    try {
+      log(image);
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('portfolio')
+          .doc('requirements')
+          .get();
+      if (documentSnapshot.exists) {
+        // final delete = <String, dynamic>{image: FieldValue.delete()};
+        // documentSnapshot.reference.delete();
+      }
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
 // function for getting imageurls in subcollection
@@ -84,7 +105,7 @@ class _DisplayCertificatesState extends State<DisplayCertificates> {
                 InkWell(
                   onTap: () {},
                   child: const Icon(
-                    Icons.edit_note,
+                    Icons.add,
                     color: kPrimaryColor,
                   ),
                 ),
@@ -94,7 +115,19 @@ class _DisplayCertificatesState extends State<DisplayCertificates> {
             Expanded(
                 child: ListView(
               children: imageUrls.map((url) {
-                return Image.network(url);
+                return badges.Badge(
+                  position: badges.BadgePosition.topEnd(),
+                  showBadge: true,
+                  onTap: () {
+                    deleteCertificate(url.toString());
+                  },
+                  badgeContent: const Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                    size: 15,
+                  ),
+                  child: Image.network(url),
+                );
               }).toList(),
             )),
           ],

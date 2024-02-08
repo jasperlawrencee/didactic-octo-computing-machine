@@ -153,11 +153,40 @@ class _homeState extends State<home> {
                   ),
                 ],
               ),
-              //put navbar here
+              Expanded(
+                  child: Column(
+                children: [
+                  const SizedBox(height: defaultPadding),
+                  profileButton(() => null, Icons.store, 'Salon Details'),
+                  const SizedBox(height: defaultPadding),
+                  profileButton(() => null, Icons.event_repeat, 'History'),
+                  const SizedBox(height: defaultPadding),
+                ],
+              )),
             ],
           ),
         ),
       ),
     );
+  }
+
+  InkWell profileButton(Function() goTo, IconData icon, String text) {
+    return InkWell(
+        onTap: goTo,
+        child: SizedBox(
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: kPrimaryColor,
+              ),
+              const SizedBox(width: defaultPadding / 2),
+              Text(
+                text,
+                style: const TextStyle(color: kPrimaryColor),
+              )
+            ],
+          ),
+        ));
   }
 }

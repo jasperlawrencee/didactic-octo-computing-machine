@@ -136,10 +136,15 @@ class _ServicesPageState extends State<ServicesPage> {
                       if (serviceDetails.hasError) {
                         return const Text('Error loading data');
                       }
-                      List<List>? myData = serviceDetails.data;
-                      log(myData![2].toString());
-                      return ServiceCard(index, myData[index][0],
-                          myData[index][1], myData[index][2]);
+                      if (serviceDetails.hasData) {
+                        try {
+                          List<List>? myData = serviceDetails.data;
+                          return ServiceCard(index, myData?[index][0],
+                              myData?[index][1], myData?[index][2]);
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      } else {}
                     },
                   );
                 },
@@ -171,7 +176,10 @@ class _ServicesPageState extends State<ServicesPage> {
                   actions: [
                     TextButton(
                         onPressed: () {
-                          // deleteDocumentInCollectionGroup(serviceNames[index]);
+                          deleteDocumentInCollectionGroup(serviceNames[index])
+                              .then((value) {
+                            setState(() {});
+                          });
                           Navigator.of(context).pop();
                         },
                         child: const Text('Yes')),
@@ -192,7 +200,9 @@ class _ServicesPageState extends State<ServicesPage> {
       ),
       child: InkWell(
         onTap: () {
-          editServiceDialog(index);
+          editServiceDialog(index).then((value) {
+            setState(() {});
+          });
         },
         child: Container(
             padding: const EdgeInsets.all(16),
@@ -231,13 +241,9 @@ class _ServicesPageState extends State<ServicesPage> {
   Future<List<List<dynamic>>> getServiceDetails() async {
     List<List<dynamic>> detailValues = [];
     try {
-      final CollectionReference collection = _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc('Hair')
-          .collection('Hairservices');
-      QuerySnapshot querySnapshot = await collection.get();
+      var collectionGroup =
+          _firestore.collectionGroup('${currentUser!.uid}services');
+      QuerySnapshot querySnapshot = await collectionGroup.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         List<dynamic> values = [
           doc['description'],
@@ -254,12 +260,8 @@ class _ServicesPageState extends State<ServicesPage> {
   }
 
   Future<List<String>> getServices(String serviceType) async {
-    var collectionGroup = _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('services')
-        .doc(serviceType)
-        .collection('${serviceType}services');
+    var collectionGroup =
+        _firestore.collectionGroup('${currentUser!.uid}services');
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
@@ -352,9 +354,7 @@ class _ServicesPageState extends State<ServicesPage> {
 
   Future<void> deleteDocumentInCollectionGroup(String documentId) async {
     var collectionGroup = FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('services');
+        .collectionGroup('${currentUser!.uid}services');
 
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();

@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
 
 import 'dart:core';
 import 'dart:developer';
@@ -65,7 +65,28 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Future<List<String>> getServices() async {
+  Future<List<List<dynamic>>> getServiceDetails() async {
+    List<List<dynamic>> detailValues = [];
+    try {
+      var collectionGroup =
+          _firestore.collectionGroup('${currentUser!.uid}services');
+      QuerySnapshot querySnapshot = await collectionGroup.get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        List<dynamic> values = [
+          doc['description'],
+          doc['duration'],
+          doc['price'],
+        ];
+        detailValues.add(values);
+      }
+      return detailValues;
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
+
+  Future<List<String>> getServices(String serviceType) async {
     var collectionGroup =
         _firestore.collectionGroup('${currentUser!.uid}services');
     try {
@@ -74,10 +95,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         details.add(data);
       }
-      serviceDescription = details.map((e) => e['description']).toList();
-      serviceDuration = details.map((e) => e['duration']).toList();
-      servicePrice = details.map((e) => e['price']).toList();
-      serviceCount = querySnapshot.size;
       serviceNames = querySnapshot.docs.map((e) => e.id).toList();
       return serviceNames;
     } catch (e) {
@@ -260,20 +277,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text('Call: '),
-                  InkWell(
-                    //call function
-                    onTap: (() async {
-                      // final Uri url = Uri(scheme: 'tel', path: salonNumber);
-                      // if (await canLaunchUrl(url)) {
-                      //   await launchUrl(url);
-                      // }
-                    }),
-                    child: Text(
-                      salonNumber,
-                      style: const TextStyle(
-                          color: kPrimaryColor,
-                          decoration: TextDecoration.underline),
-                    ),
+                  Text(
+                    salonNumber,
+                    style: const TextStyle(
+                        color: kPrimaryColor,
+                        decoration: TextDecoration.underline),
                   ),
                 ],
               ),
@@ -282,28 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  StreamBuilder<List<String>>(
-                    stream: Stream.fromFuture(getServices()),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: kPrimaryColor,
-                          ),
-                        );
-                      } else {
-                        return RefreshIndicator(
-                          onRefresh: _refresh,
-                          child: ListView.builder(
-                            itemCount: snapshot.data?.length,
-                            itemBuilder: (context, index) {
-                              return ServiceCard(index);
-                            },
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                  serviceSections('Hair'),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
@@ -327,6 +314,48 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget serviceSections(String serviceType) {
+    //parent streambuilder for getting service name
+    return StreamBuilder<List<String>>(
+      stream: Stream.fromFuture(getServices(serviceType)),
+      builder: (context, serviceName) {
+        if (!serviceName.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+            ),
+          );
+        } else {
+          return RefreshIndicator(
+              onRefresh: _refresh,
+              //child streambuilder for getting service details
+              child: StreamBuilder<List<List<dynamic>>>(
+                stream: Stream.fromFuture(getServiceDetails()),
+                builder: (context, serviceDetails) {
+                  return ListView.builder(
+                    itemCount: serviceName.data?.length,
+                    itemBuilder: (context, index) {
+                      if (serviceDetails.hasError) {
+                        return const Text('Error loading data');
+                      }
+                      if (serviceDetails.hasData) {
+                        try {
+                          List<List>? myData = serviceDetails.data;
+                          return ServiceCard(index, myData?[index][0],
+                              myData?[index][1], myData?[index][2]);
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      } else {}
+                    },
+                  );
+                },
+              ));
+        }
+      },
     );
   }
 
@@ -413,7 +442,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ignore: non_constant_identifier_names
-  Widget ServiceCard(int index) {
+  Widget ServiceCard(int index, String description, duration, price) {
     return badges.Badge(
       position: badges.BadgePosition.topEnd(),
       showBadge: true,
@@ -426,7 +455,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     canvasColor: Colors.transparent,
                     colorScheme: Theme.of(context).colorScheme.copyWith(
                           primary: kPrimaryColor,
-                          background: Colors.white70,
+                          background: Colors.white,
                           secondary: kPrimaryLightColor,
                         )),
                 child: AlertDialog(
@@ -434,7 +463,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   actions: [
                     TextButton(
                         onPressed: () {
-                          deleteDocumentInCollectionGroup(serviceNames[index]);
+                          deleteDocumentInCollectionGroup(serviceNames[index])
+                              .then((value) {
+                            setState(() {});
+                          });
                           Navigator.of(context).pop();
                         },
                         child: const Text('Yes')),
@@ -455,7 +487,9 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: InkWell(
         onTap: () {
-          editServiceDialog(index);
+          editServiceDialog(index).then((value) {
+            setState(() {});
+          });
         },
         child: Container(
             padding: const EdgeInsets.all(16),
@@ -475,25 +509,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           serviceNames[index],
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
-                        serviceDuration[index].isEmpty ||
-                                serviceDuration == null
-                            ? const Text(" - Duration")
-                            : Text(" - ${serviceDuration[index]}"),
+                        duration == null ? Text('data') : Text(' - ${duration}')
                       ],
                     ),
                     const Spacer(),
-                    serviceDescription[index].isEmpty ||
-                            serviceDescription == null
-                        ? const Text('Description')
-                        : Text(serviceDescription[index]),
+                    description == null ? Text('data') : Text(description)
                   ],
                 ),
                 Column(
-                  children: [
-                    servicePrice[index].isEmpty || servicePrice == null
-                        ? const Text('Price')
-                        : Text('${servicePrice[index]} Php')
-                  ],
+                  children: [price == null ? Text('data') : Text(price)],
                 )
               ],
             )),

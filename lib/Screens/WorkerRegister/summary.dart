@@ -570,7 +570,7 @@ class _SummaryState extends State<Summary> {
               .doc(currentUser!.uid)
               .collection('services')
               .doc(serviceType)
-              .collection('${serviceType}services')
+              .collection('${currentUser!.uid}services')
               .doc(fieldNames)
               .set(serviceFields);
         }

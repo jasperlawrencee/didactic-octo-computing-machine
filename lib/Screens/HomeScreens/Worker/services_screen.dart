@@ -46,38 +46,15 @@ class _ServicesPageState extends State<ServicesPage> {
   @override
   void initState() {
     super.initState();
-    getServices();
   }
 
   @override
   void dispose() {
-    getServices();
     super.dispose();
   }
 
   Future<void> _refresh() {
     return Future.delayed(const Duration(seconds: 2));
-  }
-
-  Future<List<String>> getServices() async {
-    var collectionGroup =
-        _firestore.collectionGroup('${currentUser!.uid}services');
-    try {
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        details.add(data);
-      }
-      serviceDescription = details.map((e) => e['description']).toList();
-      serviceDuration = details.map((e) => e['duration']).toList();
-      servicePrice = details.map((e) => e['price']).toList();
-      serviceCount = querySnapshot.size;
-      serviceNames = querySnapshot.docs.map((e) => e.id).toList();
-      return serviceNames;
-    } catch (e) {
-      log(e.toString());
-    }
-    return [];
   }
 
   @override
@@ -107,28 +84,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  StreamBuilder<List<String>>(
-                    stream: Stream.fromFuture(getServices()),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: kPrimaryColor,
-                          ),
-                        );
-                      } else {
-                        return RefreshIndicator(
-                          onRefresh: _refresh,
-                          child: ListView.builder(
-                            itemCount: snapshot.data?.length,
-                            itemBuilder: (context, index) {
-                              return ServiceCard(index);
-                            },
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                  serviceSections('Hair'),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
@@ -155,90 +111,46 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-  Future<dynamic> serviceDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Theme(
-            data: ThemeData(
-                canvasColor: Colors.transparent,
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: kPrimaryColor,
-                      background: Colors.white70,
-                      secondary: kPrimaryLightColor,
-                    )),
-            child: AlertDialog(
-              title: const Text('Add Service'),
-              content: SizedBox.square(
-                dimension: 300,
-                child: Column(
-                  children: <Widget>[
-                    DropdownMenu<String>(
-                        controller: _serviceType,
-                        initialSelection: 'Hair',
-                        dropdownMenuEntries: servicesTypes
-                            .map<DropdownMenuEntry<String>>((String value) {
-                          return DropdownMenuEntry<String>(
-                              value: value, label: value);
-                        }).toList()),
-                    flatTextField('Service Name', _serviceName),
-                    flatTextField('Price', _servicePrice),
-                    flatTextField('Duration', _serviceDuration),
-                    flatTextField('Description', _serviceDescription),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      _serviceName.clear();
-                      _servicePrice.clear();
-                      _serviceDescription.clear();
-                      _serviceDuration.clear();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Close')),
-                TextButton(
-                    onPressed: () {
-                      try {
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .set({'field': ''});
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .collection('${currentUser!.uid}services')
-                            .doc(_serviceName.text)
-                            .set({
-                          'price': _servicePrice.text,
-                          'description': _serviceDescription.text,
-                          'duration': _serviceDuration.text
-                        }).then((value) {
-                          setState(() {});
-                        });
-                        _serviceName.clear();
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    },
-                    child: const Text('Add')),
-              ],
+//streambuilder for each service category ie Hair, Lashes etc.
+  Widget serviceSections(String serviceType) {
+    //parent streambuilder for getting service name
+    return StreamBuilder<List<String>>(
+      stream: Stream.fromFuture(getServices(serviceType)),
+      builder: (context, serviceName) {
+        if (!serviceName.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
             ),
           );
-        });
+        } else {
+          return RefreshIndicator(
+              onRefresh: _refresh,
+              //child streambuilder for getting service details
+              child: StreamBuilder<List<List<dynamic>>>(
+                stream: Stream.fromFuture(getServiceDetails()),
+                builder: (context, serviceDetails) {
+                  return ListView.builder(
+                    itemCount: serviceName.data?.length,
+                    itemBuilder: (context, index) {
+                      if (serviceDetails.hasError) {
+                        return const Text('Error loading data');
+                      }
+                      List<List>? myData = serviceDetails.data;
+                      log(myData![2].toString());
+                      return ServiceCard(index, myData[index][0],
+                          myData[index][1], myData[index][2]);
+                    },
+                  );
+                },
+              ));
+        }
+      },
+    );
   }
 
   // ignore: non_constant_identifier_names
-  Widget ServiceCard(int index) {
+  Widget ServiceCard(int index, String description, duration, price) {
     return badges.Badge(
       position: badges.BadgePosition.topEnd(),
       showBadge: true,
@@ -251,7 +163,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     canvasColor: Colors.transparent,
                     colorScheme: Theme.of(context).colorScheme.copyWith(
                           primary: kPrimaryColor,
-                          background: Colors.white70,
+                          background: Colors.white,
                           secondary: kPrimaryLightColor,
                         )),
                 child: AlertDialog(
@@ -300,23 +212,15 @@ class _ServicesPageState extends State<ServicesPage> {
                           serviceNames[index],
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
-                        serviceDuration[index].isEmpty
-                            ? const Text(" - Duration")
-                            : Text(" - ${serviceDuration[index]}"),
+                        duration == null ? Text('data') : Text(' - ${duration}')
                       ],
                     ),
                     const Spacer(),
-                    serviceDescription[index].isEmpty
-                        ? const Text('Description')
-                        : Text(serviceDescription[index]),
+                    description == null ? Text('data') : Text(description)
                   ],
                 ),
                 Column(
-                  children: [
-                    servicePrice[index].isEmpty
-                        ? const Text('Price')
-                        : Text('${servicePrice[index]} Php')
-                  ],
+                  children: [price == null ? Text('data') : Text(price)],
                 )
               ],
             )),
@@ -324,9 +228,133 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
+  Future<List<List<dynamic>>> getServiceDetails() async {
+    List<List<dynamic>> detailValues = [];
+    try {
+      final CollectionReference collection = _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc('Hair')
+          .collection('Hairservices');
+      QuerySnapshot querySnapshot = await collection.get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        List<dynamic> values = [
+          doc['description'],
+          doc['duration'],
+          doc['price'],
+        ];
+        detailValues.add(values);
+      }
+      return detailValues;
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+  }
+
+  Future<List<String>> getServices(String serviceType) async {
+    var collectionGroup = _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('services')
+        .doc(serviceType)
+        .collection('${serviceType}services');
+    try {
+      QuerySnapshot querySnapshot = await collectionGroup.get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        details.add(data);
+      }
+      serviceNames = querySnapshot.docs.map((e) => e.id).toList();
+      return serviceNames;
+    } catch (e) {
+      log(e.toString());
+    }
+    return [];
+  }
+
+  Future<dynamic> serviceDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: ThemeData(
+                canvasColor: Colors.transparent,
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                      primary: kPrimaryColor,
+                      background: Colors.white,
+                      secondary: kPrimaryLightColor,
+                    )),
+            child: AlertDialog(
+              title: const Text('Add Service'),
+              content: SizedBox.square(
+                dimension: 300,
+                child: Column(
+                  children: <Widget>[
+                    DropdownMenu<String>(
+                        controller: _serviceType,
+                        initialSelection: 'Hair',
+                        dropdownMenuEntries: servicesTypes
+                            .map<DropdownMenuEntry<String>>((String value) {
+                          return DropdownMenuEntry<String>(
+                              value: value, label: value);
+                        }).toList()),
+                    flatTextField('Service Name', _serviceName),
+                    flatTextField('Price', _servicePrice),
+                    flatTextField('Duration', _serviceDuration),
+                    flatTextField('Description', _serviceDescription),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () {
+                      _serviceName.clear();
+                      _servicePrice.clear();
+                      _serviceDescription.clear();
+                      _serviceDuration.clear();
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Close')),
+                TextButton(
+                    onPressed: () {
+                      try {
+                        _firestore
+                            .collection('users')
+                            .doc(currentUser!.uid)
+                            .collection('services')
+                            .doc(_serviceType.text)
+                            .collection('${_serviceType.text}services')
+                            .doc(_serviceName.text)
+                            .set({
+                          'price': _servicePrice.text,
+                          'description': _serviceDescription.text,
+                          'duration': _serviceDuration.text
+                        }).then((value) {
+                          setState(() {});
+                        });
+                        _serviceName.clear();
+                        _servicePrice.clear();
+                        _serviceDescription.clear();
+                        _serviceDuration.clear();
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        log(e.toString());
+                      }
+                    },
+                    child: const Text('Add')),
+              ],
+            ),
+          );
+        });
+  }
+
   Future<void> deleteDocumentInCollectionGroup(String documentId) async {
     var collectionGroup = FirebaseFirestore.instance
-        .collectionGroup('${currentUser!.uid}services');
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('services');
 
     try {
       QuerySnapshot querySnapshot = await collectionGroup.get();
@@ -363,7 +391,7 @@ class _ServicesPageState extends State<ServicesPage> {
                   canvasColor: Colors.transparent,
                   colorScheme: Theme.of(context).colorScheme.copyWith(
                         primary: kPrimaryColor,
-                        background: Colors.white70,
+                        background: Colors.white,
                         secondary: kPrimaryLightColor,
                       )),
               child: AlertDialog(

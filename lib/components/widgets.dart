@@ -144,7 +144,7 @@ SizedBox logOutButton(BuildContext context) {
                       canvasColor: Colors.transparent,
                       colorScheme: Theme.of(context).colorScheme.copyWith(
                             primary: kPrimaryColor,
-                            background: Colors.white70,
+                            background: Colors.white,
                             secondary: kPrimaryLightColor,
                           )),
                   child: AlertDialog(

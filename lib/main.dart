@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(
                 horizontal: defaultPadding, vertical: defaultPadding),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30)),
+                borderRadius: BorderRadius.all(Radius.circular(1)),
                 borderSide: BorderSide.none),
           )),
       home: const WelcomeScreen(),

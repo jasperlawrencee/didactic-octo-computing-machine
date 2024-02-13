@@ -59,52 +59,54 @@ class _ServicesPageState extends State<ServicesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Services".toUpperCase(),
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: kPrimaryColor,
+    return SafeArea(
+      child: Scaffold(
+        body: Background(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Services".toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: kPrimaryColor,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding),
-              Expanded(
-                  child: Stack(
-                fit: StackFit.loose,
-                children: [
-                  serviceSections('Hair'),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          FloatingActionButton(
-                              backgroundColor: kPrimaryColor,
-                              child: const Icon(
-                                Icons.add,
-                                color: kPrimaryLightColor,
-                              ),
-                              onPressed: () {
-                                serviceDialog(context);
-                              }),
-                          const SizedBox(height: defaultPadding)
-                        ],
-                      )),
-                ],
-              )),
-            ],
+                  ],
+                ),
+                const SizedBox(height: defaultPadding),
+                Expanded(
+                    child: Stack(
+                  fit: StackFit.loose,
+                  children: [
+                    serviceSections('Hair'),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            FloatingActionButton(
+                                backgroundColor: kPrimaryColor,
+                                child: const Icon(
+                                  Icons.add,
+                                  color: kPrimaryLightColor,
+                                ),
+                                onPressed: () {
+                                  serviceDialog(context);
+                                }),
+                            const SizedBox(height: defaultPadding)
+                          ],
+                        )),
+                  ],
+                )),
+              ],
+            ),
           ),
         ),
       ),

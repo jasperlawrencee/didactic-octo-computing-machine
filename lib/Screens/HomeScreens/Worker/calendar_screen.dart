@@ -20,59 +20,61 @@ class _WorkerCalendarPageState extends State<WorkerCalendarPage> {
   TimeOfDay timeTo = TimeOfDay.now();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Calendar".toUpperCase(),
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: kPrimaryColor,
+    return SafeArea(
+      child: Scaffold(
+        body: Background(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Calendar".toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: defaultPadding)
+                  ],
+                ),
+                //Calendar Widget
+                Theme(
+                  data: ThemeData(
+                      canvasColor: Colors.transparent,
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                            primary: kPrimaryColor,
+                            background: Colors.white70,
+                            secondary: kPrimaryLightColor,
+                          )),
+                  child: Expanded(
+                    child: Stack(
+                      children: [
+                        SfCalendar(
+                          view: CalendarView.day,
+                          allowViewNavigation: true,
+                          onTap: calendarTapped,
+                          allowedViews: const [
+                            CalendarView.day,
+                            CalendarView.week,
+                            CalendarView.month,
+                          ],
+                          dataSource: MeetingDataSource(_getDataSource()),
+                          monthViewSettings: const MonthViewSettings(
+                              appointmentDisplayMode:
+                                  MonthAppointmentDisplayMode.appointment),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: defaultPadding)
-                ],
-              ),
-              //Calendar Widget
-              Theme(
-                data: ThemeData(
-                    canvasColor: Colors.transparent,
-                    colorScheme: Theme.of(context).colorScheme.copyWith(
-                          primary: kPrimaryColor,
-                          background: Colors.white70,
-                          secondary: kPrimaryLightColor,
-                        )),
-                child: Expanded(
-                  child: Stack(
-                    children: [
-                      SfCalendar(
-                        view: CalendarView.day,
-                        allowViewNavigation: true,
-                        onTap: calendarTapped,
-                        allowedViews: const [
-                          CalendarView.day,
-                          CalendarView.week,
-                          CalendarView.month,
-                        ],
-                        dataSource: MeetingDataSource(_getDataSource()),
-                        monthViewSettings: const MonthViewSettings(
-                            appointmentDisplayMode:
-                                MonthAppointmentDisplayMode.appointment),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
-              const SizedBox(height: defaultPadding)
-            ],
+                const SizedBox(height: defaultPadding)
+              ],
+            ),
           ),
         ),
       ),

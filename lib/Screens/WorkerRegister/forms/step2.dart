@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore, must_be_immutable, no_leading_underscores_for_local_identifiers
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, duplicate_ignore, must_be_immutable, no_leading_underscores_for_local_identifiers, non_constant_identifier_names
 
 import 'dart:developer';
 
@@ -31,11 +31,134 @@ class _secondStepState extends State<secondStep> {
   final TextEditingController _waxController = TextEditingController();
 
   String selectedHairValue = '';
+  String enterHairValue = '';
   String selectedMakeupValue = '';
+  String enterMakeupValue = '';
   String selectedSpaValue = '';
+  String enterSpaValue = '';
   String selectedNailsValue = '';
+  String enterNailsValue = '';
   String selectedLashesValue = '';
+  String enterLashesValue = '';
   String selectedWaxValue = '';
+  String enterWaxValue = '';
+
+  List<String> hairServices = <String>[
+    'Haircut',
+    'Hair Color',
+    'Highlights',
+    'Balayage',
+    'Ombre',
+    'Hair Extensions',
+    'Perms',
+    'Straightening/Relaxing',
+    'Keratin Treatment',
+    'Scalp Treatment',
+    'Deep Conditioning',
+    'Hair Styling',
+    'Updos',
+    'Braiding',
+    'Beard Trim',
+    'Shaving',
+    'Hair and Scalp Massage',
+    'Hair Threading',
+    'Hair Glossing',
+    'Hair Glazing',
+  ];
+  List<String> makeupServices = <String>[
+    'Makeup Application',
+    'Bridal Makeup',
+    'Airbrush Makeup',
+    'Special Effects Makeup',
+    'Editorial/Fashion Makeup',
+    'Glamour Makeup',
+    'Natural Makeup',
+    'Evening Makeup',
+    'Prom Makeup',
+    'Pageant Makeup',
+    'Stage Makeup',
+    'Photoshoot Makeup',
+    'TV/Film Makeup',
+    'Theatrical Makeup',
+    'Fantasy Makeup',
+    'Face Painting',
+    'Makeup Lessons/Tutorials',
+    'Makeup Consultations',
+  ];
+  List<String> spaServices = <String>[
+    'Massage Therapy',
+    'Body Scrub',
+    'Hydrotherapy',
+    'Reflexology',
+    'Reiki',
+    'Acupuncture',
+    'Cupping Therapy',
+    'Aromatherapy',
+    'Meditation and Mindfulness',
+    'Body Contouring',
+    'Ear Candling',
+    'Holistic Healing',
+  ];
+  List<String> nailsServices = <String>[
+    'Manicure',
+    'Pedicure',
+    'Nail Extensions',
+    'Nail Art',
+    'Nail Repair',
+    'Nail Removal',
+    'Nail Buffing and Shaping',
+    'Cuticle Care',
+    'Nail Whitening',
+    'Nail Strengthening',
+    'Nail Hardening',
+    'Nail Conditioning',
+    'Nail Polish Applications',
+    'Nail Polish Removal',
+    'Paraffin Wax Treatment for Hands and Feet',
+    'Moisturizing Treatments',
+    'Nail and Cuticle Oil Application',
+    'Nail Extensions Refill',
+    'Nail Design Consultations',
+  ];
+  List<String> lashesServices = <String>[
+    'Eyelash Extensions',
+    'Lash Lift',
+    'Lash Tinting',
+    'Eyelash Removal',
+    'Eyelash Refills',
+    'Eyelash Extension Correction',
+    'Eyelash Extension Consultations',
+    'Bottom Lash Extensions',
+    'Eyelash Extension Removal',
+    'Lash Health Treatments',
+    'Eyelash Serum Application',
+    'Lash Growth Treatments',
+    'Eyelash Extension Aftercare Instructions',
+    'Eyelash Extension Fills',
+    'Eyelash Extension Touch-ups',
+    'Custom Eyelash Design',
+  ];
+  List<String> waxServices = <String>[
+    'Eyebrow Waxing',
+    'Lip Waxing',
+    'Chin Waxing',
+    'Full Face Waxing',
+    'Underarm Waxing',
+    'Arm Waxing',
+    'Leg Waxing',
+    'Bikini Waxing',
+    'Chest Waxing',
+    'Back Waxing',
+    'Stomach Waxing',
+    'Shoulder Waxing',
+    'Neck Waxing',
+    'Buttocks Waxing',
+    'Nose Waxing',
+    'Ear Waxing',
+    'Full Body Waxing',
+    'Male Waxing Services',
+    'Female Intimate Waxing',
+  ];
 
   List<String> hairValues = [];
   List<String> makeupValues = [];
@@ -56,6 +179,7 @@ class _secondStepState extends State<secondStep> {
         const SizedBox(
           height: defaultPadding,
         ),
+        ////////////HAIR////////////////////
         CheckboxListTile(
           value: hair,
           onChanged: (value) {
@@ -68,11 +192,13 @@ class _secondStepState extends State<secondStep> {
         ),
         if (hair)
           ServiceItems(
-            items: hairValues,
-            selectedValue: selectedHairValue,
-            serviceTextEditingController: _hairController,
-            type: ServiceType.hair,
-          ),
+              addedServices: hairValues,
+              enterServices: hairServices,
+              addedValue: selectedHairValue,
+              enterValue: enterHairValue,
+              serviceTextEditingController: _hairController,
+              type: ServiceType.hair),
+        ////////////MAKEUP////////////////////
         CheckboxListTile(
           value: makeup,
           onChanged: (value) {
@@ -85,11 +211,13 @@ class _secondStepState extends State<secondStep> {
         ),
         if (makeup)
           ServiceItems(
-            items: makeupValues,
-            selectedValue: selectedMakeupValue,
-            serviceTextEditingController: _makeupController,
-            type: ServiceType.makeup,
-          ),
+              addedServices: makeupValues,
+              enterServices: makeupServices,
+              addedValue: selectedMakeupValue,
+              enterValue: enterMakeupValue,
+              serviceTextEditingController: _makeupController,
+              type: ServiceType.makeup),
+        ////////////SPA////////////////////
         CheckboxListTile(
           value: spa,
           onChanged: (value) {
@@ -102,11 +230,13 @@ class _secondStepState extends State<secondStep> {
         ),
         if (spa)
           ServiceItems(
-            items: spaValues,
-            selectedValue: selectedSpaValue,
-            serviceTextEditingController: _spaController,
-            type: ServiceType.spa,
-          ),
+              addedServices: spaValues,
+              enterServices: spaServices,
+              addedValue: selectedSpaValue,
+              enterValue: enterSpaValue,
+              serviceTextEditingController: _spaController,
+              type: ServiceType.spa),
+        ////////////NAILS////////////////////
         CheckboxListTile(
           value: nails,
           onChanged: (value) {
@@ -119,45 +249,50 @@ class _secondStepState extends State<secondStep> {
         ),
         if (nails)
           ServiceItems(
-            items: nailsValues,
-            selectedValue: selectedNailsValue,
-            serviceTextEditingController: _nailsController,
-            type: ServiceType.nails,
-          ),
+              addedServices: nailsValues,
+              enterServices: nailsServices,
+              addedValue: selectedNailsValue,
+              enterValue: enterNailsValue,
+              serviceTextEditingController: _nailsController,
+              type: ServiceType.nails),
+        ////////////LASHES////////////////////
         CheckboxListTile(
           value: lashes,
           onChanged: (value) {
             setState(() {
               lashes = value!;
-              workerForm.isLashesClicked = value;
+              workerForm.isNailsClicked = value;
             });
           },
           title: const Text("Lashes"),
         ),
         if (lashes)
           ServiceItems(
-            items: lashesValues,
-            selectedValue: selectedLashesValue,
-            serviceTextEditingController: _lashesController,
-            type: ServiceType.lashes,
-          ),
+              addedServices: lashesValues,
+              enterServices: lashesServices,
+              addedValue: selectedLashesValue,
+              enterValue: enterLashesValue,
+              serviceTextEditingController: _lashesController,
+              type: ServiceType.lashes),
+        ////////////WAX////////////////////
         CheckboxListTile(
           value: wax,
           onChanged: (value) {
             setState(() {
               wax = value!;
-              workerForm.isWaxClicked = value;
+              workerForm.isNailsClicked = value;
             });
           },
           title: const Text("Wax"),
         ),
         if (wax)
           ServiceItems(
-            items: waxValues,
-            selectedValue: selectedWaxValue,
-            serviceTextEditingController: _waxController,
-            type: ServiceType.wax,
-          ),
+              addedServices: waxValues,
+              enterServices: waxServices,
+              addedValue: selectedWaxValue,
+              enterValue: enterWaxValue,
+              serviceTextEditingController: _waxController,
+              type: ServiceType.wax),
       ],
     );
   }
@@ -165,14 +300,18 @@ class _secondStepState extends State<secondStep> {
 
 //child widget
 class ServiceItems extends StatefulWidget {
-  List<String> items;
-  String selectedValue;
+  List<String> addedServices;
+  List<String> enterServices;
+  String enterValue;
+  String addedValue;
   TextEditingController serviceTextEditingController = TextEditingController();
   final ServiceType type;
   ServiceItems({
     Key? key,
-    required this.items,
-    required this.selectedValue,
+    required this.addedServices,
+    required this.enterServices,
+    required this.addedValue,
+    required this.enterValue,
     required this.serviceTextEditingController,
     required this.type,
   }) : super(key: key);
@@ -187,6 +326,7 @@ class _ServiceItemsState extends State<ServiceItems> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        //Dropdown For Added Services
         Theme(
           data: ThemeData(canvasColor: Colors.white),
           child: DropdownButton<String>(
@@ -198,10 +338,11 @@ class _ServiceItemsState extends State<ServiceItems> {
                 fontSize: 13,
               ),
             ),
-            value: widget.selectedValue.isEmpty ? null : widget.selectedValue,
+            value: widget.addedValue.isEmpty ? null : widget.addedValue,
             isExpanded: true,
-            items: widget.items.isNotEmpty
-                ? widget.items.map<DropdownMenuItem<String>>((item) {
+            //List of Added Items
+            items: widget.addedServices.isNotEmpty
+                ? widget.addedServices.map<DropdownMenuItem<String>>((item) {
                     return DropdownMenuItem<String>(
                       value: item,
                       child: Text(item),
@@ -210,7 +351,7 @@ class _ServiceItemsState extends State<ServiceItems> {
                 : <DropdownMenuItem<String>>[],
             onChanged: (value) => setState(() {
               try {
-                widget.selectedValue = value!;
+                widget.addedValue = value!;
               } catch (e) {
                 log(e.toString());
               }
@@ -220,45 +361,64 @@ class _ServiceItemsState extends State<ServiceItems> {
         Row(
           children: [
             Expanded(
-              child: TextField(
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
+                //Dropdown For Specific Services Type
+                child: Theme(
+              data: ThemeData(canvasColor: Colors.white),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text(
+                  "Specific Service",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
                 ),
-                decoration:
-                    const InputDecoration(hintText: "Enter Service Type"),
-                controller: widget.serviceTextEditingController,
+                value: widget.enterValue.isEmpty ? null : widget.enterValue,
+                items: widget.enterServices.isNotEmpty
+                    ? widget.enterServices
+                        .map<DropdownMenuItem<String>>((item) {
+                        return DropdownMenuItem(value: item, child: Text(item));
+                      }).toList()
+                    : <DropdownMenuItem<String>>[],
+                onChanged: (value) => setState(() {
+                  try {
+                    widget.enterValue = value!;
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                }),
               ),
-            ),
+            )),
             //Add Button
             TextButton(
               onPressed: () => setState(() {
                 try {
-                  String newValue = widget.serviceTextEditingController.text;
-                  if (newValue.isNotEmpty && !widget.items.contains(newValue)) {
-                    widget.items.add(newValue);
+                  String newValue = widget.enterValue;
+                  if (newValue.isNotEmpty &&
+                      !widget.addedServices.contains(newValue)) {
+                    widget.addedServices.add(newValue);
                     widget.serviceTextEditingController.clear();
-                    widget.selectedValue = newValue;
+                    widget.addedValue = newValue;
                   }
                   switch (widget.type) {
                     case ServiceType.hair:
-                      workerForm.hair = widget.items;
+                      workerForm.hair = widget.addedServices;
                       break;
                     case ServiceType.makeup:
-                      workerForm.makeup = widget.items;
+                      workerForm.makeup = widget.addedServices;
                       break;
                     case ServiceType.spa:
-                      workerForm.spa = widget.items;
+                      workerForm.spa = widget.addedServices;
                       break;
                     case ServiceType.nails:
-                      workerForm.nails = widget.items;
+                      workerForm.nails = widget.addedServices;
                       break;
                     case ServiceType.lashes:
-                      workerForm.lashes = widget.items;
+                      workerForm.lashes = widget.addedServices;
                       break;
                     case ServiceType.wax:
-                      workerForm.wax = widget.items;
+                      workerForm.wax = widget.addedServices;
                       break;
                     default:
                       [];
@@ -274,10 +434,10 @@ class _ServiceItemsState extends State<ServiceItems> {
               onPressed: (() {
                 try {
                   setState(() {
-                    if (widget.items.contains(widget.selectedValue)) {
-                      widget.items.remove(widget.selectedValue);
+                    if (widget.addedServices.contains(widget.addedValue)) {
+                      widget.addedServices.remove(widget.addedValue);
                       try {
-                        widget.selectedValue = widget.items.first;
+                        widget.addedValue = widget.addedServices.first;
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: const Text('No Items Remain'),
@@ -285,7 +445,7 @@ class _ServiceItemsState extends State<ServiceItems> {
                               SnackBarAction(label: 'Close', onPressed: () {}),
                         ));
                       }
-                    } else if (widget.items.isEmpty) {
+                    } else if (widget.addedServices.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: const Text('Nothing to Delete'),
                         action:

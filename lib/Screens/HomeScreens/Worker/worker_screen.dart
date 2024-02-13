@@ -25,24 +25,26 @@ class _WorkerScreenState extends State<WorkerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: PersistentTabView(
-        context,
-        controller: navbarController,
-        stateManagement: true,
-        screens: screens(),
-        items: navbarItems(),
-        confineInSafeArea: true,
-        hideNavigationBarWhenKeyboardShows: true,
-        decoration: NavBarDecoration(
-          borderRadius: BorderRadius.circular(10),
-          colorBehindNavBar: Colors.white,
+    return SafeArea(
+      child: Scaffold(
+        bottomNavigationBar: PersistentTabView(
+          context,
+          controller: navbarController,
+          stateManagement: true,
+          screens: screens(),
+          items: navbarItems(),
+          confineInSafeArea: true,
+          hideNavigationBarWhenKeyboardShows: true,
+          decoration: NavBarDecoration(
+            borderRadius: BorderRadius.circular(10),
+            colorBehindNavBar: Colors.white,
+          ),
+          screenTransitionAnimation: const ScreenTransitionAnimation(
+              animateTabTransition: true,
+              curve: Curves.ease,
+              duration: Duration(milliseconds: 100)),
+          navBarStyle: NavBarStyle.style9,
         ),
-        screenTransitionAnimation: const ScreenTransitionAnimation(
-            animateTabTransition: true,
-            curve: Curves.ease,
-            duration: Duration(milliseconds: 100)),
-        navBarStyle: NavBarStyle.style9,
       ),
     );
   }

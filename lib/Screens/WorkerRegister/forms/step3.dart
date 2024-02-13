@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/components/widgets.dart';
@@ -19,7 +20,35 @@ class thirdStep extends StatefulWidget {
 int index = 0;
 
 class _thirdStepState extends State<thirdStep> {
+  List<String> salonRegistered = <String>[];
+  List<String> addedSalon = <String>[];
   List<Widget> widgets = [];
+  String salonValue = '';
+  String addedValue = '';
+  bool experience = false;
+
+  @override
+  void initState() {
+    getSalonRegistered();
+    super.initState();
+  }
+
+  Future<List<String>> getSalonRegistered() async {
+    List<String> salonNames = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'salon')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        salonNames.add(element['name']);
+      });
+      log(salonNames.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    return salonNames;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,52 +58,163 @@ class _thirdStepState extends State<thirdStep> {
     return Column(
       children: [
         const Text(
-          "Experiences\n",
+          "Experiences\n(Optional)",
           style: TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
-        ExperienceSection(),
         const SizedBox(height: defaultPadding),
-        Column(
-          children: widgets,
-        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextButton(
-              onPressed: () {
+            const Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Currently Employed',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Check if salon or parlor is listed',
+                ),
+              ],
+            ),
+            Checkbox(
+              value: experience,
+              onChanged: (value) {
                 setState(() {
-                  widgets.add(ExperienceSection());
-                  workerForm.experiences.add(Experience());
-                  index++;
-                  log(index.toString());
+                  experience = value!;
                 });
               },
-              child: const Text("Add More+"),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  try {
-                    // ignore: unrelated_type_equality_checks
-                    widgets != 0 ? widgets.removeLast() : null;
-                    index--;
-                    workerForm.experiences.removeLast();
-                    log(index.toString());
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Unable to delete field')));
-                  }
-                });
-              },
-              child: const Text("Delete Section"),
-            ),
+            )
           ],
         ),
-        // TextButton(
-        //     onPressed: () {
-        //       log(workerForm.experiences.map((e) => e.log()).join("\n \n"));
-        //     },
-        //     child: Text('data'))
+        if (experience == false)
+          Column(
+            children: [
+              ExperienceSection(),
+              const SizedBox(height: defaultPadding),
+              Column(
+                children: widgets,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        widgets.add(ExperienceSection());
+                        workerForm.experiences.add(Experience());
+                        index++;
+                        log(index.toString());
+                      });
+                    },
+                    child: const Text("Add More+"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        try {
+                          // ignore: unrelated_type_equality_checks
+                          widgets != 0 ? widgets.removeLast() : null;
+                          index--;
+                          workerForm.experiences.removeLast();
+                          log(index.toString());
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Unable to delete field')));
+                        }
+                      });
+                    },
+                    child: const Text("Delete Section"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        if (experience == true)
+          Column(
+            children: [
+              const SizedBox(height: defaultPadding),
+              //Dropdown of Salons to Add
+              SizedBox(
+                child: Theme(
+                  data: ThemeData(canvasColor: Colors.white),
+                  child: DropdownButton<String>(
+                    hint: const Text('Added Items'),
+                    isExpanded: true,
+                    value: addedValue.isEmpty ? null : addedValue,
+                    items: addedSalon.isNotEmpty
+                        ? addedSalon
+                            .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem(
+                                value: value, child: Text(value));
+                          }).toList()
+                        : <DropdownMenuItem<String>>[],
+                    onChanged: (String? value) {
+                      try {
+                        setState(() {
+                          addedValue = value!;
+                        });
+                      } catch (e) {
+                        log(e.toString());
+                      }
+                    },
+                  ),
+                ),
+              ),
+              //Dropdown of Registered Salons
+              Row(
+                children: [
+                  Expanded(
+                    child: Theme(
+                      data: ThemeData(canvasColor: Colors.white),
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        hint: const Text('Salon Registered'),
+                        value: salonValue.isEmpty ? null : salonValue,
+                        items: salonRegistered.isNotEmpty
+                            ? salonRegistered
+                                .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList()
+                            : <DropdownMenuItem<String>>[],
+                        onChanged: (String? value) {
+                          setState(() {
+                            try {
+                              salonValue = value!;
+                            } catch (e) {
+                              log(e.toString());
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        try {
+                          String newValue = salonValue;
+                          if (newValue.isNotEmpty &&
+                              addedValue.contains(newValue)) {
+                            addedSalon.add(newValue);
+                            addedValue = newValue;
+                          }
+                          log(addedSalon.toString());
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      },
+                      child: const Text('Add')),
+                  TextButton(onPressed: () {}, child: const Text('Delete')),
+                ],
+              )
+            ],
+          )
       ],
     );
   }
@@ -120,9 +260,8 @@ class _ExperienceSectionState extends State<ExperienceSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: defaultPadding),
-        flatTextField("Salon Name*", salonName),
-        flatTextField("Salon Address*", salonAddress),
+        flatTextField("Salon Name", salonName),
+        flatTextField("Salon Address", salonAddress),
         flatTextField("Salon Contact Number", salonNum),
         const SizedBox(height: defaultPadding),
         Column(

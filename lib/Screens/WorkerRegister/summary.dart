@@ -269,56 +269,70 @@ class _SummaryState extends State<Summary> {
                   const SizedBox(height: defaultPadding),
                 ],
               ),
-            const Text(
-              'Experiences',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            if (workerForm.experiences.isEmpty)
+              const Text(
+                'Experiences',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             for (Experience exp in workerForm.experiences)
               Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Salon Name',
-                      ),
-                      Text(exp.name!),
-                    ],
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Salon Address',
-                      ),
-                      Text(exp.address!),
-                    ],
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Salon Contact Number',
-                      ),
-                      Text(exp.contactNum!),
-                    ],
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Duration',
-                      ),
-                      Text(exp.date!),
-                    ],
-                  ),
-                  const SizedBox(height: defaultPadding),
+                  exp.name != null && exp.name!.isNotEmpty
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Salon Name',
+                            ),
+                            Text(exp.name!),
+                          ],
+                        )
+                      : Container(),
+                  if (workerForm.experiences.isEmpty)
+                    const SizedBox(height: defaultPadding),
+                  exp.address != null && exp.address!.isNotEmpty
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Salon Address',
+                            ),
+                            Text(exp.address!),
+                          ],
+                        )
+                      : Container(),
+                  if (workerForm.experiences.isEmpty)
+                    const SizedBox(height: defaultPadding),
+                  exp.contactNum?.isNotEmpty ?? false
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Salon Contact Number',
+                            ),
+                            Text(exp.contactNum!),
+                          ],
+                        )
+                      : Container(),
+                  if (workerForm.experiences.isEmpty)
+                    const SizedBox(height: defaultPadding),
+                  exp.date != null && exp.date!.isNotEmpty
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Duration',
+                            ),
+                            Text(exp.date!),
+                          ],
+                        )
+                      : Container(),
+                  if (workerForm.experiences.isEmpty)
+                    const SizedBox(height: defaultPadding),
                 ],
               ),
-            const SizedBox(height: defaultPadding),
+            if (workerForm.experiences.isEmpty)
+              const SizedBox(height: defaultPadding),
             const Text(
               'Requirements',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -482,13 +496,15 @@ class _SummaryState extends State<Summary> {
                 addServicesToFirebase(
                     workerForm.isWaxClicked, workerForm.wax, 'Wax');
                 //add tanan experiences from step3
-                for (Experience exp in workerForm.experiences) {
-                  _firestore
-                      .collection('users')
-                      .doc(currentUser!.uid)
-                      .collection('experiences')
-                      .add(exp.toFirebase());
-                }
+                if (workerForm.experiences.isNotEmpty) {
+                  for (Experience exp in workerForm.experiences) {
+                    _firestore
+                        .collection('users')
+                        .doc(currentUser!.uid)
+                        .collection('experiences')
+                        .add(exp.toFirebase());
+                  }
+                } else {}
                 //adds mga ids sa firebase from step4
                 addStep4();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {

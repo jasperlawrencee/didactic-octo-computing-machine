@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/SalonRegister/register_stepper.dart';
+import 'package:flutter_auth/models/servicenames.dart';
 
 import '../../../constants.dart';
 
@@ -23,19 +24,25 @@ class _step3State extends State<step3> {
   bool lashes = false;
   bool wax = false;
 
-  final TextEditingController _hairController = TextEditingController();
-  final TextEditingController _makeupController = TextEditingController();
-  final TextEditingController _spaController = TextEditingController();
-  final TextEditingController _nailsController = TextEditingController();
-  final TextEditingController _lashesController = TextEditingController();
-  final TextEditingController _waxController = TextEditingController();
+  final List<String> hairServices = ServiceNames().hairServices;
+  final List<String> makeupServices = ServiceNames().makeupServices;
+  final List<String> spaServices = ServiceNames().spaServices;
+  final List<String> nailsServices = ServiceNames().nailsServices;
+  final List<String> lashesServices = ServiceNames().lashesServices;
+  final List<String> waxServices = ServiceNames().waxServices;
 
   String selectedHairValue = '';
+  String enterHairValue = '';
   String selectedMakeupValue = '';
+  String enterMakeupValue = '';
   String selectedSpaValue = '';
+  String enterSpaValue = '';
   String selectedNailsValue = '';
+  String enterNailsValue = '';
   String selectedLashesValue = '';
+  String enterLashesValue = '';
   String selectedWaxValue = '';
+  String enterWaxValue = '';
 
   List<String> hairValues = [];
   List<String> makeupValues = [];
@@ -53,9 +60,7 @@ class _step3State extends State<step3> {
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(
-          height: defaultPadding,
-        ),
+        //////////////////////////HAIR//////////////////////////////
         CheckboxListTile(
           value: hair,
           onChanged: (value) {
@@ -68,11 +73,12 @@ class _step3State extends State<step3> {
         ),
         if (hair)
           ServiceItems(
-            items: hairValues,
-            selectedValue: selectedHairValue,
-            serviceTextEditingController: _hairController,
-            type: ServiceType.hair,
-          ),
+              items: hairValues,
+              enterServices: hairServices,
+              selectedValue: selectedHairValue,
+              enterValue: enterHairValue,
+              type: ServiceType.hair),
+        //////////////////////////MAKEUP//////////////////////////////
         CheckboxListTile(
           value: makeup,
           onChanged: (value) {
@@ -85,11 +91,12 @@ class _step3State extends State<step3> {
         ),
         if (makeup)
           ServiceItems(
-            items: makeupValues,
-            selectedValue: selectedMakeupValue,
-            serviceTextEditingController: _makeupController,
-            type: ServiceType.makeup,
-          ),
+              items: makeupValues,
+              enterServices: makeupServices,
+              selectedValue: selectedMakeupValue,
+              enterValue: enterMakeupValue,
+              type: ServiceType.makeup),
+        //////////////////////////SPA//////////////////////////////
         CheckboxListTile(
           value: spa,
           onChanged: (value) {
@@ -102,11 +109,12 @@ class _step3State extends State<step3> {
         ),
         if (spa)
           ServiceItems(
-            items: spaValues,
-            selectedValue: selectedSpaValue,
-            serviceTextEditingController: _spaController,
-            type: ServiceType.spa,
-          ),
+              items: spaValues,
+              enterServices: spaServices,
+              selectedValue: selectedSpaValue,
+              enterValue: enterSpaValue,
+              type: ServiceType.spa),
+        //////////////////////////NAILS//////////////////////////////
         CheckboxListTile(
           value: nails,
           onChanged: (value) {
@@ -119,11 +127,12 @@ class _step3State extends State<step3> {
         ),
         if (nails)
           ServiceItems(
-            items: nailsValues,
-            selectedValue: selectedNailsValue,
-            serviceTextEditingController: _nailsController,
-            type: ServiceType.nails,
-          ),
+              items: nailsValues,
+              enterServices: nailsServices,
+              selectedValue: selectedNailsValue,
+              enterValue: enterNailsValue,
+              type: ServiceType.nails),
+        //////////////////////////LASHES//////////////////////////////
         CheckboxListTile(
           value: lashes,
           onChanged: (value) {
@@ -136,11 +145,12 @@ class _step3State extends State<step3> {
         ),
         if (lashes)
           ServiceItems(
-            items: lashesValues,
-            selectedValue: selectedLashesValue,
-            serviceTextEditingController: _lashesController,
-            type: ServiceType.lashes,
-          ),
+              items: lashesValues,
+              enterServices: lashesServices,
+              selectedValue: selectedLashesValue,
+              enterValue: enterLashesValue,
+              type: ServiceType.lashes),
+        //////////////////////////WAX//////////////////////////////
         CheckboxListTile(
           value: wax,
           onChanged: (value) {
@@ -153,11 +163,14 @@ class _step3State extends State<step3> {
         ),
         if (wax)
           ServiceItems(
-            items: waxValues,
-            selectedValue: selectedWaxValue,
-            serviceTextEditingController: _waxController,
-            type: ServiceType.wax,
-          ),
+              items: waxValues,
+              enterServices: waxServices,
+              selectedValue: selectedWaxValue,
+              enterValue: enterWaxValue,
+              type: ServiceType.wax),
+        const SizedBox(
+          height: defaultPadding,
+        ),
       ],
     );
   }
@@ -166,14 +179,16 @@ class _step3State extends State<step3> {
 //child widget
 class ServiceItems extends StatefulWidget {
   List<String> items;
+  List<String> enterServices;
   String selectedValue;
-  TextEditingController serviceTextEditingController = TextEditingController();
+  String enterValue;
   final ServiceType type;
   ServiceItems({
     Key? key,
     required this.items,
+    required this.enterServices,
     required this.selectedValue,
-    required this.serviceTextEditingController,
+    required this.enterValue,
     required this.type,
   }) : super(key: key);
 
@@ -220,25 +235,42 @@ class _ServiceItemsState extends State<ServiceItems> {
         Row(
           children: [
             Expanded(
-              child: TextField(
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
+                //Dropdown For Specific Services Type
+                child: Theme(
+              data: ThemeData(canvasColor: Colors.white),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text(
+                  "Specific Service",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
                 ),
-                decoration:
-                    const InputDecoration(hintText: "Enter Service Type"),
-                controller: widget.serviceTextEditingController,
+                value: widget.enterValue.isEmpty ? null : widget.enterValue,
+                items: widget.enterServices.isNotEmpty
+                    ? widget.enterServices
+                        .map<DropdownMenuItem<String>>((item) {
+                        return DropdownMenuItem(value: item, child: Text(item));
+                      }).toList()
+                    : <DropdownMenuItem<String>>[],
+                onChanged: (value) => setState(() {
+                  try {
+                    widget.enterValue = value!;
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                }),
               ),
-            ),
+            )),
             //Add Button
             TextButton(
               onPressed: () => setState(() {
                 try {
-                  String newValue = widget.serviceTextEditingController.text;
+                  String newValue = widget.enterValue;
                   if (newValue.isNotEmpty && !widget.items.contains(newValue)) {
                     widget.items.add(newValue);
-                    widget.serviceTextEditingController.clear();
                     widget.selectedValue = newValue;
                   }
                   switch (widget.type) {

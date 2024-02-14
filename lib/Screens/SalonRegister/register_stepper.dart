@@ -73,7 +73,7 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
             canvasColor: Colors.transparent,
             colorScheme: Theme.of(context).colorScheme.copyWith(
                   primary: kPrimaryColor,
-                  background: Colors.white70,
+                  background: Colors.white,
                   secondary: kPrimaryLightColor,
                 )),
         child: Padding(
@@ -160,10 +160,20 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const Summary();
-                }));
+                if (salonFormComplete() == true) {
+                  Navigator.of(context).pop();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const Summary();
+                  }));
+                } else if (salonFormComplete() == false) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: const Text(
+                      'Required Fields Are Empty',
+                    ),
+                    action: SnackBarAction(label: 'Close', onPressed: () {}),
+                  ));
+                }
               },
             ),
           ],

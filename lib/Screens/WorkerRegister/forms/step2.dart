@@ -24,13 +24,6 @@ class _secondStepState extends State<secondStep> {
   bool lashes = false;
   bool wax = false;
 
-  final TextEditingController _hairController = TextEditingController();
-  final TextEditingController _makeupController = TextEditingController();
-  final TextEditingController _spaController = TextEditingController();
-  final TextEditingController _nailsController = TextEditingController();
-  final TextEditingController _lashesController = TextEditingController();
-  final TextEditingController _waxController = TextEditingController();
-
   final List<String> hairServices = ServiceNames().hairServices;
   final List<String> makeupServices = ServiceNames().makeupServices;
   final List<String> spaServices = ServiceNames().spaServices;
@@ -87,7 +80,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: hairServices,
               addedValue: selectedHairValue,
               enterValue: enterHairValue,
-              serviceTextEditingController: _hairController,
               type: ServiceType.hair),
         ////////////MAKEUP////////////////////
         CheckboxListTile(
@@ -106,7 +98,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: makeupServices,
               addedValue: selectedMakeupValue,
               enterValue: enterMakeupValue,
-              serviceTextEditingController: _makeupController,
               type: ServiceType.makeup),
         ////////////SPA////////////////////
         CheckboxListTile(
@@ -125,7 +116,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: spaServices,
               addedValue: selectedSpaValue,
               enterValue: enterSpaValue,
-              serviceTextEditingController: _spaController,
               type: ServiceType.spa),
         ////////////NAILS////////////////////
         CheckboxListTile(
@@ -144,7 +134,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: nailsServices,
               addedValue: selectedNailsValue,
               enterValue: enterNailsValue,
-              serviceTextEditingController: _nailsController,
               type: ServiceType.nails),
         ////////////LASHES////////////////////
         CheckboxListTile(
@@ -152,7 +141,7 @@ class _secondStepState extends State<secondStep> {
           onChanged: (value) {
             setState(() {
               lashes = value!;
-              workerForm.isNailsClicked = value;
+              workerForm.isLashesClicked = value;
             });
           },
           title: const Text("Lashes"),
@@ -163,7 +152,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: lashesServices,
               addedValue: selectedLashesValue,
               enterValue: enterLashesValue,
-              serviceTextEditingController: _lashesController,
               type: ServiceType.lashes),
         ////////////WAX////////////////////
         CheckboxListTile(
@@ -171,7 +159,7 @@ class _secondStepState extends State<secondStep> {
           onChanged: (value) {
             setState(() {
               wax = value!;
-              workerForm.isNailsClicked = value;
+              workerForm.isWaxClicked = value;
             });
           },
           title: const Text("Wax"),
@@ -182,7 +170,6 @@ class _secondStepState extends State<secondStep> {
               enterServices: waxServices,
               addedValue: selectedWaxValue,
               enterValue: enterWaxValue,
-              serviceTextEditingController: _waxController,
               type: ServiceType.wax),
       ],
     );
@@ -195,7 +182,6 @@ class ServiceItems extends StatefulWidget {
   List<String> enterServices;
   String enterValue;
   String addedValue;
-  TextEditingController serviceTextEditingController = TextEditingController();
   final ServiceType type;
   ServiceItems({
     Key? key,
@@ -203,7 +189,6 @@ class ServiceItems extends StatefulWidget {
     required this.enterServices,
     required this.addedValue,
     required this.enterValue,
-    required this.serviceTextEditingController,
     required this.type,
   }) : super(key: key);
 
@@ -289,7 +274,6 @@ class _ServiceItemsState extends State<ServiceItems> {
                   if (newValue.isNotEmpty &&
                       !widget.addedServices.contains(newValue)) {
                     widget.addedServices.add(newValue);
-                    widget.serviceTextEditingController.clear();
                     widget.addedValue = newValue;
                   }
                   switch (widget.type) {

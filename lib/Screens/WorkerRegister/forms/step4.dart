@@ -76,9 +76,9 @@ class _fourthStepState extends State<fourthStep> {
   InkWell ClearCertificates() {
     return InkWell(
       onTap: () {
-        if (certificates != null) {
+        if (certificates != null && certificates!.isNotEmpty) {
           setState(() {
-            certificates = null;
+            certificates = [];
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -101,7 +101,7 @@ class _fourthStepState extends State<fourthStep> {
   InkWell ViewCertificates(BuildContext context) {
     return InkWell(
       onTap: () {
-        certificates != null
+        certificates != null && certificates!.isNotEmpty
             ? showDialog(
                 context: context,
                 builder: (context) {
@@ -138,7 +138,7 @@ class _fourthStepState extends State<fourthStep> {
                 action: SnackBarAction(label: 'Close', onPressed: () {}),
               ));
       },
-      child: certificates != null
+      child: certificates != null && certificates!.isNotEmpty
           ? const Text(
               'View Images',
               style: TextStyle(

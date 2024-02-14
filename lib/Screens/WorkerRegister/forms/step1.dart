@@ -88,7 +88,7 @@ class _firstStepState extends State<firstStep> {
               child: Theme(
                 data: ThemeData(canvasColor: Colors.white),
                 child: DropdownButton<String>(
-                  hint: const Text("Gender"),
+                  hint: const Text("Gender*"),
                   value: genderValue,
                   icon: const Icon(Icons.arrow_drop_down),
                   // elevation: 16,
@@ -155,9 +155,9 @@ class _firstStepState extends State<firstStep> {
           "Address",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flatTextField("City", city),
-        flatTextField("Barangay", barangay),
-        flatTextField("Street Address", stAddress),
+        flatTextField("City*", city),
+        flatTextField("Barangay*", barangay),
+        flatTextField("Street Address*", stAddress),
         flatTextField("Extended Address", extAddress),
       ],
     );

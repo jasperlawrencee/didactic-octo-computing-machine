@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/verification.dart';
 import 'package:flutter_auth/components/background.dart';
@@ -269,10 +270,25 @@ class _SummaryState extends State<Summary> {
                   const SizedBox(height: defaultPadding),
                 ],
               ),
-            if (workerForm.experiences.isEmpty)
+            if (workerForm.experiences.isEmpty ||
+                workerForm.isExperienceClicked)
               const Text(
                 'Experiences',
                 style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            if (workerForm.isExperienceClicked &&
+                workerForm.salonExperiences.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Experience(s)'),
+                      showServices(context, workerForm.salonExperiences)
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
               ),
             for (Experience exp in workerForm.experiences)
               Column(
@@ -496,7 +512,8 @@ class _SummaryState extends State<Summary> {
                 addServicesToFirebase(
                     workerForm.isWaxClicked, workerForm.wax, 'Wax');
                 //add tanan experiences from step3
-                if (workerForm.experiences.isNotEmpty) {
+                if (workerForm.experiences.isNotEmpty &&
+                    workerForm.experiences is List<List>) {
                   for (Experience exp in workerForm.experiences) {
                     _firestore
                         .collection('users')
@@ -504,7 +521,15 @@ class _SummaryState extends State<Summary> {
                         .collection('experiences')
                         .add(exp.toFirebase());
                   }
-                } else {}
+                } else if (workerForm.experiences.isNotEmpty) {
+                  for (Experience exp in workerForm.experiences) {
+                    _firestore
+                        .collection('users')
+                        .doc(currentUser!.uid)
+                        .collection('experiences')
+                        .add({'experience$index': exp.toString()});
+                  }
+                }
                 //adds mga ids sa firebase from step4
                 addStep4();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -697,7 +722,7 @@ class _SummaryState extends State<Summary> {
                 })
             : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: const Text(
-                  'No image(s) provided',
+                  'No item(s) provided',
                 ),
                 action: SnackBarAction(label: 'Close', onPressed: () {}),
               ));

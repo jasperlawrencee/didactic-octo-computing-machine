@@ -89,7 +89,6 @@ class ServiceNames {
     'Lash Health Treatments',
     'Eyelash Serum Application',
     'Lash Growth Treatments',
-    'Eyelash Extension Aftercare Instructions',
     'Eyelash Extension Fills',
     'Eyelash Extension Touch-ups',
     'Custom Eyelash Design',

@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, prefer_const_constructors_in_immutables, unnecessary_null_comparison
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, prefer_const_constructors_in_immutables, unnecessary_null_comparison, list_remove_unrelated_type
 
 import 'dart:developer';
 
@@ -20,12 +20,10 @@ class thirdStep extends StatefulWidget {
 int index = 0;
 
 class _thirdStepState extends State<thirdStep> {
-  List<String> salonRegistered = <String>[];
   List<String> addedSalon = <String>[];
   List<Widget> widgets = [];
   String salonValue = '';
-  String addedValue = '';
-  bool experience = false;
+  String? addedValue;
 
   @override
   void initState() {
@@ -79,16 +77,16 @@ class _thirdStepState extends State<thirdStep> {
               ],
             ),
             Checkbox(
-              value: experience,
+              value: workerForm.isExperienceClicked,
               onChanged: (value) {
                 setState(() {
-                  experience = value!;
+                  workerForm.isExperienceClicked = value!;
                 });
               },
             )
           ],
         ),
-        if (experience == false)
+        if (workerForm.isExperienceClicked == false)
           Column(
             children: [
               ExperienceSection(),
@@ -132,7 +130,7 @@ class _thirdStepState extends State<thirdStep> {
               ),
             ],
           ),
-        if (experience == true)
+        if (workerForm.isExperienceClicked == true)
           Column(
             children: [
               const SizedBox(height: defaultPadding),
@@ -146,9 +144,7 @@ class _thirdStepState extends State<thirdStep> {
                       style: TextStyle(fontSize: 16),
                     ),
                     isExpanded: true,
-                    value: addedValue.isNotEmpty && addedValue != null
-                        ? addedValue
-                        : 'Select Item',
+                    value: addedValue,
                     items: addedSalon.isNotEmpty
                         ? addedSalon
                             .map<DropdownMenuItem<String>>((String value) {
@@ -211,13 +207,13 @@ class _thirdStepState extends State<thirdStep> {
                         try {
                           String newValue = salonValue;
                           if (newValue.isNotEmpty &&
-                              !addedValue.contains(newValue)) {
+                              !addedSalon.contains(newValue)) {
                             setState(() {
                               addedSalon.add(newValue);
                               addedValue = newValue;
+                              workerForm.salonExperiences.add(newValue);
                             });
                           }
-                          log(addedSalon.toString());
                         } catch (e) {
                           log(e.toString());
                         }
@@ -229,17 +225,11 @@ class _thirdStepState extends State<thirdStep> {
                           setState(() {
                             if (addedSalon.contains(addedValue)) {
                               addedSalon.remove(addedValue);
-                              try {
-                                addedValue = salonRegistered.first;
-                              } catch (e) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: const Text('No Items Remain'),
-                                  action: SnackBarAction(
-                                      label: 'Close', onPressed: () {}),
-                                ));
-                              }
-                            } else if (salonRegistered.isEmpty) {
+                              addedValue = addedSalon.isNotEmpty
+                                  ? addedSalon.first
+                                  : null;
+                              workerForm.salonExperiences.remove(addedValue);
+                            } else if (addedSalon.isEmpty) {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
                                 content: const Text('Nothing to Delete'),
@@ -248,14 +238,13 @@ class _thirdStepState extends State<thirdStep> {
                               ));
                             }
                           });
-                          log(addedSalon.toString());
                         } catch (e) {
                           log(e.toString());
                         }
                       },
                       child: const Text('Delete')),
                 ],
-              )
+              ),
             ],
           )
       ],

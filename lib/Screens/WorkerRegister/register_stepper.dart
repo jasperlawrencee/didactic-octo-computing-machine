@@ -162,9 +162,19 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Summary()));
+                if (workerFormComplete() == true) {
+                  Navigator.of(context).pop();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Summary()));
+                } else if (workerFormComplete() == false) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: const Text(
+                      'Required Fields Are Empty',
+                    ),
+                    action: SnackBarAction(label: 'Close', onPressed: () {}),
+                  ));
+                }
               },
             ),
           ],

@@ -66,7 +66,7 @@ class _fourthStepState extends State<fourthStep> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // ClearCertificates(),
+          ClearCertificates(),
           ViewCertificates(context),
         ],
       )
@@ -76,16 +76,23 @@ class _fourthStepState extends State<fourthStep> {
   InkWell ClearCertificates() {
     return InkWell(
       onTap: () {
-        if (certificates!.isNotEmpty) {
+        if (certificates != null) {
           setState(() {
             certificates = null;
           });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('No Items Remain'),
+            action: SnackBarAction(label: 'Close', onPressed: () {}),
+          ));
         }
       },
       child: const Text(
         'Clear',
-        style:
-            TextStyle(color: Colors.red, decoration: TextDecoration.underline),
+        style: TextStyle(
+            color: Colors.red,
+            decoration: TextDecoration.underline,
+            decorationColor: Colors.red),
         textAlign: TextAlign.center,
       ),
     );
@@ -94,7 +101,7 @@ class _fourthStepState extends State<fourthStep> {
   InkWell ViewCertificates(BuildContext context) {
     return InkWell(
       onTap: () {
-        certificates!.isNotEmpty
+        certificates != null
             ? showDialog(
                 context: context,
                 builder: (context) {
@@ -131,17 +138,21 @@ class _fourthStepState extends State<fourthStep> {
                 action: SnackBarAction(label: 'Close', onPressed: () {}),
               ));
       },
-      child: certificates!.isNotEmpty || certificates != null
+      child: certificates != null
           ? const Text(
               'View Images',
               style: TextStyle(
-                  color: kPrimaryColor, decoration: TextDecoration.underline),
+                  color: kPrimaryColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: kPrimaryColor),
               textAlign: TextAlign.center,
             )
           : const Text(
               'Please provide image(s)',
               style: TextStyle(
-                  color: kPrimaryColor, decoration: TextDecoration.underline),
+                  color: kPrimaryColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: kPrimaryColor),
               textAlign: TextAlign.center,
             ),
     );
@@ -171,15 +182,19 @@ class _fourthStepState extends State<fourthStep> {
 
   AttachCertificates() async {
     final List<XFile>? selectedImages = await picker.pickMultipleMedia();
-    if (selectedImages != null) {
-      certificates!.addAll(selectedImages);
-      try {
-        setState(() {
-          workerForm.certificates = certificates;
-        });
-      } catch (e) {
-        log(e.toString());
+    try {
+      if (selectedImages != null) {
+        certificates!.addAll(selectedImages);
+        try {
+          setState(() {
+            workerForm.certificates = certificates;
+          });
+        } catch (e) {
+          log(e.toString());
+        }
       }
+    } catch (e) {
+      log(e.toString());
     }
   }
 

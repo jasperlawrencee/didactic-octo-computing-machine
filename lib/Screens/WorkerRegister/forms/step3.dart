@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, library_private_types_in_public_api, prefer_const_constructors_in_immutables
+// ignore_for_file: camel_case_types, library_private_types_in_public_api, prefer_const_constructors_in_immutables, unnecessary_null_comparison
 
 import 'dart:developer';
 
@@ -43,7 +43,6 @@ class _thirdStepState extends State<thirdStep> {
       querySnapshot.docs.forEach((element) {
         salonNames.add(element['name']);
       });
-      log(salonNames.toString());
     } catch (e) {
       log(e.toString());
     }
@@ -142,9 +141,14 @@ class _thirdStepState extends State<thirdStep> {
                 child: Theme(
                   data: ThemeData(canvasColor: Colors.white),
                   child: DropdownButton<String>(
-                    hint: const Text('Added Items'),
+                    hint: const Text(
+                      'Added Items',
+                      style: TextStyle(fontSize: 16),
+                    ),
                     isExpanded: true,
-                    value: addedValue.isEmpty ? null : addedValue,
+                    value: addedValue.isNotEmpty && addedValue != null
+                        ? addedValue
+                        : 'Select Item',
                     items: addedSalon.isNotEmpty
                         ? addedSalon
                             .map<DropdownMenuItem<String>>((String value) {
@@ -169,40 +173,49 @@ class _thirdStepState extends State<thirdStep> {
                 children: [
                   Expanded(
                     child: Theme(
-                      data: ThemeData(canvasColor: Colors.white),
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        hint: const Text('Salon Registered'),
-                        value: salonValue.isEmpty ? null : salonValue,
-                        items: salonRegistered.isNotEmpty
-                            ? salonRegistered
-                                .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList()
-                            : <DropdownMenuItem<String>>[],
-                        onChanged: (String? value) {
-                          setState(() {
-                            try {
-                              salonValue = value!;
-                            } catch (e) {
-                              log(e.toString());
+                        data: ThemeData(canvasColor: Colors.white),
+                        child: FutureBuilder<List<String>>(
+                          future: getSalonRegistered(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const LinearProgressIndicator(
+                                color: kPrimaryColor,
+                              );
+                            } else {
+                              return DropdownButton(
+                                value: salonValue.isEmpty ? null : salonValue,
+                                isExpanded: true,
+                                hint: const Text(
+                                  'Salons Registered',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                items: snapshot.data!.isNotEmpty
+                                    ? snapshot.data!
+                                        .map((sr) => DropdownMenuItem(
+                                            value: sr, child: Text(sr)))
+                                        .toList()
+                                    : <DropdownMenuItem<String>>[],
+                                onChanged: (value) {
+                                  setState(() {
+                                    salonValue = value.toString();
+                                  });
+                                },
+                              );
                             }
-                          });
-                        },
-                      ),
-                    ),
+                          },
+                        )),
                   ),
                   TextButton(
                       onPressed: () {
                         try {
                           String newValue = salonValue;
                           if (newValue.isNotEmpty &&
-                              addedValue.contains(newValue)) {
-                            addedSalon.add(newValue);
-                            addedValue = newValue;
+                              !addedValue.contains(newValue)) {
+                            setState(() {
+                              addedSalon.add(newValue);
+                              addedValue = newValue;
+                            });
                           }
                           log(addedSalon.toString());
                         } catch (e) {
@@ -210,7 +223,37 @@ class _thirdStepState extends State<thirdStep> {
                         }
                       },
                       child: const Text('Add')),
-                  TextButton(onPressed: () {}, child: const Text('Delete')),
+                  TextButton(
+                      onPressed: () {
+                        try {
+                          setState(() {
+                            if (addedSalon.contains(addedValue)) {
+                              addedSalon.remove(addedValue);
+                              try {
+                                addedValue = salonRegistered.first;
+                              } catch (e) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: const Text('No Items Remain'),
+                                  action: SnackBarAction(
+                                      label: 'Close', onPressed: () {}),
+                                ));
+                              }
+                            } else if (salonRegistered.isEmpty) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: const Text('Nothing to Delete'),
+                                action: SnackBarAction(
+                                    label: 'Close', onPressed: () {}),
+                              ));
+                            }
+                          });
+                          log(addedSalon.toString());
+                        } catch (e) {
+                          log(e.toString());
+                        }
+                      },
+                      child: const Text('Delete')),
                 ],
               )
             ],

@@ -24,12 +24,12 @@ class _step3State extends State<step3> {
   bool lashes = false;
   bool wax = false;
 
-  final List<String> hairServices = ServiceNames().hairServices;
-  final List<String> makeupServices = ServiceNames().makeupServices;
-  final List<String> spaServices = ServiceNames().spaServices;
-  final List<String> nailsServices = ServiceNames().nailsServices;
-  final List<String> lashesServices = ServiceNames().lashesServices;
-  final List<String> waxServices = ServiceNames().waxServices;
+  final List<String> hairServices = ServiceNames().hair;
+  final List<String> makeupServices = ServiceNames().makeup;
+  final List<String> spaServices = ServiceNames().spa;
+  final List<String> nailsServices = ServiceNames().nails;
+  final List<String> lashesServices = ServiceNames().lashes;
+  final List<String> waxServices = ServiceNames().wax;
 
   String selectedHairValue = '';
   String enterHairValue = '';

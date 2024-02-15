@@ -7,6 +7,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -83,12 +84,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     child: Stack(
                   fit: StackFit.loose,
                   children: [
-                    serviceSections('Hair'),
-                    serviceSections('Makeup'),
-                    serviceSections('Spa'),
-                    serviceSections('Nails'),
-                    serviceSections('Lashes'),
-                    serviceSections('Wax'),
+                    serviceSections(),
                     Align(
                         alignment: Alignment.bottomRight,
                         child: Column(
@@ -100,7 +96,13 @@ class _ServicesPageState extends State<ServicesPage> {
                                   Icons.add,
                                   color: kPrimaryLightColor,
                                 ),
-                                onPressed: () {}),
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) {
+                                      return const AddServices();
+                                    },
+                                  ));
+                                }),
                             const SizedBox(height: defaultPadding)
                           ],
                         )),
@@ -115,10 +117,10 @@ class _ServicesPageState extends State<ServicesPage> {
   }
 
 //streambuilder for each service category ie Hair, Lashes etc.
-  Widget serviceSections(String serviceType) {
+  Widget serviceSections() {
     //parent streambuilder for getting service name
     return StreamBuilder<List<String>>(
-      stream: Stream.fromFuture(getServices(serviceType)),
+      stream: Stream.fromFuture(getServices()),
       builder: (context, serviceName) {
         if (!serviceName.hasData) {
           return const Center(
@@ -274,7 +276,7 @@ class _ServicesPageState extends State<ServicesPage> {
     }
   }
 
-  Future<List<String>> getServices(String serviceType) async {
+  Future<List<String>> getServices() async {
     var collectionGroup =
         _firestore.collectionGroup('${currentUser!.uid}services');
     try {

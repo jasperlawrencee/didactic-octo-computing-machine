@@ -23,30 +23,76 @@ class _WorkerScreenState extends State<WorkerScreen> {
   PersistentTabController navbarController =
       PersistentTabController(initialIndex: 0);
 
+  void _showBackDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text(
+            'Leaving this page will log you out',
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Log Out'),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (mounted) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        bottomNavigationBar: PersistentTabView(
-          context,
-          controller: navbarController,
-          stateManagement: true,
-          screens: screens(),
-          items: navbarItems(),
-          confineInSafeArea: true,
-          hideNavigationBarWhenKeyboardShows: true,
-          decoration: NavBarDecoration(
-            borderRadius: BorderRadius.circular(10),
-            colorBehindNavBar: Colors.white,
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
+          _showBackDialog();
+        },
+        child: SafeArea(
+          child: Scaffold(
+            bottomNavigationBar: PersistentTabView(
+              context,
+              controller: navbarController,
+              stateManagement: true,
+              screens: screens(),
+              items: navbarItems(),
+              confineInSafeArea: true,
+              hideNavigationBarWhenKeyboardShows: true,
+              decoration: NavBarDecoration(
+                borderRadius: BorderRadius.circular(10),
+                colorBehindNavBar: Colors.white,
+              ),
+              screenTransitionAnimation: const ScreenTransitionAnimation(
+                  animateTabTransition: true,
+                  curve: Curves.ease,
+                  duration: Duration(milliseconds: 100)),
+              navBarStyle: NavBarStyle.style9,
+            ),
           ),
-          screenTransitionAnimation: const ScreenTransitionAnimation(
-              animateTabTransition: true,
-              curve: Curves.ease,
-              duration: Duration(milliseconds: 100)),
-          navBarStyle: NavBarStyle.style9,
-        ),
-      ),
-    );
+        ));
   }
 
   List<Widget> screens() {

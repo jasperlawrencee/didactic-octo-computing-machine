@@ -75,12 +75,14 @@ class _LoginScreenState extends State<LoginScreen> {
           if (documentSnapshot.exists) {
             if (documentSnapshot.get('role') == 'freelancer' &&
                 documentSnapshot.get('status') == 'verified') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) {
                 return const WorkerScreen();
               }));
             } else if (documentSnapshot.get('role') == 'salon' &&
                 documentSnapshot.get('status') == 'verified') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) {
                 return const SalonScreen();
               }));
             } else if (documentSnapshot.get('role') == 'admin') {

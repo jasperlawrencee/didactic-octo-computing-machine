@@ -8,6 +8,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -86,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<List<String>> getServices(String serviceType) async {
+  Future<List<String>> getServices() async {
     var collectionGroup =
         _firestore.collectionGroup('${currentUser!.uid}services');
     try {
@@ -112,7 +113,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   canvasColor: Colors.transparent,
                   colorScheme: Theme.of(context).colorScheme.copyWith(
                         primary: kPrimaryColor,
-                        background: Colors.white70,
+                        background: Colors.white,
                         secondary: kPrimaryLightColor,
                       )),
               child: AlertDialog(
@@ -217,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
       child: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+          margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
           child: Column(
             children: [
               Text(
@@ -290,7 +291,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  serviceSections('Hair'),
+                  serviceSections(),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
@@ -303,7 +304,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 color: kPrimaryLightColor,
                               ),
                               onPressed: () {
-                                serviceDialog(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AddServices(),
+                                    ));
                               }),
                           const SizedBox(height: defaultPadding)
                         ],
@@ -317,10 +322,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget serviceSections(String serviceType) {
+  Widget serviceSections() {
     //parent streambuilder for getting service name
     return StreamBuilder<List<String>>(
-      stream: Stream.fromFuture(getServices(serviceType)),
+      stream: Stream.fromFuture(getServices()),
       builder: (context, serviceName) {
         if (!serviceName.hasData) {
           return const Center(
@@ -344,8 +349,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (serviceDetails.hasData) {
                         try {
                           List<List>? myData = serviceDetails.data;
-                          return ServiceCard(index, myData?[index][0],
-                              myData?[index][1], myData?[index][2]);
+                          return ServiceCard(
+                              index,
+                              myData?[index][0].isEmpty
+                                  ? 'Empty Description'
+                                  : myData?[index][0],
+                              myData?[index][1].isEmpty
+                                  ? 'Duration'
+                                  : myData?[index][1],
+                              myData?[index][2].isEmpty
+                                  ? 'Empty Price'
+                                  : '${myData?[index][2]} Php');
                         } catch (e) {
                           log(e.toString());
                         }
@@ -358,88 +372,6 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
     );
-  }
-
-  Future<dynamic> serviceDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Theme(
-            data: ThemeData(
-                canvasColor: Colors.transparent,
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: kPrimaryColor,
-                      background: Colors.white70,
-                      secondary: kPrimaryLightColor,
-                    )),
-            child: AlertDialog(
-              title: const Text('Add Service'),
-              content: SizedBox.square(
-                dimension: 300,
-                child: Column(
-                  children: <Widget>[
-                    DropdownMenu<String>(
-                        controller: _serviceType,
-                        initialSelection: 'Hair',
-                        dropdownMenuEntries: servicesTypes
-                            .map<DropdownMenuEntry<String>>((String value) {
-                          return DropdownMenuEntry<String>(
-                              value: value, label: value);
-                        }).toList()),
-                    flatTextField('Service Name', _serviceName),
-                    flatTextField('Price', _servicePrice),
-                    flatTextField('Duration', _serviceDuration),
-                    flatTextField('Description', _serviceDescription),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      _serviceName.clear();
-                      _servicePrice.clear();
-                      _serviceDescription.clear();
-                      _serviceDuration.clear();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Close')),
-                TextButton(
-                    onPressed: () {
-                      try {
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .set({'field': ''});
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('categories')
-                            .doc(_serviceType.text)
-                            .collection('${currentUser!.uid}services')
-                            .doc(_serviceName.text)
-                            .set({
-                          'price': _servicePrice.text,
-                          'description': _serviceDescription.text,
-                          'duration': _serviceDuration.text
-                        }).then((value) {
-                          setState(() {});
-                        });
-                        _serviceName.clear();
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    },
-                    child: const Text('Add')),
-              ],
-            ),
-          );
-        });
   }
 
   // ignore: non_constant_identifier_names
@@ -531,8 +463,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Container salonCard(Widget child) {
     return Container(
       padding: const EdgeInsets.all(12),
-      height: 150,
-      width: 150,
+      height: 160,
+      width: 160,
       decoration: const BoxDecoration(
           color: kPrimaryLightColor,
           borderRadius: BorderRadius.all(Radius.circular(8))),

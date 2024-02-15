@@ -1,5 +1,5 @@
 class ServiceNames {
-  List<String> hairServices = <String>[
+  List<String> hair = <String>[
     'Haircut',
     'Hair Color',
     'Highlights',
@@ -21,7 +21,7 @@ class ServiceNames {
     'Hair Glossing',
     'Hair Glazing',
   ];
-  List<String> makeupServices = <String>[
+  List<String> makeup = <String>[
     'Makeup Application',
     'Bridal Makeup',
     'Airbrush Makeup',
@@ -41,7 +41,7 @@ class ServiceNames {
     'Makeup Lessons/Tutorials',
     'Makeup Consultations',
   ];
-  List<String> spaServices = <String>[
+  List<String> spa = <String>[
     'Massage Therapy',
     'Body Scrub',
     'Hydrotherapy',
@@ -55,7 +55,7 @@ class ServiceNames {
     'Ear Candling',
     'Holistic Healing',
   ];
-  List<String> nailsServices = <String>[
+  List<String> nails = <String>[
     'Manicure',
     'Pedicure',
     'Nail Extensions',
@@ -76,7 +76,7 @@ class ServiceNames {
     'Nail Extensions Refill',
     'Nail Design Consultations',
   ];
-  List<String> lashesServices = <String>[
+  List<String> lashes = <String>[
     'Eyelash Extensions',
     'Lash Lift',
     'Lash Tinting',
@@ -93,7 +93,7 @@ class ServiceNames {
     'Eyelash Extension Touch-ups',
     'Custom Eyelash Design',
   ];
-  List<String> waxServices = <String>[
+  List<String> wax = <String>[
     'Eyebrow Waxing',
     'Lip Waxing',
     'Chin Waxing',

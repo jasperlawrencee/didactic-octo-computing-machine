@@ -23,7 +23,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       body: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+          margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
           child: Column(
             children: [
               Row(

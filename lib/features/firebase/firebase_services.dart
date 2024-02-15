@@ -10,11 +10,9 @@ CollectionReference users = FirebaseFirestore.instance.collection('users');
 DocumentReference docRef = users.doc('document_id');
 
 class FirebaseService {
-  final TextEditingController _serviceName = TextEditingController();
   final TextEditingController _servicePrice = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
   final TextEditingController _serviceDuration = TextEditingController();
-  final TextEditingController _serviceType = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;

@@ -14,7 +14,6 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/experience.dart';
-import '../../features/firebase/firebase_services.dart';
 
 class Summary extends StatefulWidget {
   const Summary({Key? key}) : super(key: key);
@@ -33,9 +32,9 @@ class _SummaryState extends State<Summary> {
   String nbiClearance = '';
   List<String> certificates = [];
   List skills = [];
+  bool isUploading = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     imgRef = _firestore
         .collection('users')
@@ -489,62 +488,100 @@ class _SummaryState extends State<Summary> {
             const SizedBox(height: defaultPadding),
             nextButton(context, () async {
               try {
-                //adds "freelancer" to firebase cloud storage
-                addRoleToFireStore();
-                //adds details from step1
-                addStep1();
-                //hair
-                addServicesToFirebase(
-                    workerForm.isHairClicked, workerForm.hair, 'Hair');
-                //makeup
-                addServicesToFirebase(
-                    workerForm.isMakeupClicked, workerForm.makeup, 'Makeup');
-                //spa
-                addServicesToFirebase(
-                    workerForm.isSpaClicked, workerForm.spa, 'Spa');
-                //nails
-                addServicesToFirebase(
-                    workerForm.isNailsClicked, workerForm.nails, 'Nails');
-                //lashes
-                addServicesToFirebase(
-                    workerForm.isLashesClicked, workerForm.lashes, 'Lashes');
-                //wax
-                addServicesToFirebase(
-                    workerForm.isWaxClicked, workerForm.wax, 'Wax');
-                //add tanan experiences from step3
-                if (workerForm.experiences.isNotEmpty &&
-                    workerForm.experiences is List<List>) {
-                  for (Experience exp in workerForm.experiences) {
-                    _firestore
-                        .collection('users')
-                        .doc(currentUser!.uid)
-                        .collection('experiences')
-                        .add(exp.toFirebase());
-                  }
-                } else if (workerForm.experiences.isNotEmpty) {
-                  for (Experience exp in workerForm.experiences) {
-                    _firestore
-                        .collection('users')
-                        .doc(currentUser!.uid)
-                        .collection('experiences')
-                        .add({'experience$index': exp.toString()});
-                  }
-                }
-                //adds mga ids sa firebase from step4
-                addStep4();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const WorkerSummaryScreen();
-                }));
-                log('ez');
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Theme(
+                      data: ThemeData(
+                          colorScheme: Theme.of(context).colorScheme.copyWith(
+                                primary: kPrimaryColor,
+                                background: Colors.white,
+                                secondary: kPrimaryLightColor,
+                              )),
+                      child: AlertDialog(
+                        title: const Text('Confirm Signup?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('No')),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                try {
+                                  uploadToFirebase();
+                                } catch (e) {
+                                  log(e.toString());
+                                }
+                              },
+                              child: const Text('Yes')),
+                        ],
+                      ),
+                    );
+                  },
+                );
               } catch (e) {
                 log(e.toString());
               }
-            }, 'Confirm'),
+            }, isUploading ? 'Waiting for Upload' : 'Confirm'),
             const SizedBox(height: defaultPadding),
           ],
         ),
       ),
     ));
+  }
+
+  void uploadToFirebase() async {
+    //adds "freelancer" to firebase cloud storage
+    addRoleToFireStore();
+    //adds details from step1
+    addStep1();
+    //hair
+    addServicesToFirebase(workerForm.isHairClicked, workerForm.hair, 'Hair');
+    //makeup
+    addServicesToFirebase(
+        workerForm.isMakeupClicked, workerForm.makeup, 'Makeup');
+    //spa
+    addServicesToFirebase(workerForm.isSpaClicked, workerForm.spa, 'Spa');
+    //nails
+    addServicesToFirebase(workerForm.isNailsClicked, workerForm.nails, 'Nails');
+    //lashes
+    addServicesToFirebase(
+        workerForm.isLashesClicked, workerForm.lashes, 'Lashes');
+    //wax
+    addServicesToFirebase(workerForm.isWaxClicked, workerForm.wax, 'Wax');
+    //add tanan experiences from step3
+    if (workerForm.experiences.isNotEmpty &&
+        workerForm.experiences is List<List>) {
+      for (Experience exp in workerForm.experiences) {
+        _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('experiences')
+            .add(exp.toFirebase());
+      }
+    } else if (workerForm.experiences.isNotEmpty) {
+      for (Experience exp in workerForm.experiences) {
+        _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('experiences')
+            .add({'experience$index': exp.toString()});
+      }
+    }
+    //adds mga ids sa firebase from step4
+    addStep4();
+    setState(() {
+      isUploading = true;
+    });
+    await Future.delayed(const Duration(seconds: 10));
+    setState(() {
+      isUploading = false;
+    });
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+      return const WorkerSummaryScreen();
+    }), (route) => route.isFirst);
   }
 
   Map<String, dynamic> step1() => {

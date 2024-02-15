@@ -275,6 +275,11 @@ class _ServiceItemsState extends State<ServiceItems> {
                       !widget.addedServices.contains(newValue)) {
                     widget.addedServices.add(newValue);
                     widget.addedValue = newValue;
+                  } else if (widget.addedServices.contains(newValue)) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('Item Already Added'),
+                      action: SnackBarAction(label: 'Close', onPressed: () {}),
+                    ));
                   }
                   switch (widget.type) {
                     case ServiceType.hair:

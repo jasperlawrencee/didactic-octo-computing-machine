@@ -195,14 +195,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         AlreadyHaveAnAccountCheck(
                           login: true,
                           press: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return const SignupScreen();
-                                },
-                              ),
-                            );
+                            Navigator.pushAndRemoveUntil(context,
+                                MaterialPageRoute(
+                              builder: (context) {
+                                return const SignupScreen();
+                              },
+                            ), (route) => route.isFirst);
                           },
                         ),
                       ],

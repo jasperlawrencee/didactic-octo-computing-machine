@@ -115,7 +115,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (formKey.currentState!.validate()) {
-                                    log("email and password filled up dady");
                                     log("${_email.text} ${_password.text}");
                                     _signup(_email.text, _password.text);
                                   }
@@ -140,14 +139,12 @@ class _SignupScreenState extends State<SignupScreen> {
                           AlreadyHaveAnAccountCheck(
                             login: false,
                             press: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const LoginScreen();
-                                  },
-                                ),
-                              );
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(
+                                builder: (context) {
+                                  return const LoginScreen();
+                                },
+                              ), (route) => route.isFirst);
                             },
                           ),
                           const SizedBox(height: defaultPadding),
@@ -175,7 +172,6 @@ class _SignupScreenState extends State<SignupScreen> {
     postEmailToFireStore();
 
     if (user != null) {
-      log("user created");
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const SignupLogout();
       }));
@@ -200,7 +196,6 @@ class _SignupScreenState extends State<SignupScreen> {
           .set({'email': _email.text, 'username': _username.text});
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const WorkerScreen()));
-      log("user added to firestore");
     } catch (e) {
       log(e.toString());
     }

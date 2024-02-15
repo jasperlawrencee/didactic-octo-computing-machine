@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unnecessary_null_comparison
 
 import 'dart:developer';
 
@@ -147,6 +147,7 @@ class _ServicesPageState extends State<ServicesPage> {
                           log(e.toString());
                         }
                       } else {}
+                      return null;
                     },
                   );
                 },
@@ -224,15 +225,17 @@ class _ServicesPageState extends State<ServicesPage> {
                           serviceNames[index],
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
-                        duration == null ? Text('data') : Text(' - ${duration}')
+                        duration == null
+                            ? const Text('data')
+                            : Text(' - $duration')
                       ],
                     ),
                     const Spacer(),
-                    description == null ? Text('data') : Text(description)
+                    description == null ? const Text('data') : Text(description)
                   ],
                 ),
                 Column(
-                  children: [price == null ? Text('data') : Text(price)],
+                  children: [price == null ? const Text('data') : Text(price)],
                 )
               ],
             )),

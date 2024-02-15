@@ -38,9 +38,9 @@ class _thirdStepState extends State<thirdStep> {
           .collection('users')
           .where('role', isEqualTo: 'salon')
           .get();
-      querySnapshot.docs.forEach((element) {
+      for (var element in querySnapshot.docs) {
         salonNames.add(element['name']);
-      });
+      }
     } catch (e) {
       log(e.toString());
     }

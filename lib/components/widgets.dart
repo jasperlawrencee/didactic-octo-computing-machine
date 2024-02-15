@@ -168,10 +168,10 @@ SizedBox logOutButton(BuildContext context) {
                             await FirebaseAuth.instance.signOut();
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text("Logged Out")));
-                            Navigator.push(context,
+                            Navigator.pushAndRemoveUntil(context,
                                 MaterialPageRoute(builder: (context) {
                               return const LoginScreen();
-                            }));
+                            }), (route) => route.isFirst);
                           } catch (e) {
                             log('error: $e');
                           }

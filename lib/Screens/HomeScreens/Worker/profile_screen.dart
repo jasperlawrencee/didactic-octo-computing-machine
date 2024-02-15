@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Worker/certificate_screen.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/Screens/Signup/signup_logout.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -150,10 +149,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           await FirebaseAuth.instance.signOut();
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Logged Out")));
-                          Navigator.push(context,
+                          Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(builder: (context) {
                             return const LoginScreen();
-                          }));
+                          }), (route) => route.isFirst);
                         }
                       } catch (e) {
                         log('error: $e');
@@ -189,8 +188,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Container profileStats(String title, {String? body, bool underline = false}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      height: 120,
-      width: 120,
+      height: 140,
+      width: 140,
       decoration: const BoxDecoration(
         color: kPrimaryLightColor,
         borderRadius: BorderRadius.all(Radius.circular(10)),

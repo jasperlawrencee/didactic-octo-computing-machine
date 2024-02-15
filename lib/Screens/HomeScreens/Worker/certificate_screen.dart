@@ -7,7 +7,6 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
 import 'package:badges/badges.dart' as badges;
-import 'package:flutter_auth/features/firebase/firebase_services.dart';
 
 class DisplayCertificates extends StatefulWidget {
   const DisplayCertificates({Key? key}) : super(key: key);

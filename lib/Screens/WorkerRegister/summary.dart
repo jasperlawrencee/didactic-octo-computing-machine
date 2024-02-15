@@ -270,10 +270,29 @@ class _SummaryState extends State<Summary> {
                 ],
               ),
             if (workerForm.experiences.isEmpty ||
-                workerForm.isExperienceClicked)
+                (!workerForm.isExperienceClicked &&
+                    workerForm.salonEmployed == null))
               const Text(
                 'Experiences',
                 style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            if (workerForm.salonEmployed != null)
+              Column(
+                children: [
+                  const Text(
+                    'Experiences',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Currently Employed'),
+                      Text(workerForm.salonEmployed.toString())
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                ],
               ),
             if (workerForm.isExperienceClicked &&
                 workerForm.salonExperiences.isNotEmpty)
@@ -561,15 +580,28 @@ class _SummaryState extends State<Summary> {
             .collection('experiences')
             .add(exp.toFirebase());
       }
-    } else if (workerForm.experiences.isNotEmpty) {
-      for (Experience exp in workerForm.experiences) {
+    } else if (workerForm.salonEmployed != null) {
+      log('workerform is checked and filled');
+      try {
         _firestore
             .collection('users')
             .doc(currentUser!.uid)
             .collection('experiences')
-            .add({'experience$index': exp.toString()});
+            .add({'salon': workerForm.salonEmployed.toString()});
+      } catch (e) {
+        log(e.toString());
       }
     }
+    // else if (workerForm.experiences.isNotEmpty) {
+    //   for (Experience exp in workerForm.experiences) {
+    //     _firestore
+    //         .collection('users')
+    //         .doc(currentUser!.uid)
+    //         .collection('experiences')
+    //         .add({'experience$index': exp.toString()});
+    //   }
+    // }
+
     //adds mga ids sa firebase from step4
     addStep4();
     setState(() {

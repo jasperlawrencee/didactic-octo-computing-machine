@@ -46,7 +46,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     canvasColor: Colors.transparent,
                     colorScheme: Theme.of(context).colorScheme.copyWith(
                           primary: kPrimaryColor,
-                          background: Colors.white70,
+                          background: Colors.white,
                           secondary: kPrimaryLightColor,
                         )),
                 child: Expanded(
@@ -109,7 +109,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   canvasColor: Colors.transparent,
                   colorScheme: Theme.of(context).colorScheme.copyWith(
                         primary: kPrimaryColor,
-                        background: Colors.white70,
+                        background: Colors.white,
                         secondary: kPrimaryLightColor,
                       )),
               child: AlertDialog(
@@ -172,7 +172,7 @@ List<Appointment> _getDataSource() {
     subject: 'Gravy Hair Shampoo and Rebond',
     startTime: startTime,
     endTime: endTime,
-    color: kPrimaryColor,
+    color: Colors.grey,
   ));
   meetings.add(Appointment(
     subject: 'Palabok Hair Treatment',

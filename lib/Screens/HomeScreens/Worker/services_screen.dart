@@ -32,16 +32,14 @@ class _ServicesPageState extends State<ServicesPage> {
     'Spa',
     'Wax'
   ];
-  late String serviceValue;
+  String? dropdownServiceType;
   List<String> serviceNames = [];
   List<dynamic> serviceDuration = [];
   List<dynamic> servicePrice = [];
   List<dynamic> serviceDescription = [];
-  final TextEditingController _serviceName = TextEditingController();
   final TextEditingController _servicePrice = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
   final TextEditingController _serviceDuration = TextEditingController();
-  final TextEditingController _serviceType = TextEditingController();
 
   @override
   void initState() {
@@ -86,6 +84,11 @@ class _ServicesPageState extends State<ServicesPage> {
                   fit: StackFit.loose,
                   children: [
                     serviceSections('Hair'),
+                    serviceSections('Makeup'),
+                    serviceSections('Spa'),
+                    serviceSections('Nails'),
+                    serviceSections('Lashes'),
+                    serviceSections('Wax'),
                     Align(
                         alignment: Alignment.bottomRight,
                         child: Column(
@@ -97,9 +100,7 @@ class _ServicesPageState extends State<ServicesPage> {
                                   Icons.add,
                                   color: kPrimaryLightColor,
                                 ),
-                                onPressed: () {
-                                  serviceDialog(context);
-                                }),
+                                onPressed: () {}),
                             const SizedBox(height: defaultPadding)
                           ],
                         )),
@@ -141,8 +142,17 @@ class _ServicesPageState extends State<ServicesPage> {
                       if (serviceDetails.hasData) {
                         try {
                           List<List>? myData = serviceDetails.data;
-                          return ServiceCard(index, myData?[index][0],
-                              myData?[index][1], myData?[index][2]);
+                          return ServiceCard(
+                              index,
+                              myData?[index][0].isEmpty
+                                  ? 'Empty Description'
+                                  : myData?[index][0],
+                              myData?[index][1].isEmpty
+                                  ? 'Empty Duration'
+                                  : myData?[index][1],
+                              myData?[index][2].isEmpty
+                                  ? 'Empty Price'
+                                  : '${myData?[index][2]} Php');
                         } catch (e) {
                           log(e.toString());
                         }
@@ -279,82 +289,6 @@ class _ServicesPageState extends State<ServicesPage> {
       log(e.toString());
     }
     return [];
-  }
-
-  Future<dynamic> serviceDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Theme(
-            data: ThemeData(
-                canvasColor: Colors.transparent,
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: kPrimaryColor,
-                      background: Colors.white,
-                      secondary: kPrimaryLightColor,
-                    )),
-            child: AlertDialog(
-              title: const Text('Add Service'),
-              content: SizedBox.square(
-                dimension: 300,
-                child: Column(
-                  children: <Widget>[
-                    DropdownMenu<String>(
-                        controller: _serviceType,
-                        initialSelection: 'Hair',
-                        dropdownMenuEntries: servicesTypes
-                            .map<DropdownMenuEntry<String>>((String value) {
-                          return DropdownMenuEntry<String>(
-                              value: value, label: value);
-                        }).toList()),
-                    flatTextField('Service Name', _serviceName),
-                    flatTextField('Price', _servicePrice),
-                    flatTextField('Duration', _serviceDuration),
-                    flatTextField('Description', _serviceDescription),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      _serviceName.clear();
-                      _servicePrice.clear();
-                      _serviceDescription.clear();
-                      _serviceDuration.clear();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Close')),
-                TextButton(
-                    onPressed: () {
-                      try {
-                        _firestore
-                            .collection('users')
-                            .doc(currentUser!.uid)
-                            .collection('services')
-                            .doc(_serviceType.text)
-                            .collection('${_serviceType.text}services')
-                            .doc(_serviceName.text)
-                            .set({
-                          'price': _servicePrice.text,
-                          'description': _serviceDescription.text,
-                          'duration': _serviceDuration.text
-                        }).then((value) {
-                          setState(() {});
-                        });
-                        _serviceName.clear();
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    },
-                    child: const Text('Add')),
-              ],
-            ),
-          );
-        });
   }
 
   Future<void> deleteDocumentInCollectionGroup(String documentId) async {

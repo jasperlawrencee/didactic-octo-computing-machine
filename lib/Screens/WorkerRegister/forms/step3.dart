@@ -24,7 +24,7 @@ class _thirdStepState extends State<thirdStep> {
   List<Widget> widgets = [];
   String salonValue = '';
   String? addedValue;
-
+  String salonName = 'Salon Name';
   @override
   void initState() {
     getSalonRegistered();
@@ -135,35 +135,50 @@ class _thirdStepState extends State<thirdStep> {
             children: [
               const SizedBox(height: defaultPadding),
               //Dropdown of Salons to Add
-              SizedBox(
-                child: Theme(
-                  data: ThemeData(canvasColor: Colors.white),
-                  child: DropdownButton<String>(
-                    hint: const Text(
-                      'Added Items',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    isExpanded: true,
-                    value: addedValue,
-                    items: addedSalon.isNotEmpty
-                        ? addedSalon
-                            .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem(
-                                value: value, child: Text(value));
-                          }).toList()
-                        : <DropdownMenuItem<String>>[],
-                    onChanged: (String? value) {
-                      try {
-                        setState(() {
-                          addedValue = value!;
-                        });
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    },
+              // SizedBox(
+              //   child: Theme(
+              //     data: ThemeData(canvasColor: Colors.white),
+              //     child: DropdownButton<String>(
+              //       hint: const Text(
+              //         'Added Items',
+              //         style: TextStyle(fontSize: 16),
+              //       ),
+              //       isExpanded: true,
+              //       value: addedValue,
+              //       items: addedSalon.isNotEmpty && addedSalon != null
+              //           ? addedSalon
+              //               .map<DropdownMenuItem<String>>((String value) {
+              //               return DropdownMenuItem(
+              //                   value: value, child: Text(value));
+              //             }).toList()
+              //           : <DropdownMenuItem<String>>[],
+              //       onChanged: (String? value) {
+              //         try {
+              //           setState(() {
+              //             addedValue = value!;
+              //           });
+              //         } catch (e) {
+              //           log(e.toString());
+              //         }
+              //       },
+              //     ),
+              //   ),
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Currently Employed at:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
+                  Text(
+                    salonName,
+                    style: const TextStyle(
+                        color: kPrimaryColor, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
+              const SizedBox(height: defaultPadding),
               //Dropdown of Registered Salons
               Row(
                 children: [
@@ -205,15 +220,23 @@ class _thirdStepState extends State<thirdStep> {
                   TextButton(
                       onPressed: () {
                         try {
-                          String newValue = salonValue;
-                          if (newValue.isNotEmpty &&
-                              !addedSalon.contains(newValue)) {
+                          // String newValue = salonValue;
+                          // if (newValue.isNotEmpty &&
+                          //     !addedSalon.contains(newValue)) {
+                          //   setState(() {
+                          //     addedSalon.add(newValue);
+                          //     addedValue = newValue;
+                          //   });
+                          //   workerForm.salonExperiences = addedSalon;
+                          //   log(workerForm.salonExperiences.toString());
+                          // }
+                          if (salonValue.isNotEmpty) {
                             setState(() {
-                              addedSalon.add(newValue);
-                              addedValue = newValue;
-                              workerForm.salonExperiences.add(newValue);
+                              salonName = salonValue;
+                              workerForm.salonEmployed = salonValue;
                             });
                           }
+                          log(workerForm.salonEmployed.toString());
                         } catch (e) {
                           log(e.toString());
                         }
@@ -223,20 +246,25 @@ class _thirdStepState extends State<thirdStep> {
                       onPressed: () {
                         try {
                           setState(() {
-                            if (addedSalon.contains(addedValue)) {
-                              addedSalon.remove(addedValue);
-                              addedValue = addedSalon.isNotEmpty
-                                  ? addedSalon.first
-                                  : null;
-                              workerForm.salonExperiences.remove(addedValue);
-                            } else if (addedSalon.isEmpty) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: const Text('Nothing to Delete'),
-                                action: SnackBarAction(
-                                    label: 'Close', onPressed: () {}),
-                              ));
-                            }
+                            salonName = 'Salon Name';
+                            workerForm.salonEmployed = null;
+                            // if (addedSalon.contains(addedValue) &&
+                            //     workerForm.salonExperiences
+                            //         .contains(addedValue)) {
+                            //   addedSalon.remove(addedValue);
+                            //   workerForm.salonExperiences.remove(addedValue);
+                            //   addedValue = addedSalon.isNotEmpty
+                            //       ? addedSalon.first
+                            //       : null;
+                            //   log(workerForm.salonExperiences.toString());
+                            // } else if (addedSalon.isEmpty) {
+                            //   ScaffoldMessenger.of(context)
+                            //       .showSnackBar(SnackBar(
+                            //     content: const Text('Nothing to Delete'),
+                            //     action: SnackBarAction(
+                            //         label: 'Close', onPressed: () {}),
+                            //   ));
+                            // }
                           });
                         } catch (e) {
                           log(e.toString());

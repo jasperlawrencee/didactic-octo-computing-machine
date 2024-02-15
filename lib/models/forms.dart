@@ -96,6 +96,7 @@ class WorkerForm {
   String? stAddress;
   String? extAddress;
   String? birthday;
+  String? salonEmployed;
   List<String> hair = [];
   bool isHairClicked = false;
   List<String> makeup = [];
@@ -130,6 +131,7 @@ class WorkerForm {
     this.stAddress,
     this.extAddress,
     this.birthday,
+    this.salonEmployed,
     required this.hair,
     required this.makeup,
     required this.spa,

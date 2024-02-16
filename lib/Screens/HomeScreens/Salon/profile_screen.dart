@@ -396,10 +396,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   actions: [
                     TextButton(
                         onPressed: () {
-                          deleteDocumentInCollectionGroup(serviceNames[index])
-                              .then((value) {
-                            setState(() {});
-                          });
+                          // deleteDocumentInCollectionGroup(serviceNames[index])
+                          //     .then((value) {
+                          //   setState(() {});
+                          // });
                           Navigator.of(context).pop();
                         },
                         child: const Text('Yes')),

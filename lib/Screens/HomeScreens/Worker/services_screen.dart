@@ -191,10 +191,10 @@ class _ServicesPageState extends State<ServicesPage> {
                   actions: [
                     TextButton(
                         onPressed: () {
-                          deleteDocumentInCollectionGroup(serviceNames[index])
-                              .then((value) {
-                            setState(() {});
-                          });
+                          // deleteDocumentInCollectionGroup(serviceNames[index])
+                          //     .then((value) {
+                          //   setState(() {});
+                          // });
                           Navigator.of(context).pop();
                         },
                         child: const Text('Yes')),

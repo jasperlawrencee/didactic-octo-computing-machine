@@ -150,6 +150,7 @@ class _AddServicesState extends State<AddServices> {
                               selectedServiceType, serviceTypeValue) ==
                           true) {
                         if (mounted) {
+                          log('Service already exists');
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: const Text('Service Already Exists'),
                             action: SnackBarAction(

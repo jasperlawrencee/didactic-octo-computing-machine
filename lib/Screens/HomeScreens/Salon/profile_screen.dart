@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -23,9 +24,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
-  int serviceCount = 0;
-  var details = [];
-  List<String> services = [];
+  var pageController = PageController();
   List<String> servicesTypes = [
     'Hair',
     'Lashes',
@@ -35,177 +34,126 @@ class _ProfilePageState extends State<ProfilePage> {
     'Wax'
   ];
   late String serviceValue;
-  List<String> serviceNames = [];
-  List<dynamic> serviceDuration = [];
-  List<dynamic> servicePrice = [];
-  List<dynamic> serviceDescription = [];
   String salonName = '', address = '', salonNumber = '';
-  final TextEditingController _serviceName = TextEditingController();
-  final TextEditingController _servicePrice = TextEditingController();
-  final TextEditingController _serviceDescription = TextEditingController();
-  final TextEditingController _serviceDuration = TextEditingController();
-  final TextEditingController _serviceType = TextEditingController();
+  List<String> serviceTypeAvailable = [];
+  int serviceCount = 0;
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void initState() {
-    getUserDetails();
     super.initState();
+    getUserDetails();
+    getAllServiceTypes();
+    getServiceTypeCount();
   }
 
   void getUserDetails() async {
-    await _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      setState(() {
-        salonName = documentSnapshot['name'];
-        address = documentSnapshot['address'];
-        salonNumber = documentSnapshot['salonNumber'];
+    try {
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        setState(() {
+          salonName = documentSnapshot['name'];
+          address = documentSnapshot['address'];
+          salonNumber = documentSnapshot['salonNumber'];
+        });
       });
-    });
+    } catch (e) {
+      log('Error Getting User Details: $e');
+    }
   }
 
-  Future<List<List<dynamic>>> getServiceDetails() async {
-    List<List<dynamic>> detailValues = [];
+  void getServiceTypeCount() async {
     try {
-      var collectionGroup =
-          _firestore.collectionGroup('${currentUser!.uid}services');
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        List<dynamic> values = [
-          doc['description'],
-          doc['duration'],
-          doc['price'],
-        ];
-        detailValues.add(values);
-      }
-      return detailValues;
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        serviceCount++;
+      });
     } catch (e) {
-      log(e.toString());
+      log('error getting service type count: $e');
+    }
+  }
+
+  //get all existing service types
+  Future<List<String>> getAllServiceTypes() async {
+    List<String> existingServices = [];
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+
+      querySnapshot.docs.forEach((element) {
+        existingServices.add(element.id);
+      });
+      return existingServices;
+    } catch (e) {
+      log('Getting Service Types Error: $e');
       return [];
     }
   }
 
-  Future<List<String>> getServices() async {
-    var collectionGroup =
-        _firestore.collectionGroup('${currentUser!.uid}services');
+//returns all services names inside existing service types
+  Future<List<List<String>>> getServiceNames() async {
+    List<List<String>> serviceNames = [];
     try {
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        details.add(data);
+      var serviceDocuments = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      for (var docs in serviceDocuments.docs) {
+        var serviceCollection =
+            docs.reference.collection('${currentUser!.uid}services');
+        var serviceDocs = await serviceCollection.get();
+        List<String> names = [];
+        for (var serviceDoc in serviceDocs.docs) {
+          names.add(serviceDoc.id);
+        }
+        serviceNames.add(names);
       }
-      serviceNames = querySnapshot.docs.map((e) => e.id).toList();
       return serviceNames;
     } catch (e) {
-      log(e.toString());
+      log('Error Getting Service Names: $e');
+      return [];
     }
-    return [];
   }
 
-  Future<dynamic> editServiceDialog(int index) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return Theme(
-              data: ThemeData(
-                  canvasColor: Colors.transparent,
-                  colorScheme: Theme.of(context).colorScheme.copyWith(
-                        primary: kPrimaryColor,
-                        background: Colors.white,
-                        secondary: kPrimaryLightColor,
-                      )),
-              child: AlertDialog(
-                title: Text('Edit ${serviceNames[index]}'),
-                content: SizedBox.square(
-                  dimension: 300,
-                  child: Column(
-                    children: [
-                      flatTextField('Price', _servicePrice),
-                      flatTextField('Duration', _serviceDuration),
-                      flatTextField('Description', _serviceDescription),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Close')),
-                  TextButton(
-                      onPressed: () async {
-                        try {
-                          QuerySnapshot querySnapshot = await _firestore
-                              .collectionGroup('${currentUser!.uid}services')
-                              .get();
-                          QueryDocumentSnapshot? targetDocument;
-                          //Grabs document in collection group
-                          for (QueryDocumentSnapshot doc
-                              in querySnapshot.docs) {
-                            if (doc.id == serviceNames[index]) {
-                              targetDocument = doc;
-                              break;
-                            }
-                          }
-                          //Update document if found
-                          if (targetDocument != null) {
-                            await targetDocument.reference.update({
-                              'price': _servicePrice.text,
-                              'description': _serviceDescription.text,
-                              'duration': _serviceDuration.text,
-                            }).then((value) {
-                              setState(() {});
-                            });
-                            log('updated ${targetDocument.id}');
-                          } else {
-                            log('no document found');
-                          }
-                        } catch (e) {
-                          log(e.toString());
-                        }
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Edit'))
-                ],
-              ));
-        });
-  }
-
-  Future<void> deleteDocumentInCollectionGroup(String documentId) async {
-    var collectionGroup = FirebaseFirestore.instance
-        .collectionGroup('${currentUser!.uid}services');
-
+  Future<List<List<Map<String, dynamic>>>> getServiceDetails() async {
     try {
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-
-      // Find the document with the specified ID on the client side
-      QueryDocumentSnapshot? targetDocument;
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        if (doc.id == documentId) {
-          targetDocument = doc;
-          break;
+      final servicesDocuments = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      List<List<Map<String, dynamic>>> serviceData = [];
+      for (final doc in servicesDocuments.docs) {
+        final serviceDocs =
+            await doc.reference.collection('${currentUser!.uid}services').get();
+        List<Map<String, dynamic>> serviceDataList = [];
+        for (final serviceDoc in serviceDocs.docs) {
+          final data = {
+            "description": serviceDoc.get('description'),
+            "duration": serviceDoc.get("duration"),
+            "price": serviceDoc.get("price"),
+          };
+          serviceDataList.add(data);
         }
+        serviceData.add(serviceDataList);
       }
-
-      // Delete the document if found
-      if (targetDocument != null) {
-        await targetDocument.reference.delete().then((value) {
-          setState(() {});
-        });
-        log('Document deleted successfully.');
-      } else {
-        log('Document not found.');
-      }
+      return serviceData;
     } catch (e) {
-      log(e.toString());
+      log('Error getting service details: $e');
+      return [];
     }
   }
 
@@ -254,11 +202,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   salonCard(Column(
                     children: [
                       const SizedBox(
-                        height: 75,
+                        height: 10,
                         child: Icon(
                           Icons.location_on,
                           color: kPrimaryColor,
-                          size: 50,
+                          size: 30,
                         ),
                       ),
                       const Spacer(),
@@ -291,7 +239,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  serviceSections(),
+                  servicesPageView(),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
@@ -322,142 +270,221 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget serviceSections() {
-    //parent streambuilder for getting service name
-    return StreamBuilder<List<String>>(
-      stream: Stream.fromFuture(getServices()),
-      builder: (context, serviceName) {
-        if (!serviceName.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: kPrimaryColor,
-            ),
-          );
-        } else {
-          return RefreshIndicator(
-              onRefresh: _refresh,
-              //child streambuilder for getting service details
-              child: StreamBuilder<List<List<dynamic>>>(
-                stream: Stream.fromFuture(getServiceDetails()),
-                builder: (context, serviceDetails) {
-                  return ListView.builder(
-                    itemCount: serviceName.data?.length,
-                    itemBuilder: (context, index) {
-                      if (serviceDetails.hasError) {
-                        return const Text('Error loading data');
+  Widget servicesPageView() {
+    return PageView.builder(
+      itemCount: serviceCount,
+      itemBuilder: (context, serviceIndex) {
+        return FutureBuilder<List<String>>(
+          future: getAllServiceTypes(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: kPrimaryColor),
+              );
+            } else if (snapshot.hasError) {
+              log(Error().toString());
+              return Text(Error().toString());
+            } else {
+              return Column(
+                children: [
+                  //service category text widget
+                  Text(
+                    snapshot.data![serviceIndex].isEmpty
+                        ? '???'
+                        : snapshot.data![serviceIndex],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  FutureBuilder<List<List<String>>>(
+                    future: getServiceNames(),
+                    builder: (context, serviceNames) {
+                      if (serviceNames.hasData) {
+                        return FutureBuilder<List<List<Map<String, dynamic>>>>(
+                          future: getServiceDetails(),
+                          builder: (context, serviceDetails) {
+                            if (serviceDetails.hasData) {
+                              final serviceData = serviceDetails.data!;
+                              return Expanded(
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount:
+                                        serviceNames.data![serviceIndex].length,
+                                    itemBuilder: (context, index) {
+                                      final serviceList =
+                                          serviceData[serviceIndex];
+                                      return badges.Badge(
+                                        onTap: () {
+                                          log('tapped badge');
+                                        },
+                                        position: badges.BadgePosition.topEnd(),
+                                        showBadge: true,
+                                        badgeContent: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.white,
+                                          size: 10,
+                                        ),
+                                        child: InkWell(
+                                          child: Container(
+                                            height: 100,
+                                            width: double.infinity,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            padding: const EdgeInsets.all(
+                                                defaultPadding),
+                                            decoration: const BoxDecoration(
+                                                color: kPrimaryLightColor),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        //service name
+                                                        Text(
+                                                          serviceNames.data![
+                                                                  serviceIndex]
+                                                              [index],
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        //duration
+                                                        Text(
+                                                          ' - ${serviceDetails.data![serviceIndex][index]['duration']}',
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const Spacer(),
+                                                    //descripiton
+                                                    Text(serviceDetails
+                                                            .data![serviceIndex]
+                                                        [index]['description'])
+                                                  ],
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    //price
+                                                    Text(serviceDetails
+                                                            .data![serviceIndex]
+                                                        [index]['price']),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            editServiceDialog(
+                                                context,
+                                                serviceNames.data![serviceIndex]
+                                                    [index],
+                                                index);
+                                          },
+                                        ),
+                                      );
+                                    }),
+                              );
+                            } else if (serviceDetails.hasError) {
+                              return Text('Error ${Error().toString}');
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: kPrimaryColor));
+                            }
+                          },
+                        );
+                      } else if (serviceNames.hasError) {
+                        return const Text('error getting service names');
+                      } else {
+                        return const LinearProgressIndicator(
+                            color: kPrimaryColor);
                       }
-                      if (serviceDetails.hasData) {
-                        try {
-                          List<List>? myData = serviceDetails.data;
-                          return ServiceCard(
-                              index,
-                              myData?[index][0].isEmpty
-                                  ? 'Empty Description'
-                                  : myData?[index][0],
-                              myData?[index][1].isEmpty
-                                  ? 'Duration'
-                                  : myData?[index][1],
-                              myData?[index][2].isEmpty
-                                  ? 'Empty Price'
-                                  : '${myData?[index][2]} Php');
-                        } catch (e) {
-                          log(e.toString());
-                        }
-                      } else {}
-                      return null;
                     },
-                  );
+                  ),
+                ],
+              );
+            }
+          },
+        );
+      },
+      controller: pageController,
+    );
+  }
+
+  Future<dynamic> editServiceDialog(
+      BuildContext context, String serviceName, int index) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Editing $serviceName'),
+          content: SizedBox(
+            height: 300,
+            child: Column(
+              children: [
+                flatTextField('Price', _priceController),
+                const SizedBox(height: defaultPadding),
+                flatTextField('Duration', _durationController),
+                const SizedBox(height: defaultPadding),
+                flatTextField('Description', _descriptionController),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
                 },
-              ));
-        }
+                child: const Text('CLOSE')),
+            TextButton(
+                onPressed: () {
+                  editServiceDetails(index);
+                },
+                child: const Text('EDIT')),
+          ],
+        );
       },
     );
   }
 
-  // ignore: non_constant_identifier_names
-  Widget ServiceCard(int index, String description, duration, price) {
-    return badges.Badge(
-      position: badges.BadgePosition.topEnd(),
-      showBadge: true,
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Theme(
-                data: ThemeData(
-                    canvasColor: Colors.transparent,
-                    colorScheme: Theme.of(context).colorScheme.copyWith(
-                          primary: kPrimaryColor,
-                          background: Colors.white,
-                          secondary: kPrimaryLightColor,
-                        )),
-                child: AlertDialog(
-                  title: Text("Delete ${serviceNames[index]}?"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          // deleteDocumentInCollectionGroup(serviceNames[index])
-                          //     .then((value) {
-                          //   setState(() {});
-                          // });
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Yes')),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('No')),
-                  ],
-                ),
-              );
-            });
-      },
-      badgeContent: const Icon(
-        Icons.close_rounded,
-        color: Colors.white,
-        size: 15,
-      ),
-      child: InkWell(
-        onTap: () {
-          editServiceDialog(index).then((value) {
-            setState(() {});
-          });
-        },
-        child: Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: defaultPadding),
-            color: kPrimaryLightColor,
-            width: double.infinity,
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      children: [
-                        Text(
-                          serviceNames[index],
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        duration == null
-                            ? const Text('data')
-                            : Text(' - $duration')
-                      ],
-                    ),
-                    const Spacer(),
-                    description == null ? const Text('data') : Text(description)
-                  ],
-                ),
-                Column(
-                  children: [price == null ? const Text('data') : Text(price)],
-                )
-              ],
-            )),
-      ),
-    );
+  Future<void> editServiceDetails(int index) async {
+    try {
+      //query niya tanan service types
+      final servicesDocuments = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      List<List<Map<String, dynamic>>> serviceData = [];
+      //for loop query na kuhaon tanan servicenames under subcollection
+      for (final doc in servicesDocuments.docs) {
+        final serviceDocs =
+            await doc.reference.collection('${currentUser!.uid}services').get();
+        List<Map<String, dynamic>> serviceDataList = [];
+        //for loop query na kuhaon tanan fields
+        for (final serviceDoc in serviceDocs.docs) {
+          final data = {
+            "description": serviceDoc.get('description'),
+            "duration": serviceDoc.get("duration"),
+            "price": serviceDoc.get("price"),
+          };
+          serviceDataList.add(data);
+        }
+        log(serviceDataList[index].toString());
+      }
+    } catch (e) {
+      log('Error in editing service details - ${e.toString()}');
+    }
   }
 
   Container salonCard(Widget child) {

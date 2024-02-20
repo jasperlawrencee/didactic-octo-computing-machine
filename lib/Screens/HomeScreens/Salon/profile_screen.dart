@@ -9,7 +9,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
-import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -308,18 +307,21 @@ class _ProfilePageState extends State<ProfilePage> {
                           future: getServiceDetails(),
                           builder: (context, serviceDetails) {
                             if (serviceDetails.hasData) {
-                              final serviceData = serviceDetails.data!;
                               return Expanded(
                                 child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount:
                                         serviceNames.data![serviceIndex].length,
                                     itemBuilder: (context, index) {
-                                      final serviceList =
-                                          serviceData[serviceIndex];
                                       return badges.Badge(
                                         onTap: () {
-                                          log('tapped badge');
+                                          deleteService(
+                                            //serviceType
+                                            snapshot.data![serviceIndex],
+                                            //serviceName
+                                            serviceNames.data![serviceIndex]
+                                                [index],
+                                          );
                                         },
                                         position: badges.BadgePosition.topEnd(),
                                         showBadge: true,
@@ -361,7 +363,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         ),
                                                         //duration
                                                         Text(
-                                                          ' - ${serviceDetails.data![serviceIndex][index]['duration']}',
+                                                          serviceDetails.data![
+                                                                      serviceIndex]
+                                                                      [index][
+                                                                      'duration']
+                                                                  .toString()
+                                                                  .isNotEmpty
+                                                              ? ' - ${serviceDetails.data![serviceIndex][index]['duration']}'
+                                                              : ' - Duration',
                                                         )
                                                       ],
                                                     ),
@@ -369,7 +378,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                                     //descripiton
                                                     Text(serviceDetails
                                                             .data![serviceIndex]
-                                                        [index]['description'])
+                                                                [index]
+                                                                ['description']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                        ? serviceDetails.data![
+                                                                    serviceIndex]
+                                                                [index]
+                                                            ['description']
+                                                        : 'Description')
                                                   ],
                                                 ),
                                                 Column(
@@ -377,7 +394,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                                     //price
                                                     Text(serviceDetails
                                                             .data![serviceIndex]
-                                                        [index]['price']),
+                                                                [index]['price']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                        ? serviceDetails.data![
+                                                                serviceIndex]
+                                                            [index]['price']
+                                                        : 'Price'),
                                                   ],
                                                 )
                                               ],
@@ -385,10 +408,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                           onTap: () {
                                             editServiceDialog(
-                                                context,
-                                                serviceNames.data![serviceIndex]
-                                                    [index],
-                                                index);
+                                              context,
+                                              //serviceType
+                                              snapshot.data![serviceIndex],
+                                              //serviceName
+                                              serviceNames.data![serviceIndex]
+                                                  [index],
+                                            );
                                           },
                                         ),
                                       );
@@ -422,7 +448,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<dynamic> editServiceDialog(
-      BuildContext context, String serviceName, int index) {
+    BuildContext context,
+    String serviceType,
+    String serviceName,
+  ) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -443,12 +472,26 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             TextButton(
                 onPressed: () {
+                  _priceController.clear();
+                  _durationController.clear();
+                  _descriptionController.clear();
                   Navigator.pop(context);
                 },
                 child: const Text('CLOSE')),
             TextButton(
                 onPressed: () {
-                  editServiceDetails(index);
+                  editServiceDetails(
+                    serviceType,
+                    serviceName,
+                    _priceController.text,
+                    _durationController.text,
+                    _descriptionController.text,
+                  ).then((value) {
+                    Navigator.pop(context);
+                    setState(() {
+                      value;
+                    });
+                  });
                 },
                 child: const Text('EDIT')),
           ],
@@ -457,30 +500,37 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> editServiceDetails(int index) async {
+  Future<void> editServiceDetails(
+    String serviceType,
+    String serviceName,
+    String price,
+    String duration,
+    String description,
+  ) async {
     try {
-      //query niya tanan service types
-      final servicesDocuments = await _firestore
+      DocumentReference docRef = _firestore
           .collection('users')
           .doc(currentUser!.uid)
           .collection('services')
-          .get();
-      List<List<Map<String, dynamic>>> serviceData = [];
-      //for loop query na kuhaon tanan servicenames under subcollection
-      for (final doc in servicesDocuments.docs) {
-        final serviceDocs =
-            await doc.reference.collection('${currentUser!.uid}services').get();
-        List<Map<String, dynamic>> serviceDataList = [];
-        //for loop query na kuhaon tanan fields
-        for (final serviceDoc in serviceDocs.docs) {
-          final data = {
-            "description": serviceDoc.get('description'),
-            "duration": serviceDoc.get("duration"),
-            "price": serviceDoc.get("price"),
-          };
-          serviceDataList.add(data);
-        }
-        log(serviceDataList[index].toString());
+          .doc(serviceType)
+          .collection('${currentUser!.uid}services')
+          .doc(serviceName);
+      if (price.isNotEmpty || duration.isNotEmpty || description.isNotEmpty) {
+        price.isNotEmpty
+            ? await docRef.update({'price': price})
+            : log('empty price');
+        duration.isNotEmpty
+            ? await docRef.update({'duration': duration})
+            : log('empty duration');
+        description.isNotEmpty
+            ? await docRef.update({'description': description})
+            : log('empty description');
+        log('updated service');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Empty Fields'),
+          action: SnackBarAction(label: 'Close', onPressed: () {}),
+        ));
       }
     } catch (e) {
       log('Error in editing service details - ${e.toString()}');
@@ -497,5 +547,20 @@ class _ProfilePageState extends State<ProfilePage> {
           borderRadius: BorderRadius.all(Radius.circular(8))),
       child: child,
     );
+  }
+
+  Future<void> deleteService(String serviceType, String serviceName) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .collection('${currentUser!.uid}services')
+          .doc(serviceName);
+      await docRef.delete();
+    } catch (e) {
+      log('Error deleting document $serviceName: $e');
+    }
   }
 }

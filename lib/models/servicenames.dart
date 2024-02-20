@@ -5,6 +5,7 @@ class ServiceNames {
     'Highlights',
     'Balayage',
     'Ombre',
+    'Rebond',
     'Hair Extensions',
     'Perms',
     'Straightening/Relaxing',

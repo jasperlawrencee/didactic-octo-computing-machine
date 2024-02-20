@@ -19,7 +19,7 @@ class _AddServicesState extends State<AddServices> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String addText = 'ADD';
-  List<String> serviceTypes = [
+  List<String> serviceNames = [
     'Hair',
     'Makeup',
     'Spa',
@@ -27,8 +27,8 @@ class _AddServicesState extends State<AddServices> {
     'Lashes',
     'Wax',
   ];
-  String selectedServiceType = '';
-  String serviceTypeValue = '';
+  String serviceType = '';
+  String serviceName = '';
   final TextEditingController _servicePrice = TextEditingController();
   final TextEditingController _serviceDuration = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
@@ -68,9 +68,9 @@ class _AddServicesState extends State<AddServices> {
                   borderRadius: BorderRadius.circular(50)),
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: selectedServiceType.isEmpty ? null : selectedServiceType,
-                items: serviceTypes.isNotEmpty
-                    ? serviceTypes.map<DropdownMenuItem<String>>((e) {
+                value: serviceType.isEmpty ? null : serviceType,
+                items: serviceNames.isNotEmpty
+                    ? serviceNames.map<DropdownMenuItem<String>>((e) {
                         return DropdownMenuItem<String>(
                             value: e,
                             child: Text(
@@ -81,23 +81,23 @@ class _AddServicesState extends State<AddServices> {
                     : <DropdownMenuItem<String>>[],
                 onChanged: (value) {
                   setState(() {
-                    serviceTypeValue = '';
-                    selectedServiceType = value!;
+                    serviceName = '';
+                    serviceType = value!;
                   });
                 },
               ),
             ),
-            if (selectedServiceType.toLowerCase() == 'hair')
+            if (serviceType.toLowerCase() == 'hair')
               serviceDropdown(ServiceNames().hair),
-            if (selectedServiceType.toLowerCase() == 'makeup')
+            if (serviceType.toLowerCase() == 'makeup')
               serviceDropdown(ServiceNames().makeup),
-            if (selectedServiceType.toLowerCase() == 'spa')
+            if (serviceType.toLowerCase() == 'spa')
               serviceDropdown(ServiceNames().spa),
-            if (selectedServiceType.toLowerCase() == 'nails')
+            if (serviceType.toLowerCase() == 'nails')
               serviceDropdown(ServiceNames().nails),
-            if (selectedServiceType.toLowerCase() == 'lashes')
+            if (serviceType.toLowerCase() == 'lashes')
               serviceDropdown(ServiceNames().lashes),
-            if (selectedServiceType.toLowerCase() == 'wax')
+            if (serviceType.toLowerCase() == 'wax')
               serviceDropdown(ServiceNames().wax),
             const SizedBox(height: defaultPadding),
             const Row(
@@ -146,43 +146,7 @@ class _AddServicesState extends State<AddServices> {
                     child: const Text('BACK')),
                 TextButton(
                     onPressed: () async {
-                      if (await isServiceExisting(
-                              selectedServiceType, serviceTypeValue) ==
-                          true) {
-                        if (mounted) {
-                          log('Service already exists');
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: const Text('Service Already Exists'),
-                            action: SnackBarAction(
-                                label: 'Close', onPressed: () {}),
-                          ));
-                        }
-                      } else if (await isServiceExisting(
-                              selectedServiceType, serviceTypeValue) ==
-                          false) {
-                        addServicesToFirestore(
-                                selectedServiceType,
-                                serviceTypeValue,
-                                _servicePrice.text.isEmpty
-                                    ? ''
-                                    : _servicePrice.text,
-                                _serviceDuration.text.isEmpty
-                                    ? ''
-                                    : _serviceDuration.text,
-                                _serviceDescription.text.isEmpty
-                                    ? ''
-                                    : _serviceDescription.text)
-                            .then((value) async {
-                          setState(() {
-                            addText = 'waiting for upload'.toUpperCase();
-                          });
-                          await Future.delayed(const Duration(seconds: 6));
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                            setState(() {});
-                          }
-                        });
-                      }
+                      await servicesToFirestore();
                     },
                     child: Text(addText))
               ],
@@ -193,35 +157,48 @@ class _AddServicesState extends State<AddServices> {
     );
   }
 
-  Future<void> addServicesToFirestore(String serviceType, String serviceName,
-      String? serivcePrice, serviceDuration, serviceDescription) async {
-    try {
-      //add sa categories subcollection
-      if (await isServiceExisting(serviceType, serviceName)) {
-        _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('categories')
-            .doc(serviceType)
-            .update({serviceName: ''});
+  Future<void> servicesToFirestore() async {
+    if (await isServiceTypeExisting(serviceType)) {
+      log('servicetype existing');
+      if (await isServiceNameExisting(serviceType, serviceName)) {
+        log('servicename existing');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Service Already Existing'),
+            action: SnackBarAction(label: 'Close', onPressed: () {}),
+          ));
+        }
       } else {
-        _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('categories')
-            .doc(serviceType)
-            .set({serviceName: ''}, SetOptions(merge: true));
-      }
-      //add sa services subcollection
-      if (await isServiceExisting(serviceType, serviceName)) {
-        _firestore
+        log('servicename not existing');
+        await _firestore
             .collection('users')
             .doc(currentUser!.uid)
             .collection('services')
             .doc(serviceType)
-            .set({'doc': ''}, SetOptions(merge: true));
+            .collection('${currentUser!.uid}services')
+            .doc(serviceName)
+            .set({
+          'description': _serviceDescription.text,
+          'duration': _serviceDuration.text,
+          'price': _servicePrice.text,
+        }).then((value) {
+          log('added $serviceName');
+          Navigator.of(context).pop();
+        });
       }
-      _firestore
+    } else {
+      log('servicetype not existing');
+      //add "doc" fields to make document readable
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .set({'doc': ''}).then((value) {
+        log('added $serviceType');
+        Navigator.of(context).pop();
+      });
+      await _firestore
           .collection('users')
           .doc(currentUser!.uid)
           .collection('services')
@@ -229,33 +206,58 @@ class _AddServicesState extends State<AddServices> {
           .collection('${currentUser!.uid}services')
           .doc(serviceName)
           .set({
-        'description': serviceDescription,
-        'duration': serviceDuration,
-        'price': serivcePrice,
-      }, SetOptions(merge: true));
-    } catch (e) {
+        'description': _serviceDescription.text,
+        'duration': _serviceDuration.text,
+        'price': _servicePrice.text,
+      }).then((value) {
+        log('added $serviceType with $serviceName');
+        Navigator.of(context).pop();
+      });
+    }
+  }
+
+  Future<void> addServicesToFirestore(String serviceName, String serviceType,
+      String? serivcePrice, serviceDuration, serviceDescription) async {
+    try {} catch (e) {
       log(e.toString());
     }
   }
 
-  Future<bool> isServiceExisting(String serviceType, String serviceName) async {
+  Future<bool> isServiceTypeExisting(String serviceName) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
+      DocumentReference docRef = _firestore
           .collection('users')
           .doc(currentUser!.uid)
-          .collection('categories')
-          .where(serviceName, isEqualTo: "")
-          .limit(1)
-          .get();
+          .collection('services')
+          .doc(serviceName);
+      DocumentSnapshot docSnapshot = await docRef.get();
+      return docSnapshot.exists;
+    } catch (e) {
+      log('Error getting service type: $e');
+      return false;
+    }
+  }
+
+  Future<bool> isServiceNameExisting(
+      String serviceName, String serviceType) async {
+    try {
+      // QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
+      //     .collection('users')
+      //     .doc(currentUser!.uid)
+      //     .collection('categories')
+      //     .where(serviceType, isEqualTo: "")
+      //     .limit(1)
+      //     .get();
       CollectionReference collectionReference = _firestore
           .collection('users')
           .doc(currentUser!.uid)
           .collection('services')
-          .doc(serviceType)
+          .doc(serviceName)
           .collection('${currentUser!.uid}services');
       DocumentSnapshot documentSnapshot =
-          await collectionReference.doc(serviceName).get();
-      return (querySnapshot.docs.isNotEmpty &&
+          await collectionReference.doc(serviceType).get();
+      return (
+          // querySnapshot.docs.isNotEmpty &&
           documentSnapshot.exists); // True if service already exists
     } catch (e) {
       if (mounted) {
@@ -290,7 +292,7 @@ class _AddServicesState extends State<AddServices> {
                 borderRadius: BorderRadius.circular(50)),
             child: DropdownButton<String>(
               isExpanded: true,
-              value: serviceTypeValue.isEmpty ? null : serviceTypeValue,
+              value: serviceName.isEmpty ? null : serviceName,
               items: services.isNotEmpty
                   ? services.map<DropdownMenuItem<String>>((e) {
                       return DropdownMenuItem<String>(
@@ -303,7 +305,7 @@ class _AddServicesState extends State<AddServices> {
                   : <DropdownMenuItem<String>>[],
               onChanged: (value) => setState(() {
                 try {
-                  serviceTypeValue = value!;
+                  serviceName = value!;
                 } catch (e) {
                   log(e.toString());
                 }

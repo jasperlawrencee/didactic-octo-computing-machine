@@ -23,33 +23,222 @@ class _ServicesPageState extends State<ServicesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
   int serviceCount = 0;
-  var details = [];
-  List<String> services = [];
-  List<String> servicesTypes = [
-    'Hair',
-    'Lashes',
-    'Makeup',
-    'Nails',
-    'Spa',
-    'Wax'
-  ];
-  String? dropdownServiceType;
-  List<String> serviceNames = [];
-  List<dynamic> serviceDuration = [];
-  List<dynamic> servicePrice = [];
-  List<dynamic> serviceDescription = [];
-  final TextEditingController _servicePrice = TextEditingController();
-  final TextEditingController _serviceDescription = TextEditingController();
-  final TextEditingController _serviceDuration = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  var pageController = PageController();
 
   @override
   void initState() {
     super.initState();
+    getServiceTypeCount();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void getServiceTypeCount() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        serviceCount++;
+      });
+    } catch (e) {
+      log('error getting service type count: $e');
+    }
+  }
+
+  //get all existing service types
+  Future<List<String>> getAllServiceTypes() async {
+    List<String> existingServices = [];
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+
+      querySnapshot.docs.forEach((element) {
+        existingServices.add(element.id);
+      });
+      return existingServices;
+    } catch (e) {
+      log('Getting Service Types Error: $e');
+      return [];
+    }
+  }
+
+//returns all services names inside existing service types
+  Future<List<List<String>>> getServiceNames() async {
+    List<List<String>> serviceNames = [];
+    try {
+      var serviceDocuments = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      for (var docs in serviceDocuments.docs) {
+        var serviceCollection =
+            docs.reference.collection('${currentUser!.uid}services');
+        var serviceDocs = await serviceCollection.get();
+        List<String> names = [];
+        for (var serviceDoc in serviceDocs.docs) {
+          names.add(serviceDoc.id);
+        }
+        serviceNames.add(names);
+      }
+      return serviceNames;
+    } catch (e) {
+      log('Error Getting Service Names: $e');
+      return [];
+    }
+  }
+
+  Future<List<List<Map<String, dynamic>>>> getServiceDetails() async {
+    try {
+      final servicesDocuments = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .get();
+      List<List<Map<String, dynamic>>> serviceData = [];
+      for (final doc in servicesDocuments.docs) {
+        final serviceDocs =
+            await doc.reference.collection('${currentUser!.uid}services').get();
+        List<Map<String, dynamic>> serviceDataList = [];
+        for (final serviceDoc in serviceDocs.docs) {
+          final data = {
+            "description": serviceDoc.get('description'),
+            "duration": serviceDoc.get("duration"),
+            "price": serviceDoc.get("price"),
+          };
+          serviceDataList.add(data);
+        }
+        serviceData.add(serviceDataList);
+      }
+      return serviceData;
+    } catch (e) {
+      log('Error getting service details: $e');
+      return [];
+    }
+  }
+
+  Future<dynamic> editServiceDialog(
+    BuildContext context,
+    String serviceType,
+    String serviceName,
+  ) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Editing $serviceName'),
+          content: SizedBox(
+            height: 300,
+            child: Column(
+              children: [
+                flatTextField('Price', _priceController),
+                const SizedBox(height: defaultPadding),
+                flatTextField('Duration', _durationController),
+                const SizedBox(height: defaultPadding),
+                flatTextField('Description', _descriptionController),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  _priceController.clear();
+                  _durationController.clear();
+                  _descriptionController.clear();
+                  Navigator.pop(context);
+                },
+                child: const Text('CLOSE')),
+            TextButton(
+                onPressed: () {
+                  editServiceDetails(
+                    serviceType,
+                    serviceName,
+                    _priceController.text,
+                    _durationController.text,
+                    _descriptionController.text,
+                  ).then((value) {
+                    Navigator.pop(context);
+                    setState(() {
+                      value;
+                    });
+                  });
+                },
+                child: const Text('EDIT')),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> editServiceDetails(
+    String serviceType,
+    String serviceName,
+    String price,
+    String duration,
+    String description,
+  ) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .collection('${currentUser!.uid}services')
+          .doc(serviceName);
+      if (price.isNotEmpty || duration.isNotEmpty || description.isNotEmpty) {
+        price.isNotEmpty
+            ? await docRef.update({'price': price})
+            : log('empty price');
+        duration.isNotEmpty
+            ? await docRef.update({'duration': duration})
+            : log('empty duration');
+        description.isNotEmpty
+            ? await docRef.update({'description': description})
+            : log('empty description');
+        log('updated service');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Empty Fields'),
+          action: SnackBarAction(label: 'Close', onPressed: () {}),
+        ));
+      }
+    } catch (e) {
+      log('Error in editing service details - ${e.toString()}');
+    }
+  }
+
+  Container salonCard(Widget child) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      height: 160,
+      width: 160,
+      decoration: const BoxDecoration(
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.all(Radius.circular(8))),
+      child: child,
+    );
+  }
+
+  Future<void> deleteService(String serviceType, String serviceName) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .collection('${currentUser!.uid}services')
+          .doc(serviceName);
+      await docRef.delete();
+    } catch (e) {
+      log('Error deleting document $serviceName: $e');
+    }
   }
 
   Future<void> _refresh() {
@@ -84,7 +273,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     child: Stack(
                   fit: StackFit.loose,
                   children: [
-                    serviceSections(),
+                    servicesPageView(),
                     Align(
                         alignment: Alignment.bottomRight,
                         child: Column(
@@ -116,283 +305,181 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-//streambuilder for each service category ie Hair, Lashes etc.
-  Widget serviceSections() {
-    //parent streambuilder for getting service name
-    return StreamBuilder<List<String>>(
-      stream: Stream.fromFuture(getServices()),
-      builder: (context, serviceName) {
-        if (!serviceName.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: kPrimaryColor,
-            ),
-          );
-        } else {
-          return RefreshIndicator(
-              onRefresh: _refresh,
-              //child streambuilder for getting service details
-              child: StreamBuilder<List<List<dynamic>>>(
-                stream: Stream.fromFuture(getServiceDetails()),
-                builder: (context, serviceDetails) {
-                  return ListView.builder(
-                    itemCount: serviceName.data?.length,
-                    itemBuilder: (context, index) {
-                      if (serviceDetails.hasError) {
-                        return const Text('Error loading data');
-                      }
-                      if (serviceDetails.hasData) {
-                        try {
-                          List<List>? myData = serviceDetails.data;
-                          return ServiceCard(
-                              index,
-                              myData?[index][0].isEmpty
-                                  ? 'Empty Description'
-                                  : myData?[index][0],
-                              myData?[index][1].isEmpty
-                                  ? 'Empty Duration'
-                                  : myData?[index][1],
-                              myData?[index][2].isEmpty
-                                  ? 'Empty Price'
-                                  : '${myData?[index][2]} Php');
-                        } catch (e) {
-                          log(e.toString());
-                        }
-                      } else {}
-                      return null;
-                    },
-                  );
-                },
-              ));
-        }
-      },
-    );
-  }
-
-  // ignore: non_constant_identifier_names
-  Widget ServiceCard(int index, String description, duration, price) {
-    return badges.Badge(
-      position: badges.BadgePosition.topEnd(),
-      showBadge: true,
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Theme(
-                data: ThemeData(
-                    canvasColor: Colors.transparent,
-                    colorScheme: Theme.of(context).colorScheme.copyWith(
-                          primary: kPrimaryColor,
-                          background: Colors.white,
-                          secondary: kPrimaryLightColor,
-                        )),
-                child: AlertDialog(
-                  title: Text("Delete ${serviceNames[index]}?"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          // deleteDocumentInCollectionGroup(serviceNames[index])
-                          //     .then((value) {
-                          //   setState(() {});
-                          // });
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Yes')),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('No')),
-                  ],
-                ),
+  Widget servicesPageView() {
+    return PageView.builder(
+      itemCount: serviceCount,
+      itemBuilder: (context, serviceIndex) {
+        return FutureBuilder<List<String>>(
+          future: getAllServiceTypes(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: kPrimaryColor),
               );
-            });
-      },
-      badgeContent: const Icon(
-        Icons.close_rounded,
-        color: Colors.white,
-        size: 15,
-      ),
-      child: InkWell(
-        onTap: () {
-          editServiceDialog(index).then((value) {
-            setState(() {});
-          });
-        },
-        child: Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: defaultPadding),
-            color: kPrimaryLightColor,
-            width: double.infinity,
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      children: [
-                        Text(
-                          serviceNames[index],
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        duration == null
-                            ? const Text('data')
-                            : Text(' - $duration')
-                      ],
+            } else if (snapshot.hasError) {
+              log(Error().toString());
+              return Text(Error().toString());
+            } else {
+              return Column(
+                children: [
+                  //service category text widget
+                  Text(
+                    snapshot.data![serviceIndex].isEmpty
+                        ? '???'
+                        : snapshot.data![serviceIndex],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: kPrimaryColor,
                     ),
-                    const Spacer(),
-                    description == null ? const Text('data') : Text(description)
-                  ],
-                ),
-                Column(
-                  children: [price == null ? const Text('data') : Text(price)],
-                )
-              ],
-            )),
-      ),
-    );
-  }
-
-  Future<List<List<dynamic>>> getServiceDetails() async {
-    List<List<dynamic>> detailValues = [];
-    try {
-      var collectionGroup =
-          _firestore.collectionGroup('${currentUser!.uid}services');
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        List<dynamic> values = [
-          doc['description'],
-          doc['duration'],
-          doc['price'],
-        ];
-        detailValues.add(values);
-      }
-      return detailValues;
-    } catch (e) {
-      log(e.toString());
-      return [];
-    }
-  }
-
-  Future<List<String>> getServices() async {
-    var collectionGroup =
-        _firestore.collectionGroup('${currentUser!.uid}services');
-    try {
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        details.add(data);
-      }
-      serviceNames = querySnapshot.docs.map((e) => e.id).toList();
-      return serviceNames;
-    } catch (e) {
-      log(e.toString());
-    }
-    return [];
-  }
-
-  Future<void> deleteDocumentInCollectionGroup(String documentId) async {
-    var collectionGroup = FirebaseFirestore.instance
-        .collectionGroup('${currentUser!.uid}services');
-
-    try {
-      QuerySnapshot querySnapshot = await collectionGroup.get();
-
-      // Find the document with the specified ID on the client side
-      QueryDocumentSnapshot? targetDocument;
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        if (doc.id == documentId) {
-          targetDocument = doc;
-          break;
-        }
-      }
-
-      // Delete the document if found
-      if (targetDocument != null) {
-        await targetDocument.reference.delete().then((value) {
-          setState(() {});
-        });
-        log('Document deleted successfully.');
-      } else {
-        log('Document not found.');
-      }
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
-  Future<dynamic> editServiceDialog(int index) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return Theme(
-              data: ThemeData(
-                  canvasColor: Colors.transparent,
-                  colorScheme: Theme.of(context).colorScheme.copyWith(
-                        primary: kPrimaryColor,
-                        background: Colors.white,
-                        secondary: kPrimaryLightColor,
-                      )),
-              child: AlertDialog(
-                title: Text('Edit ${serviceNames[index]}'),
-                content: SizedBox.square(
-                  dimension: 300,
-                  child: Column(
-                    children: [
-                      flatTextField('Price', _servicePrice),
-                      flatTextField('Duration', _serviceDuration),
-                      flatTextField('Description', _serviceDescription),
-                    ],
                   ),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Close')),
-                  TextButton(
-                      onPressed: () async {
-                        try {
-                          QuerySnapshot querySnapshot = await _firestore
-                              .collectionGroup('${currentUser!.uid}services')
-                              .get();
-                          QueryDocumentSnapshot? targetDocument;
-                          //Grabs document in collection group
-                          for (QueryDocumentSnapshot doc
-                              in querySnapshot.docs) {
-                            if (doc.id == serviceNames[index]) {
-                              targetDocument = doc;
-                              break;
+                  const SizedBox(height: defaultPadding),
+                  FutureBuilder<List<List<String>>>(
+                    future: getServiceNames(),
+                    builder: (context, serviceNames) {
+                      if (serviceNames.hasData) {
+                        return FutureBuilder<List<List<Map<String, dynamic>>>>(
+                          future: getServiceDetails(),
+                          builder: (context, serviceDetails) {
+                            if (serviceDetails.hasData) {
+                              return Expanded(
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount:
+                                        serviceNames.data![serviceIndex].length,
+                                    itemBuilder: (context, index) {
+                                      return badges.Badge(
+                                        onTap: () {
+                                          deleteService(
+                                            //serviceType
+                                            snapshot.data![serviceIndex],
+                                            //serviceName
+                                            serviceNames.data![serviceIndex]
+                                                [index],
+                                          );
+                                        },
+                                        position: badges.BadgePosition.topEnd(),
+                                        showBadge: true,
+                                        badgeContent: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.white,
+                                          size: 10,
+                                        ),
+                                        child: InkWell(
+                                          child: Container(
+                                            height: 100,
+                                            width: double.infinity,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            padding: const EdgeInsets.all(
+                                                defaultPadding),
+                                            decoration: const BoxDecoration(
+                                                color: kPrimaryLightColor),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        //service name
+                                                        Text(
+                                                          serviceNames.data![
+                                                                  serviceIndex]
+                                                              [index],
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        //duration
+                                                        Text(
+                                                          serviceDetails.data![
+                                                                      serviceIndex]
+                                                                      [index][
+                                                                      'duration']
+                                                                  .toString()
+                                                                  .isNotEmpty
+                                                              ? ' - ${serviceDetails.data![serviceIndex][index]['duration']}'
+                                                              : ' - Duration',
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const Spacer(),
+                                                    //descripiton
+                                                    Text(serviceDetails
+                                                            .data![serviceIndex]
+                                                                [index]
+                                                                ['description']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                        ? serviceDetails.data![
+                                                                    serviceIndex]
+                                                                [index]
+                                                            ['description']
+                                                        : 'Description')
+                                                  ],
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    //price
+                                                    Text(serviceDetails
+                                                            .data![serviceIndex]
+                                                                [index]['price']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                        ? serviceDetails.data![
+                                                                serviceIndex]
+                                                            [index]['price']
+                                                        : 'Price'),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            editServiceDialog(
+                                              context,
+                                              //serviceType
+                                              snapshot.data![serviceIndex],
+                                              //serviceName
+                                              serviceNames.data![serviceIndex]
+                                                  [index],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    }),
+                              );
+                            } else if (serviceDetails.hasError) {
+                              return Text('Error ${Error().toString}');
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: kPrimaryColor));
                             }
-                          }
-                          //Update document if found
-                          if (targetDocument != null) {
-                            await targetDocument.reference.update({
-                              'price': _servicePrice.text,
-                              'description': _serviceDescription.text,
-                              'duration': _serviceDuration.text,
-                            });
-                            log('updated ${targetDocument.id}');
-                          } else {
-                            log('no document found');
-                          }
-                        } catch (e) {
-                          log(e.toString());
-                        }
-                        _servicePrice.clear();
-                        _serviceDescription.clear();
-                        _serviceDuration.clear();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Edit'))
+                          },
+                        );
+                      } else if (serviceNames.hasError) {
+                        return const Text('error getting service names');
+                      } else {
+                        return const LinearProgressIndicator(
+                            color: kPrimaryColor);
+                      }
+                    },
+                  ),
                 ],
-              ));
-        });
+              );
+            }
+          },
+        );
+      },
+      controller: pageController,
+    );
   }
 }

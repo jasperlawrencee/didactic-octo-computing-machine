@@ -525,7 +525,7 @@ class _SummaryState extends State<Summary> {
                               },
                               child: const Text('No')),
                           TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.pop(context);
                                 try {
                                   uploadToFirebase();
@@ -550,7 +550,7 @@ class _SummaryState extends State<Summary> {
     ));
   }
 
-  void uploadToFirebase() async {
+  Future<void> uploadToFirebase() async {
     //adds "freelancer" to firebase cloud storage
     addRoleToFireStore();
     //adds details from step1
@@ -582,24 +582,29 @@ class _SummaryState extends State<Summary> {
     } else if (workerForm.salonEmployed != null) {
       log('workerform is checked and filled');
       try {
-        _firestore
+        await _firestore
             .collection('users')
             .doc(currentUser!.uid)
             .collection('experiences')
             .add({'salon': workerForm.salonEmployed.toString()});
+        QuerySnapshot querySnapshot = await _firestore
+            .collection('users')
+            .where('name', isEqualTo: workerForm.salonEmployed)
+            .get();
+        //kuhaon ang documentId sa salon nga napili
+        final docRef = querySnapshot.docs.first.reference;
+        //map to add at salon document
+        final addWorker = {'workerId': currentUser!.uid};
+        await _firestore
+            .collection('users')
+            .doc(docRef.id)
+            .collection('workers')
+            .doc(currentUser!.uid)
+            .set(addWorker);
       } catch (e) {
         log(e.toString());
       }
     }
-    // else if (workerForm.experiences.isNotEmpty) {
-    //   for (Experience exp in workerForm.experiences) {
-    //     _firestore
-    //         .collection('users')
-    //         .doc(currentUser!.uid)
-    //         .collection('experiences')
-    //         .add({'experience$index': exp.toString()});
-    //   }
-    // }
 
     //adds mga ids sa firebase from step4
     addStep4();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -15,17 +16,19 @@ class _ChatScreenState extends State<ChatScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                size: 8,
-              )),
-          title: Text('Chat ${widget.username}'),
+          title: Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded)),
+              Text(widget.username)
+            ],
+          ),
+          centerTitle: true,
         ),
+        body: Background(child: Container()),
       ),
     );
   }

@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/Salon/details_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/message_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/profile_screen.dart';
@@ -195,9 +196,7 @@ class _homeState extends State<home> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: defaultPadding,
-              ),
+              const SizedBox(height: defaultPadding),
               Row(
                 children: [
                   Text(
@@ -208,16 +207,13 @@ class _homeState extends State<home> {
                   ),
                 ],
               ),
-              Expanded(
-                  child: Column(
+              const SizedBox(height: defaultPadding),
+              Row(
                 children: [
-                  const SizedBox(height: defaultPadding),
-                  profileButton(() => null, Icons.store, 'Salon Details'),
-                  const SizedBox(height: defaultPadding),
-                  profileButton(() => null, Icons.event_repeat, 'History'),
-                  const SizedBox(height: defaultPadding),
+                  dashboardButton(Icons.store_rounded, () => SalonDetails(),
+                      'Salon Details'),
                 ],
-              )),
+              )
             ],
           ),
         ),
@@ -225,23 +221,17 @@ class _homeState extends State<home> {
     );
   }
 
-  InkWell profileButton(Function() goTo, IconData icon, String text) {
-    return InkWell(
-        onTap: goTo,
-        child: SizedBox(
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: kPrimaryColor,
-              ),
-              const SizedBox(width: defaultPadding / 2),
-              Text(
-                text,
-                style: const TextStyle(color: kPrimaryColor),
-              )
-            ],
-          ),
+  Widget dashboardButton(IconData icon, Function() function, String text) {
+    return TextButton.icon(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return function();
+          },
         ));
+      },
+      icon: Icon(icon),
+      label: Text(text),
+    );
   }
 }

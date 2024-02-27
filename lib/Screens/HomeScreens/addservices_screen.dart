@@ -173,6 +173,12 @@ class _AddServicesState extends State<AddServices> {
         await _firestore
             .collection('users')
             .doc(currentUser!.uid)
+            .collection('categories')
+            .doc(serviceType)
+            .set({serviceName: ""});
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
             .collection('services')
             .doc(serviceType)
             .collection('${currentUser!.uid}services')

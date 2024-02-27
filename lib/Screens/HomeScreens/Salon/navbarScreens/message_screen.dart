@@ -14,6 +14,33 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
+  final firestore = FirebaseFirestore.instance;
+  Stream<List<String>>? customerStream;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    customerStream = getCustomerUsername().asStream();
+  }
+
+  Future<List<String>> getCustomerUsername() async {
+    try {
+      QuerySnapshot querySnapshot = await firestore
+          .collection('users')
+          .where('role', isEqualTo: 'customer')
+          .get();
+      final customers = <String>[];
+      querySnapshot.docs.forEach((element) {
+        customers.add(element['Username']);
+      });
+      return customers;
+    } catch (e) {
+      log('Error getting customer username: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -35,9 +62,7 @@ class _MessagePageState extends State<MessagePage> {
               const SizedBox(
                 height: defaultPadding,
               ),
-              Expanded(
-                child: usersChatList(),
-              ),
+              Expanded(child: usersChatList())
             ],
           ),
         )),
@@ -46,8 +71,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget usersChatList() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('customers').snapshots(),
+    return StreamBuilder<List<String>>(
+      stream: customerStream,
       builder: (context, snapshot) {
         try {
           if (snapshot.hasError) {
@@ -56,10 +81,22 @@ class _MessagePageState extends State<MessagePage> {
             return const Center(
                 child: CircularProgressIndicator(color: kPrimaryColor));
           }
-          return ListView(
-            children: snapshot.data!.docs
-                .map((doc) => usersChatListItem(doc))
-                .toList(),
+          final customerList = snapshot.data!;
+          return ListView.builder(
+            itemCount: customerList.length,
+            itemBuilder: (context, index) {
+              final customer = customerList[index];
+              return ListTile(
+                title: Text(customer),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return ChatScreen(username: customer);
+                    },
+                  ));
+                },
+              );
+            },
           );
         } catch (e) {
           log('Error: $e');

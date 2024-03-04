@@ -175,7 +175,7 @@ class _AddServicesState extends State<AddServices> {
             .doc(currentUser!.uid)
             .collection('categories')
             .doc(serviceType)
-            .set({serviceName: ""});
+            .update({serviceName: ""});
         await _firestore
             .collection('users')
             .doc(currentUser!.uid)
@@ -195,6 +195,12 @@ class _AddServicesState extends State<AddServices> {
     } else {
       log('servicetype not existing');
       //add "doc" fields to make document readable
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('categories')
+          .doc(serviceType)
+          .set({serviceName: ""});
       await _firestore
           .collection('users')
           .doc(currentUser!.uid)
@@ -247,13 +253,6 @@ class _AddServicesState extends State<AddServices> {
   Future<bool> isServiceNameExisting(
       String serviceName, String serviceType) async {
     try {
-      // QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
-      //     .collection('users')
-      //     .doc(currentUser!.uid)
-      //     .collection('categories')
-      //     .where(serviceType, isEqualTo: "")
-      //     .limit(1)
-      //     .get();
       CollectionReference collectionReference = _firestore
           .collection('users')
           .doc(currentUser!.uid)

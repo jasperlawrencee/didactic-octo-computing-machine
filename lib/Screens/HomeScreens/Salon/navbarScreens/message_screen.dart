@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/chat_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/chat_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 
@@ -19,7 +19,6 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     customerStream = getCustomerUsername().asStream();
   }
@@ -104,24 +103,6 @@ class _MessagePageState extends State<MessagePage> {
             child: Text('Error getting users'),
           );
         }
-      },
-    );
-  }
-
-  Widget usersChatListItem(DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data =
-        documentSnapshot.data()! as Map<String, dynamic>;
-    String name = data['Username'];
-    return ListTile(
-      title: Text(data['Username']),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(
-                username: name,
-              ),
-            ));
       },
     );
   }

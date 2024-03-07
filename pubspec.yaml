@@ -26,6 +26,7 @@ dependencies:
   firebase_storage: ^11.2.7
   intl: ^0.18.1
   image_picker: ^1.0.4
+  image_cropper: ^5.0.1
   firebase_core: ^2.15.1
   cloud_firestore: ^4.9.1
   persistent_bottom_nav_bar: ^5.0.2

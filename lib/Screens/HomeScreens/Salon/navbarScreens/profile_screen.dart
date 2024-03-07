@@ -2,16 +2,20 @@
 
 import 'dart:core';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -39,6 +43,10 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final ImagePicker picker = ImagePicker();
+  File? profileImage;
+  XFile? profileImageRef;
+  var changeImage;
 
   @override
   void initState() {
@@ -186,8 +194,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       SizedBox(
                         height: 90,
-                        child: ClipOval(
-                            child: Image.asset('assets/avatars/5.jpg')),
+                        child: badges.Badge(
+                          position: badges.BadgePosition.topEnd(top: 0, end: 0),
+                          badgeContent: const Icon(
+                            Icons.edit,
+                            color: kPrimaryLightColor,
+                            size: 15,
+                          ),
+                          onTap: () {},
+                          showBadge: true,
+                          badgeStyle: const badges.BadgeStyle(
+                              badgeColor: kPrimaryColor),
+                          child: changeImage == null
+                              ? const Text('No Profile Image')
+                              : ClipOval(child: changeImage),
+                        ),
                       ),
                       const Spacer(),
                       Text(
@@ -269,6 +290,34 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future pickImage() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+      File? img = File(image.path);
+      img = await cropImage(img);
+      setState(() {
+        profileImage = img;
+        Navigator.of(context).pop();
+      });
+    } on PlatformException catch (e) {
+      log(e.toString());
+      Navigator.of(context).pop();
+    }
+  }
+
+  cropImage(File imgFile) async {
+    try {
+      CroppedFile? croppedImage =
+          await ImageCropper().cropImage(sourcePath: imgFile.path);
+      if (croppedImage == null) return null;
+      return File(croppedImage.path);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+//PageView Widget of Services
   Widget servicesPageView() {
     return PageView.builder(
       itemCount: serviceCount,

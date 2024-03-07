@@ -1,12 +1,16 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/chatBubble.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/chatservice.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ChatScreen extends StatefulWidget {
   String username;
@@ -20,9 +24,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final firestore = FirebaseFirestore.instance;
   final TextEditingController messageController = TextEditingController();
   final ChatService chatService = ChatService();
-  String currentUsername = '';
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final ImagePicker picker = ImagePicker();
+  String currentUsername = '';
   User? currentUser = FirebaseAuth.instance.currentUser;
+  File? image;
+  XFile? imageRef;
+  bool imageAdded = false;
 
   getCurrentuserid() async {
     try {
@@ -44,6 +52,23 @@ class _ChatScreenState extends State<ChatScreen> {
       log("recieved by: ${widget.username} sent by $currentUsername");
       await chatService.sendMessage(widget.username, messageController.text);
       messageController.clear();
+    }
+  }
+
+  void sendImage() async {
+    if (!imageAdded || image.toString().isEmpty) {
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference dirImages =
+          referenceRoot.child('chatImages').child(currentUser!.uid);
+      await dirImages.putFile(image!);
+      String imageUrl = await dirImages.getDownloadURL();
+      chatService.sendMessage(widget.username, imageUrl).then((value) {
+        setState(() {
+          imageAdded = false;
+          image = null;
+          imageRef = null;
+        });
+      });
     }
   }
 
@@ -123,6 +148,26 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget messageInput() {
     return Row(
       children: [
+        !imageAdded
+            ? Container()
+            : SizedBox.square(
+                dimension: 80,
+                child: badges.Badge(
+                  position: badges.BadgePosition.topEnd(end: 18),
+                  badgeContent: const Text(
+                    '-',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  child: Image.file(image!),
+                  onTap: () {
+                    setState(() {
+                      imageAdded = false;
+                      image = null;
+                      imageRef = null;
+                    });
+                  },
+                ),
+              ),
         Expanded(
             child: TextField(
           controller: messageController,
@@ -130,13 +175,92 @@ class _ChatScreenState extends State<ChatScreen> {
           obscureText: false,
         )),
         IconButton(
-            onPressed: sendMessage,
+            onPressed: attachImage,
+            icon: const Icon(
+              Icons.image,
+              color: kPrimaryColor,
+            )),
+        IconButton(
+            onPressed: () {
+              log('sending..');
+              sendImage();
+              sendMessage();
+            },
             icon: const Icon(
               Icons.send,
               color: kPrimaryColor,
             )),
         Padding(padding: EdgeInsets.only(bottom: 30))
       ],
+    );
+  }
+
+  Future<dynamic> attachImage() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+            title: const Text(
+              "Select Image From",
+              style: TextStyle(fontSize: 16),
+            ),
+            content: SizedBox.square(
+              dimension: 80,
+              // height: MediaQuery.of(context).size.height * .20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      imageRef =
+                          await picker.pickImage(source: ImageSource.camera);
+                      try {
+                        setState(() {
+                          image = File(imageRef!.path);
+                          imageAdded = true;
+                        });
+                        log(image.toString());
+                      } catch (e) {
+                        log('???');
+                      }
+                    },
+                    child: Container(
+                        padding: const EdgeInsets.all(defaultPadding),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.camera_alt_rounded),
+                            Text('Camera')
+                          ],
+                        )),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      imageRef =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      try {
+                        setState(() {
+                          image = File(imageRef!.path);
+                          imageAdded = true;
+                        });
+                        log(image.toString());
+                      } catch (e) {
+                        log('???');
+                      }
+                    },
+                    child: Container(
+                        padding: const EdgeInsets.all(defaultPadding),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [Icon(Icons.image), Text('Gallery')],
+                        )),
+                  ),
+                ],
+              ),
+            ));
+      },
     );
   }
 }

@@ -288,7 +288,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Hair'),
-                              showServices(context, salonForm.hair),
+                              showServices(context, salonForm.hair, 'Hair'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -302,7 +302,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Makeup'),
-                              showServices(context, salonForm.makeup),
+                              showServices(context, salonForm.makeup, 'Makeup'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -315,7 +315,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Spa'),
-                              showServices(context, salonForm.spa),
+                              showServices(context, salonForm.spa, 'Spa'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -328,7 +328,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Nails'),
-                              showServices(context, salonForm.nails),
+                              showServices(context, salonForm.nails, 'Nails'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -342,7 +342,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Lashes'),
-                              showServices(context, salonForm.lashes),
+                              showServices(context, salonForm.lashes, 'Lashes'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -355,7 +355,7 @@ class _SummaryState extends State<Summary> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Wax'),
-                              showServices(context, salonForm.wax),
+                              showServices(context, salonForm.wax, 'Wax'),
                             ],
                           ),
                           const SizedBox(height: defaultPadding),
@@ -435,7 +435,7 @@ class _SummaryState extends State<Summary> {
     ), (route) => route.isFirst);
   }
 
-  InkWell showServices(BuildContext context, List services) {
+  InkWell showServices(BuildContext context, List services, String title) {
     return InkWell(
       onTap: () {
         services.isNotEmpty
@@ -443,6 +443,16 @@ class _SummaryState extends State<Summary> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title),
+                        const Text(
+                          '*You need to setup your service(s) after logging in',
+                          style: TextStyle(fontSize: 14, color: Colors.red),
+                        ),
+                      ],
+                    ),
                     content: SizedBox(
                       width: MediaQuery.of(context).size.width / 1,
                       height: MediaQuery.of(context).size.height / 4,
@@ -498,6 +508,7 @@ class _SummaryState extends State<Summary> {
             'price': '',
             'duration': '',
             'description': '',
+            'image': '',
           };
           Map<String, dynamic> addFields = {};
           //add services to categories collection para kuhaon lang sa frontend ang names sa services in an array-like

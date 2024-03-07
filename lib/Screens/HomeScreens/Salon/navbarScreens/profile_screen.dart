@@ -8,6 +8,7 @@ import 'package:badges/badges.dart' as badges;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
@@ -37,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
     'Wax'
   ];
   late String serviceValue;
-  String salonName = '', address = '', salonNumber = '';
+  String address = '', salonNumber = '';
   List<String> serviceTypeAvailable = [];
   int serviceCount = 0;
   final TextEditingController _priceController = TextEditingController();
@@ -45,14 +46,12 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
   File? profileImage;
-  XFile? profileImageRef;
-  var changeImage;
+  bool isEditing = false;
 
   @override
   void initState() {
     super.initState();
     getAllServiceTypes();
-    getUserDetails();
     getServiceTypeCount();
   }
 
@@ -64,14 +63,45 @@ class _ProfilePageState extends State<ProfilePage> {
           .get()
           .then((DocumentSnapshot documentSnapshot) {
         setState(() {
-          salonName = documentSnapshot['name'];
-          address = documentSnapshot['address'];
           salonNumber = documentSnapshot['salonNumber'];
         });
       });
     } catch (e) {
       log('Error Getting User Details: $e');
     }
+  }
+
+  Future<String> getUserName() async {
+    try {
+      final dbRef =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      return dbRef.data()!['name'];
+    } catch (e) {
+      log('error getting name $e');
+    }
+    return 'Empty Name';
+  }
+
+  Future<String> getUserAddress() async {
+    try {
+      final dbRef =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      return dbRef.data()!['address'];
+    } catch (e) {
+      log('error getting address $e');
+    }
+    return 'Empty Address';
+  }
+
+  Future<String> getProfilePicture() async {
+    try {
+      final dbRef =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      return dbRef.data()!['profilePicture'];
+    } catch (e) {
+      log('error getting profile picture $e');
+    }
+    return 'Empty Profile Picutre';
   }
 
   void getServiceTypeCount() async {
@@ -152,6 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
             "description": serviceDoc.get('description'),
             "duration": serviceDoc.get("duration"),
             "price": serviceDoc.get("price"),
+            "image": serviceDoc.get("image"),
           };
           serviceDataList.add(data);
         }
@@ -185,58 +216,52 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: kPrimaryColor,
                 ),
               ),
-              const SizedBox(height: defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditing == false
+                            ? isEditing = true
+                            : isEditing = false;
+                      });
+                    },
+                    icon: Icon(
+                      isEditing ? Icons.close : Icons.edit_document,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   //salon name and picture
-                  salonCard(Column(
-                    children: [
-                      SizedBox(
-                        height: 90,
-                        child: badges.Badge(
-                          position: badges.BadgePosition.topEnd(top: 0, end: 0),
-                          badgeContent: const Icon(
-                            Icons.edit,
-                            color: kPrimaryLightColor,
-                            size: 15,
-                          ),
-                          onTap: () {},
-                          showBadge: true,
-                          badgeStyle: const badges.BadgeStyle(
-                              badgeColor: kPrimaryColor),
-                          child: changeImage == null
-                              ? const Text('No Profile Image')
-                              : ClipOval(child: changeImage),
-                        ),
+                  badges.Badge(
+                      badgeContent: const Icon(
+                        Icons.edit,
+                        color: kPrimaryLightColor,
+                        size: 15,
                       ),
-                      const Spacer(),
-                      Text(
-                        salonName,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: kPrimaryColor),
-                      ),
-                    ],
-                  )),
+                      onTap: pickImage,
+                      showBadge: isEditing,
+                      badgeStyle:
+                          const badges.BadgeStyle(badgeColor: kPrimaryColor),
+                      child: salonCard(SalonInfo())),
                   //salon address
-                  salonCard(Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                        child: Icon(
-                          Icons.location_on,
-                          color: kPrimaryColor,
-                          size: 30,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        address,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: kPrimaryColor),
-                      ),
-                    ],
-                  )),
+                  badges.Badge(
+                    badgeContent: const Icon(
+                      Icons.edit,
+                      color: kPrimaryLightColor,
+                      size: 15,
+                    ),
+                    onTap: () {},
+                    showBadge: isEditing,
+                    badgeStyle:
+                        const badges.BadgeStyle(badgeColor: kPrimaryColor),
+                    child: salonCard(SalonPlace()),
+                  ),
                   //salon phone number
                 ],
               ),
@@ -290,15 +315,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future pickImage() async {
+  Future<void> pickImage() async {
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return;
       File? img = File(image.path);
-      img = await cropImage(img);
+      img = await addtoFirebaseAfterCrop(img);
       setState(() {
         profileImage = img;
-        Navigator.of(context).pop();
       });
     } on PlatformException catch (e) {
       log(e.toString());
@@ -306,12 +330,30 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  cropImage(File imgFile) async {
+  addtoFirebaseAfterCrop(File imgFile) async {
     try {
-      CroppedFile? croppedImage =
-          await ImageCropper().cropImage(sourcePath: imgFile.path);
-      if (croppedImage == null) return null;
-      return File(croppedImage.path);
+      CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: imgFile.path,
+        aspectRatioPresets: [CropAspectRatioPreset.square],
+      );
+      if (croppedImage == null) {
+        return null;
+      } else {
+        Reference reference = FirebaseStorage.instance
+            .ref()
+            .child('salonImage')
+            .child(currentUser!.uid)
+            .child('profilePicture');
+        await reference.putFile(File(croppedImage.path));
+        final profilePictureUrl = await reference.getDownloadURL();
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .update({'profilePicture': profilePictureUrl}).then((value) {
+          log('uploaded profile picture');
+        });
+        return File(croppedImage.path);
+      }
     } catch (e) {
       log(e.toString());
     }
@@ -373,94 +415,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                           );
                                         },
                                         position: badges.BadgePosition.topEnd(),
-                                        showBadge: true,
+                                        showBadge: isEditing,
                                         badgeContent: const Icon(
                                           Icons.close_rounded,
                                           color: Colors.white,
                                           size: 10,
                                         ),
                                         child: InkWell(
-                                          child: Container(
-                                            height: 100,
-                                            width: double.infinity,
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            padding: const EdgeInsets.all(
-                                                defaultPadding),
-                                            decoration: const BoxDecoration(
-                                                color: kPrimaryLightColor),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        //service name
-                                                        Text(
-                                                          serviceNames.data![
-                                                                  serviceIndex]
-                                                              [index],
-                                                          style: const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        //duration
-                                                        Text(
-                                                          serviceDetails.data![
-                                                                      serviceIndex]
-                                                                      [index][
-                                                                      'duration']
-                                                                  .toString()
-                                                                  .isNotEmpty
-                                                              ? ' - ${serviceDetails.data![serviceIndex][index]['duration']}'
-                                                              : ' - Duration',
-                                                        )
-                                                      ],
-                                                    ),
-                                                    const Spacer(),
-                                                    //descripiton
-                                                    Text(serviceDetails
-                                                            .data![serviceIndex]
-                                                                [index]
-                                                                ['description']
-                                                            .toString()
-                                                            .isNotEmpty
-                                                        ? serviceDetails.data![
-                                                                    serviceIndex]
-                                                                [index]
-                                                            ['description']
-                                                        : 'Description')
-                                                  ],
-                                                ),
-                                                Column(
-                                                  children: [
-                                                    //price
-                                                    Text(serviceDetails
-                                                            .data![serviceIndex]
-                                                                [index]['price']
-                                                            .toString()
-                                                            .isNotEmpty
-                                                        ? serviceDetails.data![
-                                                                serviceIndex]
-                                                            [index]['price']
-                                                        : 'Price'),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
+                                          child: serviceCard(
+                                            serviceNames,
+                                            serviceIndex,
+                                            index,
+                                            serviceDetails,
                                           ),
                                           onTap: () {
                                             editServiceDialog(
                                               context,
-                                              //serviceType
+                                              //serviceTypes
                                               snapshot.data![serviceIndex],
-                                              //serviceName
+                                              //serviceNames
                                               serviceNames.data![serviceIndex]
                                                   [index],
                                             );
@@ -496,6 +469,70 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget serviceCard(
+    AsyncSnapshot<List<List<String>>> serviceNames,
+    int serviceIndex,
+    int index,
+    AsyncSnapshot<List<List<Map<String, dynamic>>>> serviceDetails,
+  ) {
+    String duration = serviceDetails.data![serviceIndex][index]['duration'];
+    String price = serviceDetails.data![serviceIndex][index]['price'];
+    String image = serviceDetails.data![serviceIndex][index]['image'];
+    String descrtiption =
+        serviceDetails.data![serviceIndex][index]['description'];
+    return Container(
+      height: 450,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
+        color: kPrimaryLightColor,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            height: 300,
+            margin: const EdgeInsets.only(bottom: defaultPadding),
+            child: Center(
+              child:
+                  image.isEmpty ? const Text('No Image') : Image.network(image),
+            ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //service name
+              Row(
+                children: [
+                  Text(
+                    serviceNames.data![serviceIndex][index],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  //duration
+                  Text(
+                    duration.toString().isNotEmpty
+                        ? ' - $duration'
+                        : ' - Duration',
+                  ),
+                ],
+              ),
+              Text(price.toString().isNotEmpty ? price : 'Price'),
+            ],
+          ),
+          const SizedBox(height: 40),
+          //descripiton
+          Text(descrtiption.toString().isNotEmpty
+              ? descrtiption
+              : 'Description'),
+        ],
+      ),
+    );
+  }
+
   Future<dynamic> editServiceDialog(
     BuildContext context,
     String serviceType,
@@ -515,6 +552,27 @@ class _ProfilePageState extends State<ProfilePage> {
                 flatTextField('Duration', _durationController),
                 const SizedBox(height: defaultPadding),
                 flatTextField('Description', _descriptionController),
+                const SizedBox(height: defaultPadding),
+                TextButton(
+                    onPressed: () {
+                      addServiceImage(serviceType, serviceName).then((value) {
+                        Navigator.of(context).pop();
+                      });
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Edit Photo',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Icon(Icons.open_in_new)
+                      ],
+                    ))
               ],
             ),
           ),
@@ -610,6 +668,142 @@ class _ProfilePageState extends State<ProfilePage> {
       await docRef.delete();
     } catch (e) {
       log('Error deleting document $serviceName: $e');
+    }
+  }
+
+  Widget SalonInfo() {
+    return StreamBuilder<String>(
+      stream: Stream.fromFuture(getUserName()),
+      builder: (context, name) {
+        if (name.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: kPrimaryColor),
+          );
+        } else if (name.hasError) {
+          return Text('Getting Name Error ${name.error}');
+        } else {
+          final salonName = name.data!;
+          return Column(
+            children: [
+              StreamBuilder<String>(
+                stream: Stream.fromFuture(getProfilePicture()),
+                builder: (context, profilePicture) {
+                  if (profilePicture.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator(color: kPrimaryColor));
+                  } else if (profilePicture.hasError) {
+                    return Text(
+                        'Error Getting Profile Picutre ${profilePicture.error}');
+                  } else {
+                    final picture = profilePicture.data!;
+                    return SizedBox(
+                      height: 90,
+                      child: Center(
+                        child: picture == null
+                            ? const Text('No Profile\nPicture')
+                            : CircleAvatar(
+                                maxRadius: 200,
+                                backgroundImage: NetworkImage(picture)),
+                      ),
+                    );
+                  }
+                },
+              ),
+              const Spacer(),
+              Text(
+                salonName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: kPrimaryColor),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget SalonPlace() {
+    return StreamBuilder<String>(
+      stream: Stream.fromFuture(getUserAddress()),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: kPrimaryColor),
+          );
+        } else if (snapshot.hasError) {
+          return Text('Getting Name Error ${snapshot.error}');
+        } else {
+          final address = snapshot.data!;
+          return Column(
+            children: [
+              const SizedBox(
+                height: 10,
+                child: Icon(
+                  Icons.location_city_rounded,
+                  color: kPrimaryColor,
+                  size: 50,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                address,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: kPrimaryColor),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Future addServiceImage(String serviceType, String serviceName) async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+      File? img = File(image.path);
+      img = await cropImage(img, serviceType, serviceName);
+      setState(() {
+        profileImage = img;
+      });
+    } on PlatformException catch (e) {
+      log(e.toString());
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future cropImage(File imgFile, String serviceType, String serviceName) async {
+    try {
+      CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: imgFile.path,
+        aspectRatioPresets: [CropAspectRatioPreset.square],
+      );
+      if (croppedImage == null) {
+        return null;
+      } else {
+        Reference reference = FirebaseStorage.instance
+            .ref()
+            .child('salonImage')
+            .child(currentUser!.uid)
+            .child('serviceImages')
+            .child(serviceName);
+        await reference.putFile(File(croppedImage.path));
+        final serviceImage = await reference.getDownloadURL();
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(serviceType)
+            .collection('${currentUser!.uid}services')
+            .doc(serviceName)
+            .update({'image': serviceImage}).then((value) {
+          log('added $serviceName image');
+        });
+        return File(croppedImage.path);
+      }
+    } catch (e) {
+      log(e.toString());
     }
   }
 }

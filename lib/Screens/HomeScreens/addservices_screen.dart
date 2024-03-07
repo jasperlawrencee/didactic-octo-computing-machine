@@ -1,12 +1,17 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/servicenames.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddServices extends StatefulWidget {
   const AddServices({super.key});
@@ -32,6 +37,8 @@ class _AddServicesState extends State<AddServices> {
   final TextEditingController _servicePrice = TextEditingController();
   final TextEditingController _serviceDuration = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
+  File? serviceImage;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,6 +143,44 @@ class _AddServicesState extends State<AddServices> {
             ),
             flatTextField('Serivce Description', _serviceDescription),
             const SizedBox(height: defaultPadding),
+            const Row(
+              children: [
+                Text(
+                  'Image',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            TextButton(
+                onPressed: () {
+                  getImage();
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Add Photo',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Icon(Icons.open_in_new)
+                  ],
+                )),
+            const SizedBox(height: defaultPadding),
+            InkWell(
+              onTap: serviceImage == null ? null : viewImage,
+              child: Text(
+                serviceImage == null ? 'Empty' : 'View',
+                style: const TextStyle(
+                    color: kPrimaryColor, decoration: TextDecoration.underline),
+              ),
+            ),
+            const SizedBox(height: defaultPadding),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -144,11 +189,7 @@ class _AddServicesState extends State<AddServices> {
                       Navigator.pop(context);
                     },
                     child: const Text('BACK')),
-                TextButton(
-                    onPressed: () async {
-                      await servicesToFirestore();
-                    },
-                    child: Text(addText))
+                TextButton(onPressed: servicesToFirestore, child: Text(addText))
               ],
             )
           ],
@@ -157,75 +198,28 @@ class _AddServicesState extends State<AddServices> {
     );
   }
 
-  Future<void> servicesToFirestore() async {
-    if (await isServiceTypeExisting(serviceType)) {
-      log('servicetype existing');
-      if (await isServiceNameExisting(serviceType, serviceName)) {
-        log('servicename existing');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: const Text('Service Already Existing'),
-            action: SnackBarAction(label: 'Close', onPressed: () {}),
-          ));
-        }
-      } else {
-        log('servicename not existing');
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('categories')
-            .doc(serviceType)
-            .update({serviceName: ""});
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(serviceType)
-            .collection('${currentUser!.uid}services')
-            .doc(serviceName)
-            .set({
-          'description': _serviceDescription.text,
-          'duration': _serviceDuration.text,
-          'price': _servicePrice.text,
-        }).then((value) {
-          log('added $serviceName');
-          Navigator.of(context).pop();
-        });
-      }
-    } else {
-      log('servicetype not existing');
-      //add "doc" fields to make document readable
-      await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('categories')
-          .doc(serviceType)
-          .set({serviceName: ""});
-      await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc(serviceType)
-          .set({'doc': ''}).then((value) {
-        log('added $serviceType');
-        Navigator.of(context).pop();
-      });
-      await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc(serviceType)
-          .collection('${currentUser!.uid}services')
-          .doc(serviceName)
-          .set({
-        'description': _serviceDescription.text,
-        'duration': _serviceDuration.text,
-        'price': _servicePrice.text,
-      }).then((value) {
-        log('added $serviceType with $serviceName');
-        Navigator.of(context).pop();
-      });
-    }
+  viewImage() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Image.file(serviceImage!),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  setState(() {
+                    serviceImage = null;
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ))
+          ],
+        );
+      },
+    );
   }
 
   Future<void> addServicesToFirestore(String serviceName, String serviceType,
@@ -318,5 +312,121 @@ class _AddServicesState extends State<AddServices> {
             )),
       ],
     );
+  }
+
+  Future getImage() async {
+    try {
+      final img = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (img != null) {
+        File? image = File(img.path);
+        image = await cropImage(image);
+        setState(() {
+          serviceImage = image;
+        });
+        return serviceImage;
+      } else {
+        return;
+      }
+    } catch (e) {
+      log("error picking image $e");
+    }
+  }
+
+  Future cropImage(File imgFile) async {
+    try {
+      CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: imgFile.path,
+        aspectRatioPresets: [CropAspectRatioPreset.square],
+      );
+      if (croppedImage == null) {
+        return;
+      } else {
+        return File(croppedImage.path);
+      }
+    } catch (e) {
+      log('error cropping image $e');
+    }
+  }
+
+  Future<void> servicesToFirestore() async {
+    if (await isServiceTypeExisting(serviceType)) {
+      log('servicetype existing');
+      if (await isServiceNameExisting(serviceType, serviceName)) {
+        log('servicename existing');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Service Already Existing'),
+            action: SnackBarAction(label: 'Close', onPressed: () {}),
+          ));
+        }
+      } else {
+        Reference reference = FirebaseStorage.instance
+            .ref()
+            .child('salonImage')
+            .child(currentUser!.uid)
+            .child('serviceImages')
+            .child(serviceName);
+        if (serviceImage != null) {
+          await reference.putFile(File(serviceImage!.path));
+        }
+        final serviceImageUrl = await reference.getDownloadURL();
+        log('servicename not existing');
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('categories')
+            .doc(serviceType)
+            .update({serviceName: ""});
+        await _firestore
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('services')
+            .doc(serviceType)
+            .collection('${currentUser!.uid}services')
+            .doc(serviceName)
+            .set({
+          'description': _serviceDescription.text,
+          'duration': _serviceDuration.text,
+          'price': _servicePrice.text,
+          'image': serviceImageUrl,
+        }).then((value) {
+          log('added $serviceName');
+          Navigator.of(context).pop();
+        });
+      }
+    } else {
+      log('servicetype not existing');
+      //add "doc" fields to make document readable
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('categories')
+          .doc(serviceType)
+          .set({serviceName: ""});
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .set({'doc': ''}).then((value) {
+        log('added $serviceType');
+        Navigator.of(context).pop();
+      });
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('services')
+          .doc(serviceType)
+          .collection('${currentUser!.uid}services')
+          .doc(serviceName)
+          .set({
+        'description': _serviceDescription.text,
+        'duration': _serviceDuration.text,
+        'price': _servicePrice.text,
+      }).then((value) {
+        log('added $serviceType with $serviceName');
+        Navigator.of(context).pop();
+      });
+    }
   }
 }

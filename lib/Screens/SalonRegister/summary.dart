@@ -491,6 +491,18 @@ class _SummaryState extends State<Summary> {
     await Future.delayed(const Duration(seconds: 10));
     //adds all singup text "String" data to firebase cloud storage
     await _firestore.collection('users').doc(currentUser!.uid).set(step1());
+    await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('bookings')
+        .add({
+      'customerID': '',
+      'clientID': '',
+      'services': '',
+      'date': '',
+      'time': '',
+      'status': '',
+    });
     //adds "salon" to firebase cloud storage
     addRoleToFireStore();
     //adds imageUrl to firebase storage and step1 document in firebase cloud

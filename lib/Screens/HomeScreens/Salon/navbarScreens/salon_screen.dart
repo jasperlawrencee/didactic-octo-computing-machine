@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/details_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/message_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/profile_screen.dart';
@@ -12,6 +11,8 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 import '../../../../components/widgets.dart';
 import '../../../../constants.dart';
+
+//https://www.behance.net/gallery/181941113/Salon-Booking-App-UIUX-Design?tracking_source=search_projects|salon+app+design&l=60
 
 class SalonScreen extends StatefulWidget {
   const SalonScreen({Key? key}) : super(key: key);
@@ -167,11 +168,17 @@ class _homeState extends State<home> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> views = ['This Month', 'This Year', 'This Week'];
+    List<String> branches = ['Branch 1', 'Branch 2', 'Branch 3'];
+    String dropdownValue = views.first;
+    String dropdownBranch = branches.first;
+
     return SafeArea(
       child: Background(
         child: Container(
           margin: const EdgeInsets.fromLTRB(20, 50, 20, 0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // const Spacer(),
               Row(
@@ -200,23 +207,135 @@ class _homeState extends State<home> {
               Row(
                 children: [
                   Text(
-                    "Good Day, $salonName!",
+                    salonName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 20,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: defaultPadding),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  dashboardButton(Icons.store_rounded, () => SalonDetails(),
-                      'Salon Details'),
+                  const Text(
+                    'Overview',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  DropdownButton(
+                    value: dropdownValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        dropdownValue = value!;
+                      });
+                    },
+                    items: views.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
                 ],
-              )
+              ),
+              const SizedBox(height: defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      overviewCard('Appointments', '28'),
+                      overviewCard('Reviews', '18'),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      overviewCard('Total Sales', 'PHP 16,526'),
+                      overviewCard('title', 'value')
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Salon Details',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  DropdownButton(
+                    value: dropdownBranch,
+                    onChanged: (String? value) {
+                      setState(() {
+                        dropdownBranch = value!;
+                      });
+                    },
+                    items:
+                        branches.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: defaultPadding),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(defaultPadding),
+                decoration: const BoxDecoration(
+                    color: kPrimaryLightColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Appointments',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Staff',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Feedbacks',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Container overviewCard(String title, String value) {
+    return Container(
+      width: MediaQuery.of(context).size.width * .43,
+      margin: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          )
+        ],
       ),
     );
   }

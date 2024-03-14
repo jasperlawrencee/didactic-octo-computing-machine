@@ -367,32 +367,57 @@ class _AddServicesState extends State<AddServices> {
             .child('serviceImages')
             .child(serviceName);
         if (serviceImage != null) {
-          await reference.putFile(File(serviceImage!.path));
+          UploadTask uploadTask = reference.putFile(File(serviceImage!.path));
+          final storageSnapshot = uploadTask.snapshot;
+          final serviceImageUrl = await storageSnapshot.ref.getDownloadURL();
+          log('servicename not existing');
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .update({serviceName: ""});
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${currentUser!.uid}services')
+              .doc(serviceName)
+              .set({
+            'description': _serviceDescription.text,
+            'duration': _serviceDuration.text,
+            'price': _servicePrice.text,
+            'image': serviceImageUrl,
+          }).then((value) {
+            log('added $serviceName');
+            Navigator.of(context).pop();
+          });
+        } else {
+          log('servicename not existing');
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .update({serviceName: ""});
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${currentUser!.uid}services')
+              .doc(serviceName)
+              .set({
+            'description': _serviceDescription.text,
+            'duration': _serviceDuration.text,
+            'price': _servicePrice.text,
+            'image': '',
+          }).then((value) {
+            log('added $serviceName');
+            Navigator.of(context).pop();
+          });
         }
-        final serviceImageUrl = await reference.getDownloadURL();
-        log('servicename not existing');
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('categories')
-            .doc(serviceType)
-            .update({serviceName: ""});
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(serviceType)
-            .collection('${currentUser!.uid}services')
-            .doc(serviceName)
-            .set({
-          'description': _serviceDescription.text,
-          'duration': _serviceDuration.text,
-          'price': _servicePrice.text,
-          'image': serviceImageUrl,
-        }).then((value) {
-          log('added $serviceName');
-          Navigator.of(context).pop();
-        });
       }
     } else {
       log('servicetype not existing');

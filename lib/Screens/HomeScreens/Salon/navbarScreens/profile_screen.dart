@@ -321,6 +321,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (image == null) return;
       File? img = File(image.path);
       img = await addtoFirebaseAfterCrop(img);
+      Navigator.of(context).pop();
       setState(() {
         profileImage = img;
       });
@@ -475,62 +476,51 @@ class _ProfilePageState extends State<ProfilePage> {
     int index,
     AsyncSnapshot<List<List<Map<String, dynamic>>>> serviceDetails,
   ) {
+    String name = serviceNames.data![serviceIndex][index];
     String duration = serviceDetails.data![serviceIndex][index]['duration'];
     String price = serviceDetails.data![serviceIndex][index]['price'];
     String image = serviceDetails.data![serviceIndex][index]['image'];
     String descrtiption =
         serviceDetails.data![serviceIndex][index]['description'];
     return Container(
-      height: 450,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.all(defaultPadding),
-      decoration: const BoxDecoration(
-        color: kPrimaryLightColor,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 300,
-            margin: const EdgeInsets.only(bottom: defaultPadding),
-            child: Center(
-              child:
-                  image.isEmpty ? const Text('No Image') : Image.network(image),
-            ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //service name
-              Row(
-                children: [
-                  Text(
-                    serviceNames.data![serviceIndex][index],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.all(defaultPadding),
+        decoration: const BoxDecoration(
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            image.isEmpty
+                ? const Text('No Image')
+                : SizedBox.square(
+                    dimension: 80,
+                    child: Image.network(image),
                   ),
-                  //duration
-                  Text(
-                    duration.toString().isNotEmpty
-                        ? ' - $duration'
-                        : ' - Duration',
-                  ),
-                ],
-              ),
-              Text(price.toString().isNotEmpty ? price : 'Price'),
-            ],
-          ),
-          const SizedBox(height: 40),
-          //descripiton
-          Text(descrtiption.toString().isNotEmpty
-              ? descrtiption
-              : 'Description'),
-        ],
-      ),
-    );
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    duration.isEmpty
+                        ? const Text(' - Duration')
+                        : Text("- $duration")
+                  ],
+                ),
+                price.isEmpty ? const Text('Price') : Text(price),
+                descrtiption.isEmpty
+                    ? const Text('Description')
+                    : Text(descrtiption),
+              ],
+            )
+          ],
+        ));
   }
 
   Future<dynamic> editServiceDialog(
@@ -657,18 +647,41 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> deleteService(String serviceType, String serviceName) async {
-    try {
-      DocumentReference docRef = _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc(serviceType)
-          .collection('${currentUser!.uid}services')
-          .doc(serviceName);
-      await docRef.delete();
-    } catch (e) {
-      log('Error deleting document $serviceName: $e');
-    }
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Delete $serviceName?"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('No')),
+            TextButton(
+                onPressed: () async {
+                  try {
+                    DocumentReference docRef = _firestore
+                        .collection('users')
+                        .doc(currentUser!.uid)
+                        .collection('services')
+                        .doc(serviceType)
+                        .collection('${currentUser!.uid}services')
+                        .doc(serviceName);
+                    await docRef.delete();
+                    Navigator.pop(context);
+                  } catch (e) {
+                    log('Error deleting document $serviceName: $e');
+                  }
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                )),
+          ],
+        );
+      },
+    );
   }
 
   Widget SalonInfo() {

@@ -1,5 +1,9 @@
 // ignore_for_file: unrelated_type_equality_checks, unnecessary_null_comparison
 
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/appointment_screen.dart';
 import 'package:flutter_auth/components/background.dart';
@@ -15,9 +19,47 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  final _firestore = FirebaseFirestore.instance;
   TextEditingController eventTitle = TextEditingController();
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
+
+  Future<String> getUsername() async {
+    try {
+      final collectionRef =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      if (collectionRef.exists) {
+        final username = collectionRef.get('name');
+        return username;
+      } else {
+        return '';
+      }
+    } catch (e) {
+      log('error getting username $e');
+      return '';
+    }
+  }
+
+  Future<List<String>> getWorkerEmployed() async {
+    //kuhaon tanan worker na employed under user collection
+    //return ang username under that collection
+    try {
+      final experiences = await _firestore
+          .collectionGroup('experiences')
+          .where('salon', isEqualTo: await getUsername())
+          .get();
+      if (experiences.docs.isNotEmpty) {
+        log('naay employees');
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      log('error getting employees $e');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -21,45 +21,10 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
+  Map<String, dynamic> data = {};
   TextEditingController eventTitle = TextEditingController();
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
-
-  Future<String> getUsername() async {
-    try {
-      final collectionRef =
-          await _firestore.collection('users').doc(currentUser!.uid).get();
-      if (collectionRef.exists) {
-        final username = collectionRef.get('name');
-        return username;
-      } else {
-        return '';
-      }
-    } catch (e) {
-      log('error getting username $e');
-      return '';
-    }
-  }
-
-  Future<List<String>> getWorkerEmployed() async {
-    //kuhaon tanan worker na employed under user collection
-    //return ang username under that collection
-    try {
-      final experiences = await _firestore
-          .collectionGroup('experiences')
-          .where('salon', isEqualTo: await getUsername())
-          .get();
-      if (experiences.docs.isNotEmpty) {
-        log('naay employees');
-        return [];
-      } else {
-        return [];
-      }
-    } catch (e) {
-      log('error getting employees $e');
-      return [];
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,28 +86,64 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  String? _subjectText = '',
-      _startTimeText = '',
-      _endTimeText = '',
-      _dateText = '',
-      _timeDetails = '';
+  List<Appointment> _getDataSource() {
+    final List<Appointment> meetings = <Appointment>[];
+    final DateTime today = DateTime.now();
+    final DateTime startTime =
+        DateTime(today.year, today.month, today.day, 9, 0, 0);
+    final DateTime endTime = startTime.add(const Duration(hours: 2));
+    bool isApproved = false;
+    meetings.add(Appointment(
+      subject: data['services'].toString().splitMapJoin(', '),
+      startTime: startTime,
+      endTime: endTime,
+      color: isApproved ? kPrimaryColor : Colors.grey,
+    ));
+    log(DateTime(today.year, today.month, today.day, 16, 0, 0).toString());
+    return meetings;
+  }
+
+  getAppointments() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .get();
+      querySnapshot.docs.forEach((doc) {
+        setState(() {
+          data = doc.data() as Map<String, dynamic>;
+        });
+      });
+      log(data.toString());
+    } catch (e) {
+      log('error getting appointments $e');
+      return {};
+    }
+  }
+
+  @override
+  void initState() {
+    getAppointments();
+    super.initState();
+  }
 
   void calendarTapped(CalendarTapDetails details) {
     if (details.targetElement == CalendarElement.appointment ||
         details.targetElement == CalendarElement.agenda) {
       final Appointment appointmentDetails = details.appointments![0];
-      _subjectText = appointmentDetails.subject;
-      _dateText = DateFormat('MMMM dd, yyyy')
+      final subjectText = appointmentDetails.subject;
+      final dateText = DateFormat('MMMM dd, yyyy')
           .format(appointmentDetails.startTime)
           .toString();
-      _startTimeText =
+      final startTimeText =
           DateFormat('hh:mm a').format(appointmentDetails.startTime).toString();
-      _endTimeText =
+      final endTimeText =
           DateFormat('hh:mm a').format(appointmentDetails.endTime).toString();
       if (appointmentDetails.isAllDay) {
-        _timeDetails = 'All day';
+        const timeDetails = 'All day';
       } else {
-        _timeDetails = '$_startTimeText - $_endTimeText';
+        final timeDetails = '$startTimeText - $endTimeText';
       }
       Navigator.push(context, MaterialPageRoute(
         builder: (context) {
@@ -151,34 +152,6 @@ class _CalendarPageState extends State<CalendarPage> {
       ));
     }
   }
-}
-
-List<Appointment> _getDataSource() {
-  final List<Appointment> meetings = <Appointment>[];
-  final DateTime today = DateTime.now();
-  final DateTime startTime =
-      DateTime(today.year, today.month, today.day, 9, 0, 0);
-  final DateTime endTime = startTime.add(const Duration(hours: 2));
-  bool isApproved = false;
-  meetings.add(Appointment(
-    subject: 'Gravy Hair Shampoo and Rebond',
-    startTime: startTime,
-    endTime: endTime,
-    color: isApproved ? kPrimaryColor : Colors.grey,
-  ));
-  meetings.add(Appointment(
-    subject: 'Palabok Hair Treatment',
-    startTime: DateTime(today.year, today.month, today.day, 12, 0, 0),
-    endTime: DateTime(today.year, today.month, today.day, 15, 0, 0),
-    color: kPrimaryColor,
-  ));
-  meetings.add(Appointment(
-    subject: 'Spaghetti Nail Treatment',
-    startTime: DateTime(today.year, today.month, today.day, 15, 0, 0),
-    endTime: DateTime(today.year, today.month, today.day, 16, 0, 0),
-    color: isApproved ? kPrimaryColor : Colors.grey,
-  ));
-  return meetings;
 }
 
 class MeetingDataSource extends CalendarDataSource {

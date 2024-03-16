@@ -21,7 +21,6 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
-  Map<String, dynamic> data = {};
   TextEditingController eventTitle = TextEditingController();
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
@@ -59,22 +58,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         )),
                 child: Expanded(
                   child: Stack(
-                    children: [
-                      SfCalendar(
-                        view: CalendarView.day,
-                        allowViewNavigation: true,
-                        onTap: calendarTapped,
-                        allowedViews: const [
-                          CalendarView.day,
-                          CalendarView.week,
-                          CalendarView.month,
-                        ],
-                        dataSource: MeetingDataSource(_getDataSource()),
-                        monthViewSettings: const MonthViewSettings(
-                            appointmentDisplayMode:
-                                MonthAppointmentDisplayMode.appointment),
-                      ),
-                    ],
+                    children: [calendarBuilder()],
                   ),
                 ),
               ),
@@ -86,24 +70,45 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  List<Appointment> _getDataSource() {
-    final List<Appointment> meetings = <Appointment>[];
-    final DateTime today = DateTime.now();
-    final DateTime startTime =
-        DateTime(today.year, today.month, today.day, 9, 0, 0);
-    final DateTime endTime = startTime.add(const Duration(hours: 2));
-    bool isApproved = false;
-    meetings.add(Appointment(
-      subject: data['services'].toString().splitMapJoin(', '),
-      startTime: startTime,
-      endTime: endTime,
-      color: isApproved ? kPrimaryColor : Colors.grey,
-    ));
-    log(DateTime(today.year, today.month, today.day, 16, 0, 0).toString());
-    return meetings;
+  StreamBuilder<List<Appointment>> calendarBuilder() {
+    return StreamBuilder(
+      stream: Stream.fromFuture(getAppointments()),
+      builder: (context, appointments) {
+        if (appointments.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+            ),
+          );
+        } else if (appointments.hasError) {
+          return Center(
+            child: Text("Error getting appointments ${appointments.error}"),
+          );
+        } else {
+          final details = appointments.data!;
+          return SfCalendar(
+            showNavigationArrow: true,
+            showTodayButton: true,
+            view: CalendarView.day,
+            allowViewNavigation: true,
+            onTap: calendarTapped,
+            allowedViews: const [
+              CalendarView.day,
+              CalendarView.week,
+              CalendarView.month,
+            ],
+            dataSource: MeetingDataSource(appointments.data!),
+            monthViewSettings: const MonthViewSettings(
+                appointmentDisplayMode:
+                    MonthAppointmentDisplayMode.appointment),
+          );
+        }
+      },
+    );
   }
 
-  getAppointments() async {
+  Future<List<Appointment>> getAppointments() async {
+    List<Map<String, dynamic>> appointments = [];
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('users')
@@ -111,45 +116,40 @@ class _CalendarPageState extends State<CalendarPage> {
           .collection('bookings')
           .get();
       querySnapshot.docs.forEach((doc) {
-        setState(() {
-          data = doc.data() as Map<String, dynamic>;
-        });
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        appointments.add(data);
       });
-      log(data.toString());
+      final appointment = appointments
+          .map((a) => Appointment(
+                subject: a['services'].toString(),
+                startTime: a['dateFrom'].toDate(),
+                endTime: a['dateTo'].toDate(),
+                color: a['status'] == 'pending' ? Colors.grey : kPrimaryColor,
+              ))
+          .toList();
+      return appointment;
     } catch (e) {
       log('error getting appointments $e');
-      return {};
+      return [];
     }
   }
 
-  @override
-  void initState() {
-    getAppointments();
-    super.initState();
-  }
-
-  void calendarTapped(CalendarTapDetails details) {
+  void calendarTapped(CalendarTapDetails details) async {
+    final appointmentDetails = await getAppointments();
+    log(appointmentDetails.toString());
     if (details.targetElement == CalendarElement.appointment ||
         details.targetElement == CalendarElement.agenda) {
-      final Appointment appointmentDetails = details.appointments![0];
-      final subjectText = appointmentDetails.subject;
-      final dateText = DateFormat('MMMM dd, yyyy')
-          .format(appointmentDetails.startTime)
-          .toString();
-      final startTimeText =
-          DateFormat('hh:mm a').format(appointmentDetails.startTime).toString();
-      final endTimeText =
-          DateFormat('hh:mm a').format(appointmentDetails.endTime).toString();
-      if (appointmentDetails.isAllDay) {
-        const timeDetails = 'All day';
-      } else {
-        final timeDetails = '$startTimeText - $endTimeText';
+      if (mounted) {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return SalonAppointmentScreen(
+                customerName: 'appointment.first.toString()',
+                salonAddress: 'Gawas sa balay',
+                timeDate: 'timeDate',
+                appointments: ['Haircut', 'Hair Color', 'Rebond']);
+          },
+        ));
       }
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) {
-          return SalonAppointmentScreen();
-        },
-      ));
     }
   }
 }

@@ -90,7 +90,7 @@ class _CalendarPageState extends State<CalendarPage> {
             showTodayButton: true,
             view: CalendarView.day,
             allowViewNavigation: true,
-            onTap: (details) => calendarTapped(details),
+            onTap: calendarTapped,
             allowedViews: const [
               CalendarView.day,
               CalendarView.week,
@@ -100,6 +100,22 @@ class _CalendarPageState extends State<CalendarPage> {
             monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode:
                     MonthAppointmentDisplayMode.appointment),
+            // appointmentBuilder:
+            //     (BuildContext context, CalendarAppointmentDetails details) {
+            //   Appointment appointmentData = details.appointments.first;
+            //   Color appointmentColor =
+            //       appointmentData.subject.contains('pending')
+            //           ? Colors.grey
+            //           : appointmentData.subject.contains('confirmed')
+            //               ? kPrimaryColor
+            //               : appointmentData.subject.contains('completed')
+            //                   ? Colors.green
+            //                   : Colors.black;
+            //   return Container(
+            //     color: appointmentColor,
+            //     child: Text(details.appointments.first.subject),
+            //   );
+            // },
           );
         }
       },
@@ -118,18 +134,29 @@ class _CalendarPageState extends State<CalendarPage> {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         appointments.add(data);
       });
-      final appointment = appointments
-          .map((a) => Appointment(
-                subject: a['customerID'],
-                startTime: a['dateFrom'].toDate(),
-                endTime: a['dateTo'].toDate(),
-                color: a['status'] == 'pending' ? Colors.grey : kPrimaryColor,
-              ))
-          .toList();
-      return appointment;
+
+      final List<Appointment> appointmentList = appointments.map((a) {
+        // Assign a default color if 'status' doesn't match any expected values
+        final color = a['status'] == 'pending'
+            ? Colors.grey
+            : a['status'] == 'confirmed'
+                ? kPrimaryColor
+                : Colors.green;
+        final appointment = Appointment(
+          notes: a['customerID'],
+          subject: a['services'].toString(),
+          location: a['location'],
+          startTime: a['dateFrom'].toDate(),
+          endTime: a['dateTo'].toDate(),
+          color: color ?? Colors.grey, // Fallback color
+        );
+        return appointment;
+      }).toList();
+
+      return appointmentList;
     } catch (e) {
-      log('error getting appointments $e');
-      return [];
+      log('Error getting appointments: $e');
+      return []; // Return empty list in case of error
     }
   }
 

@@ -5,19 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class SalonAppointmentScreen extends StatefulWidget {
-  String customerName;
-  String salonAddress;
-  String timeDate;
-  List<String> appointments;
+  Appointment? appointment;
 
   SalonAppointmentScreen({
     super.key,
-    required this.customerName,
-    required this.salonAddress,
-    required this.timeDate,
-    required this.appointments,
+    this.appointment,
   });
 
   @override
@@ -27,7 +23,8 @@ class SalonAppointmentScreen extends StatefulWidget {
 class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
-  String? tryvalue = null;
+  final dateFormatter = DateFormat('MMMM d h:mma');
+  String? nullValue = null;
 
   Future<String> getUsername() async {
     try {
@@ -143,14 +140,14 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             DropdownButton(
-                                value: tryvalue ?? defaultValue,
+                                value: nullValue ?? defaultValue,
                                 items: (workers.data!).map((String value) {
                                   return DropdownMenuItem(
                                       value: value, child: Text(value));
                                 }).toList(),
                                 onChanged: (String? newvalue) {
                                   setState(() {
-                                    tryvalue = newvalue!;
+                                    nullValue = newvalue!;
                                   });
                                 })
                           ],
@@ -163,22 +160,33 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               const Text('Customer Name'),
                               const SizedBox(height: 1),
                               Text(
-                                widget.customerName,
+                                'widget.customerName',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: defaultPadding),
                               const Text('Salon Place'),
                               const SizedBox(height: 1),
                               Text(
-                                widget.salonAddress,
+                                'widget.salonAddress',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: defaultPadding),
                               const Text('Time & Date'),
                               const SizedBox(height: 1),
-                              Text(
-                                widget.timeDate,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              Row(
+                                children: [
+                                  Text(
+                                    dateFormatter
+                                        .format(widget.appointment!.startTime),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    ' - ${DateFormat.jm().format(widget.appointment!.endTime)}',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
                               ),
                               const SizedBox(height: defaultPadding),
                               const Text('Service Appointment'),
@@ -191,10 +199,9 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       scrollDirection: Axis.horizontal,
-                                      itemCount: widget.appointments.length,
+                                      itemCount: 2,
                                       itemBuilder: (context, index) {
-                                        return serviceCard(
-                                            widget.appointments[index]);
+                                        return serviceCard('data');
                                       },
                                     ),
                                   );
@@ -299,8 +306,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text('BACK')),
-                  TextButton(onPressed: () {}, child: Text('CONFIRM')),
+                      child: const Text('BACK')),
+                  TextButton(onPressed: () {}, child: const Text('CONFIRM')),
                 ],
               ),
             ],
@@ -312,14 +319,14 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
 
   Container serviceCard(String service) {
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 0, 8, 0),
-      decoration: BoxDecoration(
+      margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+      decoration: const BoxDecoration(
           color: kPrimaryLightColor,
           borderRadius: BorderRadius.all(Radius.circular(30))),
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: Text(
         service,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }

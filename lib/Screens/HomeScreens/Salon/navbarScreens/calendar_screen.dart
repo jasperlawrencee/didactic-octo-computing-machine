@@ -85,13 +85,12 @@ class _CalendarPageState extends State<CalendarPage> {
             child: Text("Error getting appointments ${appointments.error}"),
           );
         } else {
-          final details = appointments.data!;
           return SfCalendar(
             showNavigationArrow: true,
             showTodayButton: true,
             view: CalendarView.day,
             allowViewNavigation: true,
-            onTap: calendarTapped,
+            onTap: (details) => calendarTapped(details),
             allowedViews: const [
               CalendarView.day,
               CalendarView.week,
@@ -121,7 +120,7 @@ class _CalendarPageState extends State<CalendarPage> {
       });
       final appointment = appointments
           .map((a) => Appointment(
-                subject: a['services'].toString(),
+                subject: a['customerID'],
                 startTime: a['dateFrom'].toDate(),
                 endTime: a['dateTo'].toDate(),
                 color: a['status'] == 'pending' ? Colors.grey : kPrimaryColor,
@@ -134,19 +133,16 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  void calendarTapped(CalendarTapDetails details) async {
-    final appointmentDetails = await getAppointments();
-    log(appointmentDetails.toString());
+  void calendarTapped(CalendarTapDetails details) {
     if (details.targetElement == CalendarElement.appointment ||
         details.targetElement == CalendarElement.agenda) {
+      Appointment appointment = details.appointments![0];
       if (mounted) {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
             return SalonAppointmentScreen(
-                customerName: 'appointment.first.toString()',
-                salonAddress: 'Gawas sa balay',
-                timeDate: 'timeDate',
-                appointments: ['Haircut', 'Hair Color', 'Rebond']);
+              appointment: appointment,
+            );
           },
         ));
       }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/features/parse.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -27,48 +28,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
   final _firestore = FirebaseFirestore.instance;
   final dateFormatter = DateFormat('MMMM d h:mma');
   String? nullValue = null;
-
-  intStringToDouble(String integerString) {
-    double doubleValue = int.parse(integerString) / 1;
-    String formattedDouble = doubleValue.toStringAsFixed(2);
-    return formattedDouble;
-  }
-
-  stringToMap(String inputString) {
-    List<Map<String, dynamic>> listOfMaps = [];
-
-    // Remove leading and trailing brackets from the input string
-    String content = inputString.substring(1, inputString.length - 1);
-
-    // Split the string into individual map strings
-    List<String> mapStrings = content.split(RegExp(r'(?<=\}),\s*(?=\{)'));
-
-    for (String mapString in mapStrings) {
-      Map<String, dynamic> map = parseMap(mapString);
-      listOfMaps.add(map);
-    }
-
-    return listOfMaps;
-  }
-
-  Map<String, dynamic> parseMap(String mapString) {
-    Map<String, dynamic> map = {};
-
-    mapString = mapString.replaceAll(RegExp(r'^\{|\}$'), '');
-
-    List<String> keyValuePairs = mapString.split(RegExp(r',(?![^\[]*[\]])'));
-
-    for (String pair in keyValuePairs) {
-      List<String> keyValue = pair.split(':');
-
-      String key = keyValue[0].trim().replaceAll(RegExp(r'^"|"$'), '');
-      String value = keyValue[1].trim().replaceAll(RegExp(r'^"|"$'), '');
-
-      map[key] = value;
-    }
-
-    return map;
-  }
+  Parse convert = Parse();
 
   Future<String> getUsername() async {
     try {
@@ -131,7 +91,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     try {
       final documentSnapshot = await _firestore
           .collection('users')
-          .doc(widget.appointment!.notes)
+          .doc(widget.appointment!.subject)
           .get();
       if (documentSnapshot.exists) {
         return documentSnapshot.data()!['Username'];
@@ -146,7 +106,6 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log(widget.appointment!.color.toString());
     return Scaffold(
       body: Background(
           child: Container(
@@ -171,7 +130,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                 ],
               ),
               Text(
-                'Ref. ${widget.appointment!.notes.toString()}',
+                'Ref. ${widget.appointment!.id}',
                 style: const TextStyle(
                     color: Colors.black54, fontStyle: FontStyle.italic),
               ),
@@ -264,18 +223,21 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                         builder: (context, constraints) {
                                           return SizedBox(
                                             width: constraints.maxWidth,
-                                            height: 25,
+                                            height: 30,
                                             child: ListView.builder(
                                               shrinkWrap: true,
                                               scrollDirection: Axis.horizontal,
-                                              itemCount: stringToMap(widget
-                                                      .appointment!.subject)
+                                              itemCount: convert
+                                                  .stringToMap(widget
+                                                      .appointment!.notes
+                                                      .toString())
                                                   .length,
                                               itemBuilder: (context, index) {
-                                                String services = stringToMap(
-                                                        widget.appointment!
-                                                            .subject)[index]
-                                                    ["serviceName"];
+                                                String services =
+                                                    convert.stringToMap(widget
+                                                            .appointment!.notes
+                                                            .toString())[index]
+                                                        ["serviceName"];
                                                 return serviceCard(services);
                                               },
                                             ),
@@ -316,16 +278,17 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                             ),
                             ListView.builder(
                               shrinkWrap: true,
-                              itemCount:
-                                  stringToMap(widget.appointment!.subject)
-                                      .length,
+                              itemCount: convert
+                                  .stringToMap(
+                                      widget.appointment!.notes.toString())
+                                  .length,
                               itemBuilder: (context, index) {
-                                String services = stringToMap(
-                                        widget.appointment!.subject)[index]
-                                    ["serviceName"];
-                                String price = stringToMap(
-                                        widget.appointment!.subject)[index]
-                                    ["price"];
+                                String services = convert.stringToMap(widget
+                                    .appointment!.notes
+                                    .toString())[index]["serviceName"];
+                                String price = convert.stringToMap(widget
+                                    .appointment!.notes
+                                    .toString())[index]["price"];
                                 return Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -336,7 +299,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                           const TextStyle(color: Colors.grey),
                                     ),
                                     Text(
-                                      'PHP ${intStringToDouble(price)}',
+                                      'PHP ${convert.intStringToDouble(price)}',
                                       style:
                                           const TextStyle(color: Colors.grey),
                                     )
@@ -345,12 +308,13 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               },
                             ),
                           ],
-                        ))
+                        )),
                       ],
                     );
                   }
                 },
               ),
+
               const SizedBox(height: defaultPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -360,7 +324,10 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                         Navigator.of(context).pop();
                       },
                       child: const Text('BACK')),
-                  TextButton(onPressed: () {}, child: const Text('CONFIRM')),
+                  if (widget.appointment!.startTime.isAfter(DateTime.now()))
+                    TextButton(
+                        onPressed: confirmAppointment,
+                        child: const Text('CONFIRM')),
                 ],
               ),
             ],
@@ -401,5 +368,24 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
       ),
       child: child,
     );
+  }
+
+  Future<void> confirmAppointment() async {
+    try {
+      String bookingDocument = widget.appointment!.id.toString();
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'confirmed'}).then((value) {
+        log('finished');
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      });
+    } catch (e) {
+      log('error confirming appointment $e');
+    }
   }
 }

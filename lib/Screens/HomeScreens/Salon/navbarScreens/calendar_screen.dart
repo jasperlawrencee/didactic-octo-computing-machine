@@ -6,8 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/Salon/appointment_screen.dart';
+import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/features/parse.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -24,6 +26,7 @@ class _CalendarPageState extends State<CalendarPage> {
   TextEditingController eventTitle = TextEditingController();
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
+  Parse convert = Parse();
 
   @override
   Widget build(BuildContext context) {
@@ -100,22 +103,6 @@ class _CalendarPageState extends State<CalendarPage> {
             monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode:
                     MonthAppointmentDisplayMode.appointment),
-            // appointmentBuilder:
-            //     (BuildContext context, CalendarAppointmentDetails details) {
-            //   Appointment appointmentData = details.appointments.first;
-            //   Color appointmentColor =
-            //       appointmentData.subject.contains('pending')
-            //           ? Colors.grey
-            //           : appointmentData.subject.contains('confirmed')
-            //               ? kPrimaryColor
-            //               : appointmentData.subject.contains('completed')
-            //                   ? Colors.green
-            //                   : Colors.black;
-            //   return Container(
-            //     color: appointmentColor,
-            //     child: Text(details.appointments.first.subject),
-            //   );
-            // },
           );
         }
       },
@@ -138,17 +125,18 @@ class _CalendarPageState extends State<CalendarPage> {
       final List<Appointment> appointmentList = appointments.map((a) {
         // Assign a default color if 'status' doesn't match any expected values
         final color = a['status'] == 'pending'
-            ? Colors.grey
+            ? const Color.fromARGB(255, 158, 158, 158)
             : a['status'] == 'confirmed'
                 ? kPrimaryColor
-                : Colors.green;
+                : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
-          notes: a['customerID'],
-          subject: a['services'].toString(),
+          id: a['reference'].toString(),
+          subject: a['customerID'],
+          notes: a['services'].toString(),
           location: a['location'],
           startTime: a['dateFrom'].toDate(),
           endTime: a['dateTo'].toDate(),
-          color: color ?? Colors.grey, // Fallback color
+          color: color, // Fallback color
         );
         return appointment;
       }).toList();

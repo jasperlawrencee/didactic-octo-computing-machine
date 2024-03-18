@@ -217,4 +217,21 @@ class FirebaseService {
               ));
         });
   }
+
+  Future<List<String>> getCustomerUsername() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'customer')
+          .get();
+      final customers = <String>[];
+      querySnapshot.docs.forEach((element) {
+        customers.add(element['Username']);
+      });
+      return customers;
+    } catch (e) {
+      log('Error getting customer username: $e');
+      return [];
+    }
+  }
 }

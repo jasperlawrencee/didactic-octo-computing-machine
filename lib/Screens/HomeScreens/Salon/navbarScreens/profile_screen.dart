@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -41,9 +42,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String address = '', salonNumber = '';
   List<String> serviceTypeAvailable = [];
   int serviceCount = 0;
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _durationController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
   File? profileImage;
   bool isEditing = false;
@@ -423,22 +421,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                           size: 10,
                                         ),
                                         child: InkWell(
+                                          onTap: isEditing
+                                              ? () => navigateToEditPage(
+                                                  snapshot.data![serviceIndex],
+                                                  serviceNames
+                                                          .data![serviceIndex]
+                                                      [index])
+                                              : null,
                                           child: serviceCard(
                                             serviceNames,
                                             serviceIndex,
                                             index,
                                             serviceDetails,
                                           ),
-                                          onTap: () {
-                                            editServiceDialog(
-                                              context,
-                                              //serviceTypes
-                                              snapshot.data![serviceIndex],
-                                              //serviceNames
-                                              serviceNames.data![serviceIndex]
-                                                  [index],
-                                            );
-                                          },
                                         ),
                                       );
                                     }),
@@ -468,6 +463,17 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       controller: pageController,
     );
+  }
+
+  navigateToEditPage(String type, String name) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) {
+        return EditServices(
+          serviceType: type,
+          serviceName: name,
+        );
+      },
+    ));
   }
 
   Widget serviceCard(
@@ -521,117 +527,6 @@ class _ProfilePageState extends State<ProfilePage> {
             )
           ],
         ));
-  }
-
-  Future<dynamic> editServiceDialog(
-    BuildContext context,
-    String serviceType,
-    String serviceName,
-  ) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Editing $serviceName'),
-          content: SizedBox(
-            height: 300,
-            child: Column(
-              children: [
-                flatTextField('Price', _priceController),
-                const SizedBox(height: defaultPadding),
-                flatTextField('Duration', _durationController),
-                const SizedBox(height: defaultPadding),
-                flatTextField('Description', _descriptionController),
-                const SizedBox(height: defaultPadding),
-                TextButton(
-                    onPressed: () {
-                      addServiceImage(serviceType, serviceName).then((value) {
-                        Navigator.of(context).pop();
-                      });
-                    },
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Edit Photo',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Icon(Icons.open_in_new)
-                      ],
-                    ))
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  _priceController.clear();
-                  _durationController.clear();
-                  _descriptionController.clear();
-                  Navigator.pop(context);
-                },
-                child: const Text('CLOSE')),
-            TextButton(
-                onPressed: () {
-                  editServiceDetails(
-                    serviceType,
-                    serviceName,
-                    _priceController.text,
-                    _durationController.text,
-                    _descriptionController.text,
-                  ).then((value) {
-                    Navigator.pop(context);
-                    setState(() {
-                      value;
-                    });
-                  });
-                },
-                child: const Text('EDIT')),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> editServiceDetails(
-    String serviceType,
-    String serviceName,
-    String price,
-    String duration,
-    String description,
-  ) async {
-    try {
-      DocumentReference docRef = _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc(serviceType)
-          .collection('${currentUser!.uid}services')
-          .doc(serviceName);
-      if (price.isNotEmpty || duration.isNotEmpty || description.isNotEmpty) {
-        price.isNotEmpty
-            ? await docRef.update({'price': price})
-            : log('empty price');
-        duration.isNotEmpty
-            ? await docRef.update({'duration': duration})
-            : log('empty duration');
-        description.isNotEmpty
-            ? await docRef.update({'description': description})
-            : log('empty description');
-        log('updated service');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Empty Fields'),
-          action: SnackBarAction(label: 'Close', onPressed: () {}),
-        ));
-      }
-    } catch (e) {
-      log('Error in editing service details - ${e.toString()}');
-    }
   }
 
   Container salonCard(Widget child) {
@@ -769,54 +664,5 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
     );
-  }
-
-  Future addServiceImage(String serviceType, String serviceName) async {
-    try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (image == null) return;
-      File? img = File(image.path);
-      img = await cropImage(img, serviceType, serviceName);
-      setState(() {
-        profileImage = img;
-      });
-    } on PlatformException catch (e) {
-      log(e.toString());
-      Navigator.of(context).pop();
-    }
-  }
-
-  Future cropImage(File imgFile, String serviceType, String serviceName) async {
-    try {
-      CroppedFile? croppedImage = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: [CropAspectRatioPreset.square],
-      );
-      if (croppedImage == null) {
-        return null;
-      } else {
-        Reference reference = FirebaseStorage.instance
-            .ref()
-            .child('salonImage')
-            .child(currentUser!.uid)
-            .child('serviceImages')
-            .child(serviceName);
-        await reference.putFile(File(croppedImage.path));
-        final serviceImage = await reference.getDownloadURL();
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(serviceType)
-            .collection('${currentUser!.uid}services')
-            .doc(serviceName)
-            .update({'image': serviceImage}).then((value) {
-          log('added $serviceName image');
-        });
-        return File(croppedImage.path);
-      }
-    } catch (e) {
-      log(e.toString());
-    }
   }
 }

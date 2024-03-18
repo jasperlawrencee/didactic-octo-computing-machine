@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/chat_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/features/firebase/firebase_services.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -16,28 +17,12 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   final firestore = FirebaseFirestore.instance;
   Stream<List<String>>? customerStream;
+  FirebaseService firebaseService = FirebaseService();
 
   @override
   void initState() {
     super.initState();
-    customerStream = getCustomerUsername().asStream();
-  }
-
-  Future<List<String>> getCustomerUsername() async {
-    try {
-      QuerySnapshot querySnapshot = await firestore
-          .collection('users')
-          .where('role', isEqualTo: 'customer')
-          .get();
-      final customers = <String>[];
-      querySnapshot.docs.forEach((element) {
-        customers.add(element['Username']);
-      });
-      return customers;
-    } catch (e) {
-      log('Error getting customer username: $e');
-      return [];
-    }
+    customerStream = firebaseService.getCustomerUsername().asStream();
   }
 
   @override

@@ -511,11 +511,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 Row(
                   children: [
                     Text(
-                      name,
+                      "$name ",
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     duration.isEmpty
-                        ? const Text(' - Duration')
+                        ? const Text('- Duration')
                         : Text("- $duration")
                   ],
                 ),

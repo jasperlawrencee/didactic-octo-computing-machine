@@ -38,7 +38,7 @@ List<String> mins = List.generate(60, (index) => (index + 1).toString());
 
 class _EditServicesState extends State<EditServices> {
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   String type = hrMin.first;
   String timeOftype = '1';
   User? currentUser = FirebaseAuth.instance.currentUser;
@@ -78,7 +78,7 @@ class _EditServicesState extends State<EditServices> {
           ),
           Text("${widget.serviceType} - ${widget.serviceName}"),
           const SizedBox(height: defaultPadding),
-          flatTextField('Description', _durationController),
+          flatTextField('Description', _descriptionController),
           const SizedBox(height: defaultPadding),
           flatTextField('Price', _priceController),
           const SizedBox(height: defaultPadding),
@@ -111,15 +111,23 @@ class _EditServicesState extends State<EditServices> {
               TextButton(
                   onPressed: () {
                     if (mounted) {
+                      _priceController.clear();
+                      _descriptionController.clear();
                       Navigator.pop(context);
                     }
                   },
-                  child: Text('BACK')),
+                  child: const Text('BACK')),
               TextButton(
                   onPressed: () {
-                    log("$timeOftype $type");
+                    editServiceDetails(
+                        widget.serviceType, //servicetype
+                        widget.serviceName, //servicename
+                        _priceController.text, //price
+                        "$timeOftype $type", //duration
+                        _descriptionController.text //description
+                        );
                   },
-                  child: Text('EDIT')),
+                  child: const Text('EDIT')),
             ],
           ),
         ],
@@ -210,12 +218,12 @@ class _EditServicesState extends State<EditServices> {
       if (image == null) return;
       File? img = File(image.path);
       img = await cropImage(img, serviceType, serviceName);
-      setState(() {
-        profileImage = img;
-      });
+      setState(() => profileImage = img);
     } on PlatformException catch (e) {
       log(e.toString());
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 

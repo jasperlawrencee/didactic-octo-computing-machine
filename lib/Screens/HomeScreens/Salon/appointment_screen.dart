@@ -106,6 +106,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List servicesList =
+        convert.stringToMap(widget.appointment!.notes.toString());
     return Scaffold(
       body: Background(
           child: Container(
@@ -199,7 +201,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: defaultPadding),
-                                      const Text('Time & Date'),
+                                      const Text('Date & Time'),
                                       const SizedBox(height: 1),
                                       Row(
                                         children: [
@@ -278,33 +280,56 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                             ),
                             ListView.builder(
                               shrinkWrap: true,
-                              itemCount: convert
-                                  .stringToMap(
-                                      widget.appointment!.notes.toString())
-                                  .length,
+                              itemCount: servicesList.length + 1,
                               itemBuilder: (context, index) {
-                                String services = convert.stringToMap(widget
-                                    .appointment!.notes
-                                    .toString())[index]["serviceName"];
-                                String price = convert.stringToMap(widget
-                                    .appointment!.notes
-                                    .toString())[index]["price"];
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      services,
-                                      style:
-                                          const TextStyle(color: Colors.grey),
-                                    ),
-                                    Text(
-                                      'PHP ${convert.intStringToDouble(price)}',
-                                      style:
-                                          const TextStyle(color: Colors.grey),
-                                    )
-                                  ],
-                                );
+                                List<int> priceList = [];
+                                for (Map<String, dynamic> prc
+                                    in convert.stringToMap(
+                                        widget.appointment!.notes.toString())) {
+                                  priceList.add(prc['price']);
+                                }
+                                log(priceList.toString());
+                                if (index == servicesList.length) {
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Service Fee",
+                                        style:
+                                            const TextStyle(color: Colors.grey),
+                                      ),
+                                      Text(
+                                        'getServiceFeeToString',
+                                        style:
+                                            const TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  String services = convert.stringToMap(widget
+                                      .appointment!.notes
+                                      .toString())[index]["serviceName"];
+                                  String price = convert.stringToMap(widget
+                                      .appointment!.notes
+                                      .toString())[index]["price"];
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        services,
+                                        style:
+                                            const TextStyle(color: Colors.grey),
+                                      ),
+                                      Text(
+                                        'PHP ${convert.intStringToDouble(price)}',
+                                        style:
+                                            const TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  );
+                                }
                               },
                             ),
                           ],
@@ -335,6 +360,15 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
         ),
       )),
     );
+  }
+
+  String getServiceFeeToString(List<int> listInt) {
+    if (listInt.isEmpty) {
+      return '00.00';
+    }
+
+    int sum = listInt.reduce((value, element) => value + element);
+    return (sum / listInt.length).toStringAsFixed(3);
   }
 
   Container serviceCard(String service) {

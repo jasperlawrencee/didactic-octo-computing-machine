@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -34,13 +35,27 @@ class _AddServicesState extends State<AddServices> {
   ];
   String serviceType = '';
   String serviceName = '';
+  String type = hrMin.first;
+  String timeOftype = '1';
   final TextEditingController _servicePrice = TextEditingController();
-  final TextEditingController _serviceDuration = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
   File? serviceImage;
 
   @override
   Widget build(BuildContext context) {
+    List<DropdownMenuItem<String>> timeList = type == 'hr'
+        ? hrs.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList()
+        : mins.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList();
     return Scaffold(
       body: SafeArea(
           child: Background(
@@ -110,6 +125,18 @@ class _AddServicesState extends State<AddServices> {
             const Row(
               children: [
                 Text(
+                  'Description',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            flatTextField('Serivce Description', _serviceDescription),
+            const SizedBox(height: defaultPadding),
+            const Row(
+              children: [
+                Text(
                   'Price',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -129,19 +156,7 @@ class _AddServicesState extends State<AddServices> {
                 ),
               ],
             ),
-            flatTextField('Serivce Duration', _serviceDuration),
-            const SizedBox(height: defaultPadding),
-            const Row(
-              children: [
-                Text(
-                  'Description',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            flatTextField('Serivce Description', _serviceDescription),
+            durationDropdowns(timeList),
             const SizedBox(height: defaultPadding),
             const Row(
               children: [
@@ -270,6 +285,45 @@ class _AddServicesState extends State<AddServices> {
     }
   }
 
+  Container durationDropdowns(List<DropdownMenuItem<String>> timeList) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              DropdownButton(
+                value: timeOftype,
+                items: timeList,
+                onChanged: (String? newVale) {
+                  setState(() {
+                    timeOftype = newVale!;
+                  });
+                },
+              ),
+              const SizedBox(width: defaultPadding),
+              DropdownButton<String>(
+                value: type,
+                onChanged: ((String? newValue) {
+                  setState(() {
+                    type = newValue!;
+                  });
+                }),
+                items: hrMin.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget serviceDropdown(List<String> services) {
     return Column(
       children: [
@@ -386,7 +440,7 @@ class _AddServicesState extends State<AddServices> {
               .doc(serviceName)
               .set({
             'description': _serviceDescription.text,
-            'duration': _serviceDuration.text,
+            'duration': "$timeOftype $type",
             'price': _servicePrice.text,
             'image': serviceImageUrl,
           }).then((value) {
@@ -410,7 +464,7 @@ class _AddServicesState extends State<AddServices> {
               .doc(serviceName)
               .set({
             'description': _serviceDescription.text,
-            'duration': _serviceDuration.text,
+            'duration': "$timeOftype $type",
             'price': _servicePrice.text,
             'image': '',
           }).then((value) {
@@ -446,7 +500,7 @@ class _AddServicesState extends State<AddServices> {
           .doc(serviceName)
           .set({
         'description': _serviceDescription.text,
-        'duration': _serviceDuration.text,
+        'duration': "$timeOftype $type",
         'price': _servicePrice.text,
       }).then((value) {
         log('added $serviceType with $serviceName');

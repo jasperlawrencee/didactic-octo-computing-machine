@@ -104,10 +104,32 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     }
   }
 
+  Future<void> confirmAppointment() async {
+    try {
+      String bookingDocument = widget.appointment!.id.toString();
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'confirmed'}).then((value) {
+        log('finished');
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      });
+    } catch (e) {
+      log('error confirming appointment $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    List servicesList =
+    List<Map<String, dynamic>> servicesList =
         convert.stringToMap(widget.appointment!.notes.toString());
+    double total = double.parse(getTotal(extractPrice(servicesList))) +
+        double.parse(getServicesFee(extractPrice(
+            convert.stringToMap(widget.appointment!.notes.toString()))));
     return Scaffold(
       body: Background(
           child: Container(
@@ -261,16 +283,17 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [Text('Payment Method'), Text('data')],
                             ),
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
+                                const Text(
                                   'Total',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'data',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  total.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 )
                               ],
                             ),
@@ -282,25 +305,20 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               shrinkWrap: true,
                               itemCount: servicesList.length + 1,
                               itemBuilder: (context, index) {
-                                List<int> priceList = [];
-                                for (Map<String, dynamic> prc
-                                    in convert.stringToMap(
-                                        widget.appointment!.notes.toString())) {
-                                  priceList.add(prc['price']);
-                                }
-                                log(priceList.toString());
                                 if (index == servicesList.length) {
+                                  List<int> prices = extractPrice(convert
+                                      .stringToMap(widget.appointment!.notes
+                                          .toString()));
                                   return Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Service Fee",
-                                        style:
-                                            const TextStyle(color: Colors.grey),
+                                        style: TextStyle(color: Colors.grey),
                                       ),
                                       Text(
-                                        'getServiceFeeToString',
+                                        "PHP ${getServicesFee(prices)}",
                                         style:
                                             const TextStyle(color: Colors.grey),
                                       ),
@@ -362,13 +380,35 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     );
   }
 
-  String getServiceFeeToString(List<int> listInt) {
+  String getServicesFee(List<int> listInt) {
     if (listInt.isEmpty) {
       return '00.00';
     }
 
     int sum = listInt.reduce((value, element) => value + element);
-    return (sum / listInt.length).toStringAsFixed(3);
+    return (sum * 0.05).toStringAsFixed(2);
+  }
+
+  String getTotal(List<int> list) {
+    if (list.isEmpty) {
+      return '00.00';
+    }
+
+    int sum = list.reduce((value, element) => value + element);
+    // int total = sum + extractPrice(list);
+    return sum.toStringAsFixed(2);
+  }
+
+  List<int> extractPrice(List<Map<String, dynamic>> list) {
+    List<int> prices = [];
+
+    for (var item in list) {
+      if (item.containsKey("price")) {
+        prices.add(int.parse(item["price"]));
+      }
+    }
+
+    return prices;
   }
 
   Container serviceCard(String service) {
@@ -402,24 +442,5 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
       ),
       child: child,
     );
-  }
-
-  Future<void> confirmAppointment() async {
-    try {
-      String bookingDocument = widget.appointment!.id.toString();
-      await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('bookings')
-          .doc(bookingDocument)
-          .update({'status': 'confirmed'}).then((value) {
-        log('finished');
-        if (mounted) {
-          Navigator.pop(context);
-        }
-      });
-    } catch (e) {
-      log('error confirming appointment $e');
-    }
   }
 }

@@ -367,7 +367,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                         Navigator.of(context).pop();
                       },
                       child: const Text('BACK')),
-                  if (widget.appointment!.startTime.isAfter(DateTime.now()))
+                  if (widget.appointment!.endTime
+                      .isAfter(DateTime.now().add(const Duration(hours: 1))))
                     TextButton(
                         onPressed: confirmAppointment,
                         child: const Text('CONFIRM')),

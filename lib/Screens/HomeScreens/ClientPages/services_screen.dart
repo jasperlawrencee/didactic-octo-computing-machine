@@ -8,8 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
-import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 
 class ServicesPage extends StatefulWidget {
@@ -23,9 +23,6 @@ class _ServicesPageState extends State<ServicesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
   int serviceCount = 0;
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _durationController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   var pageController = PageController();
 
   @override
@@ -121,96 +118,6 @@ class _ServicesPageState extends State<ServicesPage> {
     } catch (e) {
       log('Error getting service details: $e');
       return [];
-    }
-  }
-
-  Future<dynamic> editServiceDialog(
-    BuildContext context,
-    String serviceType,
-    String serviceName,
-  ) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Editing $serviceName'),
-          content: SizedBox(
-            height: 300,
-            child: Column(
-              children: [
-                flatTextField('Price', _priceController),
-                const SizedBox(height: defaultPadding),
-                flatTextField('Duration', _durationController),
-                const SizedBox(height: defaultPadding),
-                flatTextField('Description', _descriptionController),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  _priceController.clear();
-                  _durationController.clear();
-                  _descriptionController.clear();
-                  Navigator.pop(context);
-                },
-                child: const Text('CLOSE')),
-            TextButton(
-                onPressed: () {
-                  editServiceDetails(
-                    serviceType,
-                    serviceName,
-                    _priceController.text,
-                    _durationController.text,
-                    _descriptionController.text,
-                  ).then((value) {
-                    Navigator.pop(context);
-                    setState(() {
-                      value;
-                    });
-                  });
-                },
-                child: const Text('EDIT')),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> editServiceDetails(
-    String serviceType,
-    String serviceName,
-    String price,
-    String duration,
-    String description,
-  ) async {
-    try {
-      DocumentReference docRef = _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .doc(serviceType)
-          .collection('${currentUser!.uid}services')
-          .doc(serviceName);
-      if (price.isNotEmpty || duration.isNotEmpty || description.isNotEmpty) {
-        price.isNotEmpty
-            ? await docRef.update({'price': price})
-            : log('empty price');
-        duration.isNotEmpty
-            ? await docRef.update({'duration': duration})
-            : log('empty duration');
-        description.isNotEmpty
-            ? await docRef.update({'description': description})
-            : log('empty description');
-        log('updated service');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Empty Fields'),
-          action: SnackBarAction(label: 'Close', onPressed: () {}),
-        ));
-      }
-    } catch (e) {
-      log('Error in editing service details - ${e.toString()}');
     }
   }
 
@@ -337,8 +244,8 @@ class _ServicesPageState extends State<ServicesPage> {
                   const SizedBox(height: defaultPadding),
                   FutureBuilder<List<List<String>>>(
                     future: getServiceNames(),
-                    builder: (context, serviceNames) {
-                      if (serviceNames.hasData) {
+                    builder: (context, serviceType) {
+                      if (serviceType.hasData) {
                         return FutureBuilder<List<List<Map<String, dynamic>>>>(
                           future: getServiceDetails(),
                           builder: (context, serviceDetails) {
@@ -347,8 +254,8 @@ class _ServicesPageState extends State<ServicesPage> {
                                 child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount:
-                                        serviceNames.data![serviceIndex].length,
-                                    itemBuilder: (context, index) {
+                                        serviceType.data![serviceIndex].length,
+                                    itemBuilder: (context, service) {
                                       return badges.Badge(
                                         onTap: () {
                                           showDialog(
@@ -356,7 +263,7 @@ class _ServicesPageState extends State<ServicesPage> {
                                             builder: (context) {
                                               return AlertDialog(
                                                 content: Text(
-                                                  'Delete ${serviceNames.data![serviceIndex][index]}?',
+                                                  'Delete ${serviceType.data![serviceIndex][service]}?',
                                                   style: const TextStyle(
                                                       fontSize: 20,
                                                       fontWeight:
@@ -370,9 +277,9 @@ class _ServicesPageState extends State<ServicesPage> {
                                                           snapshot.data![
                                                               serviceIndex],
                                                           //serviceName
-                                                          serviceNames.data![
+                                                          serviceType.data![
                                                                   serviceIndex]
-                                                              [index],
+                                                              [service],
                                                         ).then((value) {
                                                           Navigator.of(context)
                                                               .pop();
@@ -425,9 +332,9 @@ class _ServicesPageState extends State<ServicesPage> {
                                                       children: [
                                                         //service name
                                                         Text(
-                                                          serviceNames.data![
+                                                          serviceType.data![
                                                                   serviceIndex]
-                                                              [index],
+                                                              [service],
                                                           style: const TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -437,11 +344,11 @@ class _ServicesPageState extends State<ServicesPage> {
                                                         Text(
                                                           serviceDetails.data![
                                                                       serviceIndex]
-                                                                      [index][
+                                                                      [service][
                                                                       'duration']
                                                                   .toString()
                                                                   .isNotEmpty
-                                                              ? ' - ${serviceDetails.data![serviceIndex][index]['duration']}'
+                                                              ? ' - ${serviceDetails.data![serviceIndex][service]['duration']}'
                                                               : ' - Duration',
                                                         )
                                                       ],
@@ -450,13 +357,13 @@ class _ServicesPageState extends State<ServicesPage> {
                                                     //descripiton
                                                     Text(serviceDetails
                                                             .data![serviceIndex]
-                                                                [index]
+                                                                [service]
                                                                 ['description']
                                                             .toString()
                                                             .isNotEmpty
                                                         ? serviceDetails.data![
                                                                     serviceIndex]
-                                                                [index]
+                                                                [service]
                                                             ['description']
                                                         : 'Description')
                                                   ],
@@ -466,12 +373,11 @@ class _ServicesPageState extends State<ServicesPage> {
                                                     //price
                                                     Text(serviceDetails
                                                             .data![serviceIndex]
-                                                                [index]['price']
+                                                                [service]
+                                                                ['price']
                                                             .toString()
                                                             .isNotEmpty
-                                                        ? serviceDetails.data![
-                                                                serviceIndex]
-                                                            [index]['price']
+                                                        ? "PHP ${serviceDetails.data![serviceIndex][service]['price']}"
                                                         : 'Price'),
                                                   ],
                                                 )
@@ -479,14 +385,20 @@ class _ServicesPageState extends State<ServicesPage> {
                                             ),
                                           ),
                                           onTap: () {
-                                            editServiceDialog(
-                                              context,
-                                              //serviceType
-                                              snapshot.data![serviceIndex],
-                                              //serviceName
-                                              serviceNames.data![serviceIndex]
-                                                  [index],
-                                            );
+                                            // log(snapshot.data![serviceIndex]);
+                                            // log(serviceType.data![serviceIndex]
+                                            //     [service]);
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                              builder: (context) {
+                                                return EditServices(
+                                                    serviceType: snapshot
+                                                        .data![serviceIndex],
+                                                    serviceName: serviceType
+                                                            .data![serviceIndex]
+                                                        [service]);
+                                              },
+                                            ));
                                           },
                                         ),
                                       );
@@ -501,7 +413,7 @@ class _ServicesPageState extends State<ServicesPage> {
                             }
                           },
                         );
-                      } else if (serviceNames.hasError) {
+                      } else if (serviceType.hasError) {
                         return const Text('error getting service names');
                       } else {
                         return const LinearProgressIndicator(

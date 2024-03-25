@@ -120,12 +120,18 @@ class _EditServicesState extends State<EditServices> {
               TextButton(
                   onPressed: () {
                     editServiceDetails(
-                        widget.serviceType, //servicetype
-                        widget.serviceName, //servicename
-                        _priceController.text, //price
-                        "$timeOftype $type", //duration
-                        _descriptionController.text //description
-                        );
+                            widget.serviceType, //servicetype
+                            widget.serviceName, //servicename
+                            _priceController.text, //price
+                            "$timeOftype $type", //duration
+                            _descriptionController.text //description
+                            )
+                        .then((value) {
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                      }
+                      setState(() {});
+                    });
                   },
                   child: const Text('EDIT')),
             ],

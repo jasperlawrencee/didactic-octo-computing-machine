@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/appointment_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/appointment_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/parse.dart';
@@ -31,7 +31,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       body: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
+          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
           child: Column(
             children: [
               Row(

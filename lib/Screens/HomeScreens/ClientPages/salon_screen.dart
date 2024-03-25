@@ -3,9 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/calendar_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/message_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/profile_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/message_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/profile_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/services_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
@@ -101,6 +102,7 @@ List<Widget> screens() {
   return [
     const home(),
     const CalendarPage(),
+    const ServicesPage(),
     const MessagePage(),
     const ProfilePage(),
   ];
@@ -116,6 +118,12 @@ List<PersistentBottomNavBarItem> navBarItems() {
     PersistentBottomNavBarItem(
       icon: const Icon(Icons.calendar_month_outlined),
       title: 'Bookings',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.room_service_outlined),
+      title: 'Services',
       activeColorPrimary: kPrimaryColor,
       inactiveColorPrimary: kPrimaryLightColor,
     ),
@@ -180,7 +188,6 @@ class _homeState extends State<home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -216,78 +223,6 @@ class _homeState extends State<home> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Overview',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  DropdownButton(
-                    value: dropdownValue,
-                    onChanged: (String? value) {
-                      setState(() {
-                        dropdownValue = value!;
-                      });
-                    },
-                    items: views.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      overviewCard('Appointments', '28'),
-                      overviewCard('Reviews', '18'),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      overviewCard('Total Sales', 'PHP 16,526'),
-                      overviewCard('title', 'value')
-                    ],
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Salon Details',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  DropdownButton(
-                    value: dropdownBranch,
-                    onChanged: (String? value) {
-                      setState(() {
-                        dropdownBranch = value!;
-                      });
-                    },
-                    items:
-                        branches.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(defaultPadding),
@@ -315,27 +250,6 @@ class _homeState extends State<home> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Container overviewCard(String title, String value) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .43,
-      margin: const EdgeInsets.all(4),
-      padding: const EdgeInsets.all(defaultPadding),
-      decoration: const BoxDecoration(
-          color: kPrimaryLightColor,
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          )
-        ],
       ),
     );
   }

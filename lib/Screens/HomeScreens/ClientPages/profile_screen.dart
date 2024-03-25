@@ -11,10 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
-import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -38,9 +36,6 @@ class _ProfilePageState extends State<ProfilePage> {
     'Spa',
     'Wax'
   ];
-  late String serviceValue;
-  String address = '', salonNumber = '';
-  List<String> serviceTypeAvailable = [];
   int serviceCount = 0;
   final ImagePicker picker = ImagePicker();
   File? profileImage;
@@ -51,22 +46,6 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     getAllServiceTypes();
     getServiceTypeCount();
-  }
-
-  void getUserDetails() async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        setState(() {
-          salonNumber = documentSnapshot['salonNumber'];
-        });
-      });
-    } catch (e) {
-      log('Error Getting User Details: $e');
-    }
   }
 
   Future<String> getUserName() async {
@@ -202,11 +181,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
       child: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
+          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
           child: Column(
             children: [
               Text(
-                "Salon Profile".toUpperCase(),
+                "Profile".toUpperCase(),
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.bold,
@@ -264,48 +243,36 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              //call salon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Call: '),
-                  Text(
-                    salonNumber,
-                    style: const TextStyle(
-                        color: kPrimaryColor,
-                        decoration: TextDecoration.underline),
-                  ),
-                ],
-              ),
-              const SizedBox(height: defaultPadding),
-              Expanded(
-                  child: Stack(
-                fit: StackFit.loose,
-                children: [
-                  servicesPageView(),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          FloatingActionButton(
-                              backgroundColor: kPrimaryColor,
-                              child: const Icon(
-                                Icons.add,
-                                color: kPrimaryLightColor,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const AddServices(),
-                                    ));
-                              }),
-                          const SizedBox(height: defaultPadding)
-                        ],
-                      )),
-                ],
-              )),
+              Text(
+                  'salon photo outside, salon photo inside, owner name, gcash number')
+              // Expanded(
+              //     child: Stack(
+              //   fit: StackFit.loose,
+              //   children: [
+              //     servicesPageView(),
+              //     Align(
+              //         alignment: Alignment.bottomRight,
+              //         child: Column(
+              //           mainAxisAlignment: MainAxisAlignment.end,
+              //           children: [
+              //             FloatingActionButton(
+              //                 backgroundColor: kPrimaryColor,
+              //                 child: const Icon(
+              //                   Icons.add,
+              //                   color: kPrimaryLightColor,
+              //                 ),
+              //                 onPressed: () {
+              //                   Navigator.push(
+              //                       context,
+              //                       MaterialPageRoute(
+              //                         builder: (context) => const AddServices(),
+              //                       ));
+              //                 }),
+              //             const SizedBox(height: defaultPadding)
+              //           ],
+              //         )),
+              //   ],
+              // )),
             ],
           ),
         ),
@@ -600,7 +567,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ConnectionState.waiting) {
                     return const Center(
                         child: CircularProgressIndicator(color: kPrimaryColor));
-                  } else if (profilePicture.hasError) {
+                  } else if (profilePicture.hasError &&
+                      profilePicture == null) {
                     return Text(
                         'Error Getting Profile Picutre ${profilePicture.error}');
                   } else {

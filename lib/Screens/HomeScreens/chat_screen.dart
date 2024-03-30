@@ -41,7 +41,6 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         currentUsername = username;
       });
-      log(currentUsername);
     } catch (e) {
       log('Error getting currentuser name of customer: $e');
     }

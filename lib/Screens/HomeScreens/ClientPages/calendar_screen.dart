@@ -31,7 +31,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       body: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+          margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
           child: Column(
             children: [
               Row(
@@ -128,7 +128,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ? kPrimaryColor
                 : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
-          id: a['reference'].toString(),
+          id: a['customerID'].toString(),
           subject: a['customerID'],
           notes: a['services'].toString(),
           location: a['location'],

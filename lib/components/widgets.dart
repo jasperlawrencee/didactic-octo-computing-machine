@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/constants.dart';
 
@@ -42,11 +43,10 @@ TextFormField textField(String text, IconData icon, bool isPasswordType,
   );
 }
 
-TextFormField flatTextField(
-  String text,
-  TextEditingController? controller,
-) {
+TextFormField flatTextField(String text, TextEditingController? controller,
+    {bool istext = true}) {
   return TextFormField(
+    inputFormatters: [LengthLimitingTextInputFormatter(50)],
     controller: controller,
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -60,6 +60,7 @@ TextFormField flatTextField(
       fontWeight: FontWeight.w500,
     ),
     cursorColor: kPrimaryColor,
+    keyboardType: istext ? TextInputType.text : TextInputType.number,
     decoration: InputDecoration(
       hintText: text,
     ),

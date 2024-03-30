@@ -44,8 +44,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    getAllServiceTypes();
-    getServiceTypeCount();
   }
 
   Future<String> getUserName() async {
@@ -77,22 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return dbRef.data()!['profilePicture'];
     } catch (e) {
       log('error getting profile picture $e');
-    }
-    return 'Empty Profile Picutre';
-  }
-
-  void getServiceTypeCount() async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .get();
-      querySnapshot.docs.forEach((element) {
-        serviceCount++;
-      });
-    } catch (e) {
-      log('error getting service type count: $e');
+      return 'https://www.gokulagro.com/wp-content/uploads/2023/01/no-images.png';
     }
   }
 
@@ -181,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
       child: Background(
         child: Container(
-          margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+          margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
           child: Column(
             children: [
               Text(
@@ -245,34 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: defaultPadding),
               Text(
                   'salon photo outside, salon photo inside, owner name, gcash number')
-              // Expanded(
-              //     child: Stack(
-              //   fit: StackFit.loose,
-              //   children: [
-              //     servicesPageView(),
-              //     Align(
-              //         alignment: Alignment.bottomRight,
-              //         child: Column(
-              //           mainAxisAlignment: MainAxisAlignment.end,
-              //           children: [
-              //             FloatingActionButton(
-              //                 backgroundColor: kPrimaryColor,
-              //                 child: const Icon(
-              //                   Icons.add,
-              //                   color: kPrimaryLightColor,
-              //                 ),
-              //                 onPressed: () {
-              //                   Navigator.push(
-              //                       context,
-              //                       MaterialPageRoute(
-              //                         builder: (context) => const AddServices(),
-              //                       ));
-              //                 }),
-              //             const SizedBox(height: defaultPadding)
-              //           ],
-              //         )),
-              //   ],
-              // )),
             ],
           ),
         ),
@@ -466,12 +421,10 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            image.isEmpty
-                ? const Text('No Image')
-                : SizedBox.square(
-                    dimension: 80,
-                    child: Image.network(image),
-                  ),
+            SizedBox.square(
+              dimension: 80,
+              child: Image.network(image),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

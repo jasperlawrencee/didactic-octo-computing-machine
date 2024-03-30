@@ -80,31 +80,10 @@ class _EditServicesState extends State<EditServices> {
           const SizedBox(height: defaultPadding),
           flatTextField('Description', _descriptionController),
           const SizedBox(height: defaultPadding),
-          flatTextField('Price', _priceController),
+          flatTextField('Price', _priceController, istext: false),
           const SizedBox(height: defaultPadding),
           durationDropdowns(timeList),
           const SizedBox(height: defaultPadding),
-          TextButton(
-              style: const ButtonStyle(
-                  padding:
-                      MaterialStatePropertyAll(EdgeInsets.all(defaultPadding)),
-                  backgroundColor:
-                      MaterialStatePropertyAll(kPrimaryLightColor)),
-              onPressed: () =>
-                  addServiceImage(widget.serviceType, widget.serviceName)
-                      .then((value) {
-                    Navigator.pop(context);
-                  }),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Photo',
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                  Icon(Icons.open_in_new)
-                ],
-              )),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

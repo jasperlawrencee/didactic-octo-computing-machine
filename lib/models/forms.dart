@@ -26,6 +26,7 @@ bool workerFormComplete() {
     workerForm.tinID,
     workerForm.certificates,
   ];
+
   bool filledAny = workerForm.hair.isNotEmpty ||
       workerForm.makeup.isNotEmpty ||
       workerForm.spa.isNotEmpty ||
@@ -38,7 +39,7 @@ bool workerFormComplete() {
       workerForm.isNailsClicked == true ||
       workerForm.isLashesClicked == true ||
       workerForm.isWaxClicked == true;
-  bool complete = !fields.any((element) => element == null) &&
+  bool complete = !fields.any((element) => element == null || element == '') &&
       checkedAny == true &&
       filledAny == true;
   return complete;
@@ -78,7 +79,7 @@ bool salonFormComplete() {
       salonForm.isNailsClicked == true ||
       salonForm.isLashesClicked == true ||
       salonForm.isWaxClicked == true;
-  bool complete = !fields.any((element) => element == null) &&
+  bool complete = !fields.any((element) => element == null || element == '') &&
       checkedAny == true &&
       filledAny == true;
   return complete;

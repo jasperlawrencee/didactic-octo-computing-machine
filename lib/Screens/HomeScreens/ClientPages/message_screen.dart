@@ -31,7 +31,7 @@ class _MessagePageState extends State<MessagePage> {
       child: Scaffold(
         body: Background(
             child: Container(
-          margin: const EdgeInsets.only(top: 35),
+          margin: const EdgeInsets.only(top: 50),
           child: Column(
             children: [
               Text(
@@ -66,6 +66,7 @@ class _MessagePageState extends State<MessagePage> {
                 child: CircularProgressIndicator(color: kPrimaryColor));
           }
           final customerList = snapshot.data!;
+          log(customerList.length.toString());
           return ListView.builder(
             itemCount: customerList.length,
             itemBuilder: (context, index) {

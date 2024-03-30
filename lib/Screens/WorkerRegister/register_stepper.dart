@@ -163,10 +163,12 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
               child: const Text('Yes'),
               onPressed: () {
                 if (workerFormComplete() == true) {
+                  log('form complete');
                   Navigator.of(context).pop();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Summary()));
                 } else if (workerFormComplete() == false) {
+                  log('worker form incomplete');
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: const Text(

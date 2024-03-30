@@ -144,7 +144,7 @@ class _AddServicesState extends State<AddServices> {
                 ),
               ],
             ),
-            flatTextField('Serivce Price', _servicePrice),
+            flatTextField('Serivce Price', _servicePrice, istext: false),
             const SizedBox(height: defaultPadding),
             const Row(
               children: [
@@ -158,44 +158,44 @@ class _AddServicesState extends State<AddServices> {
             ),
             durationDropdowns(timeList),
             const SizedBox(height: defaultPadding),
-            const Row(
-              children: [
-                Text(
-                  'Image',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            TextButton(
-                onPressed: () {
-                  getImage();
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Add Photo',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Icon(Icons.open_in_new)
-                  ],
-                )),
-            const SizedBox(height: defaultPadding),
-            InkWell(
-              onTap: serviceImage == null ? null : viewImage,
-              child: Text(
-                serviceImage == null ? 'Empty' : 'View',
-                style: const TextStyle(
-                    color: kPrimaryColor, decoration: TextDecoration.underline),
-              ),
-            ),
-            const SizedBox(height: defaultPadding),
+            // const Row(
+            //   children: [
+            //     Text(
+            //       'Image',
+            //       style: TextStyle(
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // TextButton(
+            //     onPressed: () {
+            //       getImage();
+            //     },
+            //     child: const Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         Text(
+            //           'Add Photo',
+            //           style: TextStyle(
+            //             fontSize: 13,
+            //             fontFamily: 'Inter',
+            //             fontWeight: FontWeight.w500,
+            //           ),
+            //         ),
+            //         Icon(Icons.open_in_new)
+            //       ],
+            //     )),
+            // const SizedBox(height: defaultPadding),
+            // InkWell(
+            //   onTap: serviceImage == null ? null : viewImage,
+            //   child: Text(
+            //     serviceImage == null ? 'Empty' : 'View',
+            //     style: const TextStyle(
+            //         color: kPrimaryColor, decoration: TextDecoration.underline),
+            //   ),
+            // ),
+            // const SizedBox(height: defaultPadding),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

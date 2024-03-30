@@ -11,6 +11,7 @@ import 'package:flutter_auth/Screens/HomeScreens/addservices_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:intl/intl.dart';
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({Key? key}) : super(key: key);
@@ -22,7 +23,6 @@ class ServicesPage extends StatefulWidget {
 class _ServicesPageState extends State<ServicesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
-  int serviceCount = 0;
   var pageController = PageController();
 
   @override
@@ -31,8 +31,14 @@ class _ServicesPageState extends State<ServicesPage> {
     getServiceTypeCount();
   }
 
-  void getServiceTypeCount() async {
+  String formatDouble(double value) {
+    final format = NumberFormat('#,##0.00');
+    return format.format(value);
+  }
+
+  Future getServiceTypeCount() async {
     try {
+      int serviceCount = 0;
       QuerySnapshot querySnapshot = await _firestore
           .collection('users')
           .doc(currentUser!.uid)
@@ -41,6 +47,7 @@ class _ServicesPageState extends State<ServicesPage> {
       querySnapshot.docs.forEach((element) {
         serviceCount++;
       });
+      return serviceCount;
     } catch (e) {
       log('error getting service type count: $e');
     }
@@ -158,7 +165,7 @@ class _ServicesPageState extends State<ServicesPage> {
       child: Scaffold(
         body: Background(
           child: Container(
-            margin: const EdgeInsets.fromLTRB(15, 35, 15, 0),
+            margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
             child: Column(
               children: [
                 Row(
@@ -180,7 +187,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     child: Stack(
                   fit: StackFit.loose,
                   children: [
-                    servicesPageView(),
+                    ServicesPageView(),
                     Align(
                         alignment: Alignment.bottomRight,
                         child: Column(
@@ -212,222 +219,253 @@ class _ServicesPageState extends State<ServicesPage> {
     );
   }
 
-  Widget servicesPageView() {
-    return PageView.builder(
-      itemCount: serviceCount,
-      itemBuilder: (context, serviceIndex) {
-        return FutureBuilder<List<String>>(
-          future: getAllServiceTypes(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData &&
-                snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: kPrimaryColor),
-              );
-            } else if (snapshot.hasError) {
-              log(Error().toString());
-              return Text(Error().toString());
-            } else {
-              return Column(
-                children: [
-                  //service category text widget
-                  Text(
-                    snapshot.data![serviceIndex].isEmpty
-                        ? '???'
-                        : snapshot.data![serviceIndex],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  FutureBuilder<List<List<String>>>(
-                    future: getServiceNames(),
-                    builder: (context, serviceType) {
-                      if (serviceType.hasData) {
-                        return FutureBuilder<List<List<Map<String, dynamic>>>>(
-                          future: getServiceDetails(),
-                          builder: (context, serviceDetails) {
-                            if (serviceDetails.hasData) {
-                              return Expanded(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        serviceType.data![serviceIndex].length,
-                                    itemBuilder: (context, service) {
-                                      return badges.Badge(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                content: Text(
-                                                  'Delete ${serviceType.data![serviceIndex][service]}?',
-                                                  style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        deleteService(
-                                                          //serviceType
-                                                          snapshot.data![
-                                                              serviceIndex],
-                                                          //serviceName
-                                                          serviceType.data![
-                                                                  serviceIndex]
-                                                              [service],
-                                                        ).then((value) {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                          setState(() {
-                                                            value;
-                                                          });
-                                                        });
-                                                      },
-                                                      child:
-                                                          const Text('Delete')),
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      child:
-                                                          const Text('Close')),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                        position: badges.BadgePosition.topEnd(),
-                                        showBadge: true,
-                                        badgeContent: const Icon(
-                                          Icons.close_rounded,
-                                          color: Colors.white,
-                                          size: 10,
-                                        ),
-                                        child: InkWell(
-                                          child: Container(
-                                            height: 100,
-                                            width: double.infinity,
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            padding: const EdgeInsets.all(
-                                                defaultPadding),
-                                            decoration: const BoxDecoration(
-                                                color: kPrimaryLightColor),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        //service name
-                                                        Text(
-                                                          serviceType.data![
-                                                                  serviceIndex]
-                                                              [service],
-                                                          style: const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        //duration
-                                                        Text(
-                                                          serviceDetails.data![
+  // ignore: non_constant_identifier_names
+  Widget ServicesPageView() {
+    return StreamBuilder(
+      stream: Stream.fromFuture(getServiceTypeCount()),
+      builder: (context, servicecount) {
+        if (servicecount.hasData) {
+          return PageView.builder(
+            itemCount: int.parse(servicecount.data!.toString()),
+            itemBuilder: (context, serviceIndex) {
+              return FutureBuilder<List<String>>(
+                future: getAllServiceTypes(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData &&
+                      snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: kPrimaryColor),
+                    );
+                  } else if (snapshot.hasError) {
+                    log(Error().toString());
+                    return Text(Error().toString());
+                  } else {
+                    return Column(
+                      children: [
+                        //service category text widget
+                        Text(
+                          snapshot.data![serviceIndex].isEmpty
+                              ? '???'
+                              : snapshot.data![serviceIndex],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: defaultPadding),
+                        FutureBuilder<List<List<String>>>(
+                          future: getServiceNames(),
+                          builder: (context, serviceType) {
+                            if (serviceType.hasData) {
+                              return FutureBuilder<
+                                  List<List<Map<String, dynamic>>>>(
+                                future: getServiceDetails(),
+                                builder: (context, serviceDetails) {
+                                  if (serviceDetails.hasData) {
+                                    return Expanded(
+                                      child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: serviceType
+                                              .data![serviceIndex].length,
+                                          itemBuilder: (context, service) {
+                                            return badges.Badge(
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      content: Text(
+                                                        'Delete ${serviceType.data![serviceIndex][service]}?',
+                                                        style: const TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              deleteService(
+                                                                //serviceType
+                                                                snapshot.data![
+                                                                    serviceIndex],
+                                                                //serviceName
+                                                                serviceType.data![
+                                                                        serviceIndex]
+                                                                    [service],
+                                                              ).then((value) {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                setState(() {
+                                                                  value;
+                                                                });
+                                                              });
+                                                            },
+                                                            child: const Text(
+                                                                'Delete')),
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: const Text(
+                                                                'Close')),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              position:
+                                                  badges.BadgePosition.topEnd(),
+                                              showBadge: true,
+                                              badgeContent: const Icon(
+                                                Icons.close_rounded,
+                                                color: Colors.white,
+                                                size: 10,
+                                              ),
+                                              child: InkWell(
+                                                child: Container(
+                                                  height: 100,
+                                                  width: double.infinity,
+                                                  margin: const EdgeInsets
+                                                      .symmetric(vertical: 5),
+                                                  padding: const EdgeInsets.all(
+                                                      defaultPadding),
+                                                  decoration: const BoxDecoration(
+                                                      color:
+                                                          kPrimaryLightColor),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              //service name
+                                                              Text(
+                                                                serviceType.data![
+                                                                        serviceIndex]
+                                                                    [service],
+                                                                style: const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              //duration
+                                                              Text(
+                                                                serviceDetails
+                                                                        .data![
+                                                                            serviceIndex]
+                                                                            [
+                                                                            service]
+                                                                            [
+                                                                            'duration']
+                                                                        .toString()
+                                                                        .isNotEmpty
+                                                                    ? ' - ${serviceDetails.data![serviceIndex][service]['duration']}'
+                                                                    : ' - Duration',
+                                                              )
+                                                            ],
+                                                          ),
+                                                          const Spacer(),
+                                                          //descripiton
+                                                          Text(
+                                                            serviceDetails
+                                                                    .data![
+                                                                        serviceIndex]
+                                                                        [
+                                                                        service]
+                                                                        [
+                                                                        'description']
+                                                                    .toString()
+                                                                    .isNotEmpty
+                                                                ? serviceDetails
+                                                                            .data![serviceIndex]
+                                                                        [
+                                                                        service]
+                                                                    [
+                                                                    'description']
+                                                                : 'Description',
+                                                            softWrap: true,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .clip,
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          //price
+                                                          Text(serviceDetails
+                                                                  .data![
                                                                       serviceIndex]
-                                                                      [service][
-                                                                      'duration']
+                                                                      [service]
+                                                                      ['price']
                                                                   .toString()
                                                                   .isNotEmpty
-                                                              ? ' - ${serviceDetails.data![serviceIndex][service]['duration']}'
-                                                              : ' - Duration',
-                                                        )
-                                                      ],
-                                                    ),
-                                                    const Spacer(),
-                                                    //descripiton
-                                                    Text(serviceDetails
-                                                            .data![serviceIndex]
-                                                                [service]
-                                                                ['description']
-                                                            .toString()
-                                                            .isNotEmpty
-                                                        ? serviceDetails.data![
-                                                                    serviceIndex]
-                                                                [service]
-                                                            ['description']
-                                                        : 'Description')
-                                                  ],
+                                                              ? "PHP ${formatDouble(double.parse(serviceDetails.data![serviceIndex][service]['price']))}"
+                                                              : 'Price'),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                                Column(
-                                                  children: [
-                                                    //price
-                                                    Text(serviceDetails
-                                                            .data![serviceIndex]
-                                                                [service]
-                                                                ['price']
-                                                            .toString()
-                                                            .isNotEmpty
-                                                        ? "PHP ${serviceDetails.data![serviceIndex][service]['price']}"
-                                                        : 'Price'),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            // log(snapshot.data![serviceIndex]);
-                                            // log(serviceType.data![serviceIndex]
-                                            //     [service]);
-                                            Navigator.push(context,
-                                                MaterialPageRoute(
-                                              builder: (context) {
-                                                return EditServices(
-                                                    serviceType: snapshot
-                                                        .data![serviceIndex],
-                                                    serviceName: serviceType
-                                                            .data![serviceIndex]
-                                                        [service]);
-                                              },
-                                            ));
-                                          },
-                                        ),
-                                      );
-                                    }),
+                                                onTap: () {
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return EditServices(
+                                                          serviceType:
+                                                              snapshot.data![
+                                                                  serviceIndex],
+                                                          serviceName: serviceType
+                                                                      .data![
+                                                                  serviceIndex]
+                                                              [service]);
+                                                    },
+                                                  ));
+                                                },
+                                              ),
+                                            );
+                                          }),
+                                    );
+                                  } else if (serviceDetails.hasError) {
+                                    return Text('Error ${Error().toString}');
+                                  } else {
+                                    return const Center(
+                                        child: CircularProgressIndicator(
+                                            color: kPrimaryColor));
+                                  }
+                                },
                               );
-                            } else if (serviceDetails.hasError) {
-                              return Text('Error ${Error().toString}');
+                            } else if (serviceType.hasError) {
+                              return const Text('error getting service names');
                             } else {
-                              return const Center(
-                                  child: CircularProgressIndicator(
-                                      color: kPrimaryColor));
+                              return const LinearProgressIndicator(
+                                  color: kPrimaryColor);
                             }
                           },
-                        );
-                      } else if (serviceType.hasError) {
-                        return const Text('error getting service names');
-                      } else {
-                        return const LinearProgressIndicator(
-                            color: kPrimaryColor);
-                      }
-                    },
-                  ),
-                ],
+                        ),
+                      ],
+                    );
+                  }
+                },
               );
-            }
-          },
-        );
+            },
+            controller: pageController,
+          );
+        } else {
+          return Container();
+        }
       },
-      controller: pageController,
     );
   }
 }

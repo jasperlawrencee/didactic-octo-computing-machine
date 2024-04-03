@@ -565,6 +565,8 @@ class _SummaryState extends State<Summary> {
         'salonRepresentative': salonForm.salonRepresentative,
         'representativeEmail': salonForm.representativeEmail,
         'representativeNum': salonForm.representativeNum,
+        'profilePicture': '',
+        'rating': double.parse('0.0'),
       };
 
   Map<String, dynamic> step2() => {

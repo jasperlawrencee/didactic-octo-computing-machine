@@ -36,7 +36,7 @@ class Parse {
   }
 
   intStringToDouble(String integerString) {
-    double doubleValue = int.parse(integerString) / 1;
+    double doubleValue = double.parse(integerString) / 1;
     String formattedDouble = doubleValue.toStringAsFixed(2);
     return formattedDouble;
   }

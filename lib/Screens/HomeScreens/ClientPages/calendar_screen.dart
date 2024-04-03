@@ -128,8 +128,8 @@ class _CalendarPageState extends State<CalendarPage> {
                 ? kPrimaryColor
                 : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
-          id: a['customerID'].toString(),
-          subject: a['customerID'],
+          id: a['reference'].toString(),
+          subject: a['customerUsername'].toString(),
           notes: a['services'].toString(),
           location: a['location'],
           startTime: a['dateFrom'].toDate(),

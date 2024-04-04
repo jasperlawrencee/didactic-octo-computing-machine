@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types, library_private_types_in_public_api, prefer_const_constructors_in_immutables, unnecessary_null_comparison, list_remove_unrelated_type
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_auth/Screens/WorkerRegister/register_stepper.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/models/experience.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class thirdStep extends StatefulWidget {
@@ -25,6 +27,10 @@ class _thirdStepState extends State<thirdStep> {
   String salonValue = '';
   String? addedValue;
   String salonName = 'Salon Name';
+  XFile? nbiClearanceRef;
+  File? nbiClearance;
+  final ImagePicker picker = ImagePicker();
+
   @override
   void initState() {
     getSalonRegistered();
@@ -131,39 +137,10 @@ class _thirdStepState extends State<thirdStep> {
             ],
           ),
         if (workerForm.isExperienceClicked == true)
+          //SALONS DRPODOWN
           Column(
             children: [
               const SizedBox(height: defaultPadding),
-              //Dropdown of Salons to Add
-              // SizedBox(
-              //   child: Theme(
-              //     data: ThemeData(canvasColor: Colors.white),
-              //     child: DropdownButton<String>(
-              //       hint: const Text(
-              //         'Added Items',
-              //         style: TextStyle(fontSize: 16),
-              //       ),
-              //       isExpanded: true,
-              //       value: addedValue,
-              //       items: addedSalon.isNotEmpty && addedSalon != null
-              //           ? addedSalon
-              //               .map<DropdownMenuItem<String>>((String value) {
-              //               return DropdownMenuItem(
-              //                   value: value, child: Text(value));
-              //             }).toList()
-              //           : <DropdownMenuItem<String>>[],
-              //       onChanged: (String? value) {
-              //         try {
-              //           setState(() {
-              //             addedValue = value!;
-              //           });
-              //         } catch (e) {
-              //           log(e.toString());
-              //         }
-              //       },
-              //     ),
-              //   ),
-              // ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -220,16 +197,6 @@ class _thirdStepState extends State<thirdStep> {
                   TextButton(
                       onPressed: () {
                         try {
-                          // String newValue = salonValue;
-                          // if (newValue.isNotEmpty &&
-                          //     !addedSalon.contains(newValue)) {
-                          //   setState(() {
-                          //     addedSalon.add(newValue);
-                          //     addedValue = newValue;
-                          //   });
-                          //   workerForm.salonExperiences = addedSalon;
-                          //   log(workerForm.salonExperiences.toString());
-                          // }
                           if (salonValue.isNotEmpty) {
                             setState(() {
                               salonName = salonValue;
@@ -248,23 +215,6 @@ class _thirdStepState extends State<thirdStep> {
                           setState(() {
                             salonName = 'Salon Name';
                             workerForm.salonEmployed = null;
-                            // if (addedSalon.contains(addedValue) &&
-                            //     workerForm.salonExperiences
-                            //         .contains(addedValue)) {
-                            //   addedSalon.remove(addedValue);
-                            //   workerForm.salonExperiences.remove(addedValue);
-                            //   addedValue = addedSalon.isNotEmpty
-                            //       ? addedSalon.first
-                            //       : null;
-                            //   log(workerForm.salonExperiences.toString());
-                            // } else if (addedSalon.isEmpty) {
-                            //   ScaffoldMessenger.of(context)
-                            //       .showSnackBar(SnackBar(
-                            //     content: const Text('Nothing to Delete'),
-                            //     action: SnackBarAction(
-                            //         label: 'Close', onPressed: () {}),
-                            //   ));
-                            // }
                           });
                         } catch (e) {
                           log(e.toString());
@@ -273,8 +223,31 @@ class _thirdStepState extends State<thirdStep> {
                       child: const Text('Delete')),
                 ],
               ),
+              const SizedBox(height: defaultPadding),
+              const Text(
+                'Certificate of Employment',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                  onPressed: () {},
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+                    width: double.infinity,
+                    height: defaultPadding * 2.5,
+                    decoration: const BoxDecoration(
+                        color: kPrimaryLightColor,
+                        borderRadius: BorderRadius.all(Radius.circular(30))),
+                    child: const Align(
+                      alignment: Alignment.center,
+                      child: Text('Upload'),
+                    ),
+                  )),
+              InkWell(
+                child: Text('View Image'),
+                onTap: () {},
+              )
             ],
-          )
+          ),
       ],
     );
   }

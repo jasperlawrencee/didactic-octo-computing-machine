@@ -32,6 +32,7 @@ class _SummaryState extends State<Summary> {
   List<String> certificates = [];
   List skills = [];
   bool isUploading = false;
+
   @override
   void initState() {
     super.initState();
@@ -321,6 +322,7 @@ class _SummaryState extends State<Summary> {
                           ],
                         )
                       : Container(),
+                  const SizedBox(height: defaultPadding),
                   if (workerForm.experiences.isEmpty)
                     const SizedBox(height: defaultPadding),
                   exp.address != null && exp.address!.isNotEmpty
@@ -334,6 +336,7 @@ class _SummaryState extends State<Summary> {
                           ],
                         )
                       : Container(),
+                  const SizedBox(height: defaultPadding),
                   if (workerForm.experiences.isEmpty)
                     const SizedBox(height: defaultPadding),
                   exp.contactNum?.isNotEmpty ?? false
@@ -347,6 +350,7 @@ class _SummaryState extends State<Summary> {
                           ],
                         )
                       : Container(),
+                  const SizedBox(height: defaultPadding),
                   if (workerForm.experiences.isEmpty)
                     const SizedBox(height: defaultPadding),
                   exp.date != null && exp.date!.isNotEmpty
@@ -360,6 +364,7 @@ class _SummaryState extends State<Summary> {
                           ],
                         )
                       : Container(),
+                  const SizedBox(height: defaultPadding),
                   if (workerForm.experiences.isEmpty)
                     const SizedBox(height: defaultPadding),
                 ],
@@ -629,7 +634,9 @@ class _SummaryState extends State<Summary> {
         'address':
             "${workerForm.barangay} ${workerForm.stAddress} ${workerForm.extAddress} ${workerForm.city}",
         'birthday': '${workerForm.birthday}',
-        'about': ''
+        'about': '',
+        'profilePicture': '',
+        'rating': double.parse('0.0'),
       };
 
   Map<String, dynamic> step2() => {
@@ -665,20 +672,14 @@ class _SummaryState extends State<Summary> {
           for (String fieldNames in servicesList) {
             addFields[fieldNames] = '';
           }
-          await _firestore
-              .collection('users')
-              .doc(currentUser!.uid)
-              .collection('categories')
-              .doc(serviceType)
-              .set(addFields, SetOptions(merge: true));
-          //??way buot firebase
+          //adding doc field to make collection query-able
           await _firestore
               .collection('users')
               .doc(currentUser!.uid)
               .collection('services')
               .doc(serviceType)
               .set({'doc': ''});
-          //add services to services dapat naa na tanan shit
+          //add services to services dapat naa na tanan
           await _firestore
               .collection('users')
               .doc(currentUser!.uid)
@@ -687,6 +688,12 @@ class _SummaryState extends State<Summary> {
               .collection('${currentUser!.uid}services')
               .doc(fieldNames)
               .set(serviceFields);
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .set(addFields, SetOptions(merge: true));
         }
       } catch (e) {
         log(e.toString());

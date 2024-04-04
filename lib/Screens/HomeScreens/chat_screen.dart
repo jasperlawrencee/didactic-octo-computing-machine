@@ -41,7 +41,6 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         currentUsername = username;
       });
-      log(currentUsername);
     } catch (e) {
       log('Error getting currentuser name of customer: $e');
     }
@@ -80,31 +79,28 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 52),
-      child: SafeArea(
-          child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Colors.white,
-              )),
-          backgroundColor: kPrimaryColor,
-          title: Text(
-            'Chat ${widget.username}',
-            style: const TextStyle(color: Colors.white),
-          ),
+    return SafeArea(
+        child: Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+            )),
+        backgroundColor: kPrimaryColor,
+        title: Text(
+          widget.username,
+          style: const TextStyle(color: Colors.white),
         ),
-        body: Background(
-            child: Column(
-          children: [Expanded(child: messageList()), messageInput()],
-        )),
+      ),
+      body: Background(
+          child: Column(
+        children: [Expanded(child: messageList()), messageInput()],
       )),
-    );
+    ));
   }
 
   Widget messageList() {

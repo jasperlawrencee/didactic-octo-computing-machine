@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -34,13 +35,27 @@ class _AddServicesState extends State<AddServices> {
   ];
   String serviceType = '';
   String serviceName = '';
+  String type = hrMin.first;
+  String timeOftype = '1';
   final TextEditingController _servicePrice = TextEditingController();
-  final TextEditingController _serviceDuration = TextEditingController();
   final TextEditingController _serviceDescription = TextEditingController();
   File? serviceImage;
 
   @override
   Widget build(BuildContext context) {
+    List<DropdownMenuItem<String>> timeList = type == 'hr'
+        ? hrs.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList()
+        : mins.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList();
     return Scaffold(
       body: SafeArea(
           child: Background(
@@ -110,30 +125,6 @@ class _AddServicesState extends State<AddServices> {
             const Row(
               children: [
                 Text(
-                  'Price',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            flatTextField('Serivce Price', _servicePrice),
-            const SizedBox(height: defaultPadding),
-            const Row(
-              children: [
-                Text(
-                  'Duration',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            flatTextField('Serivce Duration', _serviceDuration),
-            const SizedBox(height: defaultPadding),
-            const Row(
-              children: [
-                Text(
                   'Description',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -146,41 +137,65 @@ class _AddServicesState extends State<AddServices> {
             const Row(
               children: [
                 Text(
-                  'Image',
+                  'Price',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            TextButton(
-                onPressed: () {
-                  getImage();
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Add Photo',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Icon(Icons.open_in_new)
-                  ],
-                )),
+            flatTextField('Serivce Price', _servicePrice, istext: false),
             const SizedBox(height: defaultPadding),
-            InkWell(
-              onTap: serviceImage == null ? null : viewImage,
-              child: Text(
-                serviceImage == null ? 'Empty' : 'View',
-                style: const TextStyle(
-                    color: kPrimaryColor, decoration: TextDecoration.underline),
-              ),
+            const Row(
+              children: [
+                Text(
+                  'Duration',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
+            durationDropdowns(timeList),
             const SizedBox(height: defaultPadding),
+            // const Row(
+            //   children: [
+            //     Text(
+            //       'Image',
+            //       style: TextStyle(
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // TextButton(
+            //     onPressed: () {
+            //       getImage();
+            //     },
+            //     child: const Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         Text(
+            //           'Add Photo',
+            //           style: TextStyle(
+            //             fontSize: 13,
+            //             fontFamily: 'Inter',
+            //             fontWeight: FontWeight.w500,
+            //           ),
+            //         ),
+            //         Icon(Icons.open_in_new)
+            //       ],
+            //     )),
+            // const SizedBox(height: defaultPadding),
+            // InkWell(
+            //   onTap: serviceImage == null ? null : viewImage,
+            //   child: Text(
+            //     serviceImage == null ? 'Empty' : 'View',
+            //     style: const TextStyle(
+            //         color: kPrimaryColor, decoration: TextDecoration.underline),
+            //   ),
+            // ),
+            // const SizedBox(height: defaultPadding),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -268,6 +283,45 @@ class _AddServicesState extends State<AddServices> {
       log(e.toString());
       return false;
     }
+  }
+
+  Container durationDropdowns(List<DropdownMenuItem<String>> timeList) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              DropdownButton(
+                value: timeOftype,
+                items: timeList,
+                onChanged: (String? newVale) {
+                  setState(() {
+                    timeOftype = newVale!;
+                  });
+                },
+              ),
+              const SizedBox(width: defaultPadding),
+              DropdownButton<String>(
+                value: type,
+                onChanged: ((String? newValue) {
+                  setState(() {
+                    type = newValue!;
+                  });
+                }),
+                items: hrMin.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget serviceDropdown(List<String> services) {
@@ -367,32 +421,57 @@ class _AddServicesState extends State<AddServices> {
             .child('serviceImages')
             .child(serviceName);
         if (serviceImage != null) {
-          await reference.putFile(File(serviceImage!.path));
+          UploadTask uploadTask = reference.putFile(File(serviceImage!.path));
+          final storageSnapshot = uploadTask.snapshot;
+          final serviceImageUrl = await storageSnapshot.ref.getDownloadURL();
+          log('servicename not existing');
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .update({serviceName: ""});
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${currentUser!.uid}services')
+              .doc(serviceName)
+              .set({
+            'description': _serviceDescription.text,
+            'duration': "$timeOftype $type",
+            'price': _servicePrice.text,
+            'image': serviceImageUrl,
+          }).then((value) {
+            log('added $serviceName');
+            Navigator.of(context).pop();
+          });
+        } else {
+          log('servicename not existing');
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('categories')
+              .doc(serviceType)
+              .update({serviceName: ""});
+          await _firestore
+              .collection('users')
+              .doc(currentUser!.uid)
+              .collection('services')
+              .doc(serviceType)
+              .collection('${currentUser!.uid}services')
+              .doc(serviceName)
+              .set({
+            'description': _serviceDescription.text,
+            'duration': "$timeOftype $type",
+            'price': _servicePrice.text,
+            'image': '',
+          }).then((value) {
+            log('added $serviceName');
+            Navigator.of(context).pop();
+          });
         }
-        final serviceImageUrl = await reference.getDownloadURL();
-        log('servicename not existing');
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('categories')
-            .doc(serviceType)
-            .update({serviceName: ""});
-        await _firestore
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('services')
-            .doc(serviceType)
-            .collection('${currentUser!.uid}services')
-            .doc(serviceName)
-            .set({
-          'description': _serviceDescription.text,
-          'duration': _serviceDuration.text,
-          'price': _servicePrice.text,
-          'image': serviceImageUrl,
-        }).then((value) {
-          log('added $serviceName');
-          Navigator.of(context).pop();
-        });
       }
     } else {
       log('servicetype not existing');
@@ -421,7 +500,7 @@ class _AddServicesState extends State<AddServices> {
           .doc(serviceName)
           .set({
         'description': _serviceDescription.text,
-        'duration': _serviceDuration.text,
+        'duration': "$timeOftype $type",
         'price': _servicePrice.text,
       }).then((value) {
         log('added $serviceType with $serviceName');

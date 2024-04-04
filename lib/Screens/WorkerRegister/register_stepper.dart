@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/navbarScreens/worker_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/worker_screen.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step1.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step2.dart';
 import 'package:flutter_auth/Screens/WorkerRegister/forms/step3.dart';
@@ -163,10 +163,12 @@ class _WorkerRegisterScreenState extends State<WorkerRegisterScreen> {
               child: const Text('Yes'),
               onPressed: () {
                 if (workerFormComplete() == true) {
+                  log('form complete');
                   Navigator.of(context).pop();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Summary()));
                 } else if (workerFormComplete() == false) {
+                  log('worker form incomplete');
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: const Text(

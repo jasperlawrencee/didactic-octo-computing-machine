@@ -3,15 +3,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/details_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/calendar_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/message_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Salon/navbarScreens/profile_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/message_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/profile_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/services_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 import '../../../../components/widgets.dart';
 import '../../../../constants.dart';
+
+//https://www.behance.net/gallery/181941113/Salon-Booking-App-UIUX-Design?tracking_source=search_projects|salon+app+design&l=60
 
 class SalonScreen extends StatefulWidget {
   const SalonScreen({Key? key}) : super(key: key);
@@ -100,6 +102,7 @@ List<Widget> screens() {
   return [
     const home(),
     const CalendarPage(),
+    const ServicesPage(),
     const MessagePage(),
     const ProfilePage(),
   ];
@@ -115,6 +118,12 @@ List<PersistentBottomNavBarItem> navBarItems() {
     PersistentBottomNavBarItem(
       icon: const Icon(Icons.calendar_month_outlined),
       title: 'Bookings',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.room_service_outlined),
+      title: 'Services',
       activeColorPrimary: kPrimaryColor,
       inactiveColorPrimary: kPrimaryLightColor,
     ),
@@ -167,13 +176,18 @@ class _homeState extends State<home> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> views = ['This Month', 'This Year', 'This Week'];
+    List<String> branches = ['Branch 1', 'Branch 2', 'Branch 3'];
+    String dropdownValue = views.first;
+    String dropdownBranch = branches.first;
+
     return SafeArea(
       child: Background(
         child: Container(
           margin: const EdgeInsets.fromLTRB(20, 50, 20, 0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -200,20 +214,39 @@ class _homeState extends State<home> {
               Row(
                 children: [
                   Text(
-                    "Good Day, $salonName!",
+                    salonName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 20,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              Row(
-                children: [
-                  dashboardButton(Icons.store_rounded, () => SalonDetails(),
-                      'Salon Details'),
-                ],
-              )
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(defaultPadding),
+                decoration: const BoxDecoration(
+                    color: kPrimaryLightColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Appointments',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Staff',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Feedbacks',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

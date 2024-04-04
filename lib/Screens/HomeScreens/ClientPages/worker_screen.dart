@@ -3,10 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/navbarScreens/calendar_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/navbarScreens/message_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/navbarScreens/profile_screen.dart';
-import 'package:flutter_auth/Screens/HomeScreens/Worker/navbarScreens/services_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/message_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/profile_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/services_screen.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
@@ -98,12 +98,14 @@ class _WorkerScreenState extends State<WorkerScreen> {
   List<Widget> screens() {
     return [
       const home(),
-      const WorkerCalendarPage(),
+      // const WosrkerCalendarPage(),
+      const CalendarPage(),
       const ServicesPage(),
       const MessagePage(),
-      const ProfilePage(
-        parentDocumentId: 'users',
-      ),
+      const ProfilePage(),
+      // const ProfilePage(
+      //   parentDocumentId: 'users',
+      // ),
     ];
   }
 }

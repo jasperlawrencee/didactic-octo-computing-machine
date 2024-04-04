@@ -37,6 +37,9 @@ dependencies:
   badges: ^3.1.2
   flutter_phone_direct_caller: ^2.1.1
   url_launcher: ^6.2.4
+  side_navigation: ^1.0.4
+
+web: ^0.10.0
 
 dependency_overrides:
   # firebase_messaging_platform_interface: 3.1.6
@@ -69,15 +72,17 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/avatars/
+    - assets/logo/
+    - assets/admin-icons/
 
   fonts:
     - family: Inter
       fonts:
-      - asset: fonts/inter/Inter-Regular.ttf
-      - asset: fonts/inter/Inter-Bold.ttf
-      - asset: fonts/inter/Inter-Light.ttf
-      - asset: fonts/inter/Inter-Medium.ttf
-      - asset: fonts/inter/Inter-Black.ttf
+        - asset: fonts/inter/Inter-Regular.ttf
+        - asset: fonts/inter/Inter-Bold.ttf
+        - asset: fonts/inter/Inter-Light.ttf
+        - asset: fonts/inter/Inter-Medium.ttf
+        - asset: fonts/inter/Inter-Black.ttf
   #  - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/AdminScreens/Dashboard.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers.dart';
 import 'package:flutter_auth/asset_strings.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -15,9 +16,7 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   List<Widget> views = const [
     AdminDashboard(),
-    Center(
-      child: Text('Account'),
-    ),
+    ManageUsers(),
     Center(
       child: Text('Settings'),
     ),

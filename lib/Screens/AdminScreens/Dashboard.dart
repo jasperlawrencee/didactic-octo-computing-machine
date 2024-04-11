@@ -17,6 +17,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
         backgroundColor: AdminBG,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
             'Welcome, Admin!',
             style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
@@ -31,7 +32,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 Row(
                   children: [
                     DashboardCard(
-                      name: 'Total Service Fee Earnings',
+                      name: 'Total Service Fee \nEarnings',
                       image: cash,
                       value: 'PHP 50,000',
                       verified: true,
@@ -40,7 +41,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       width: 20,
                     ),
                     DashboardCard(
-                      name: 'All Verified Freelancers',
+                      name: 'All Verified \nFreelancers',
                       image: worker,
                       value: '200',
                       verified: true,
@@ -49,7 +50,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       width: 20,
                     ),
                     DashboardCard(
-                      name: 'All Verified Salons',
+                      name: 'All Verified \nSalons',
                       image: salon,
                       value: '350',
                       verified: true,
@@ -62,7 +63,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 Row(
                   children: [
                     DashboardCard(
-                      name: 'ALL REGISTERED CLIENTS',
+                      name: 'ALL REGISTERED \nCLIENTS',
                       image: user,
                       value: '800',
                       verified: true,
@@ -71,7 +72,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       width: 20,
                     ),
                     DashboardCard(
-                      name: 'ALL UNVERIFIED FREELANCERS',
+                      name: 'ALL UNVERIFIED \nFREELANCERS',
                       image: worker,
                       value: '120',
                       verified: false,
@@ -80,7 +81,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       width: 20,
                     ),
                     DashboardCard(
-                      name: 'ALL UNVERIFIED SALONS',
+                      name: 'ALL UNVERIFIED \nSALONS',
                       image: salon,
                       value: '150',
                       verified: false,
@@ -159,10 +160,11 @@ class _DashboardCardState extends State<DashboardCard> {
                   ],
                 ),
                 Text(
-                  widget.name,
+                  widget.name.toUpperCase(),
+                  maxLines: 2,
                   style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: widget.verified ? textVerified : nameUnverified),
                 )
               ])),

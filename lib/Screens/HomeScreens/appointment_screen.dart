@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,10 +13,14 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class SalonAppointmentScreen extends StatefulWidget {
   Appointment? appointment;
+  List<Appointment>? existingAppointments;
+  String? role;
 
   SalonAppointmentScreen({
     super.key,
     this.appointment,
+    this.existingAppointments,
+    this.role,
   });
 
   @override
@@ -25,7 +31,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
   final dateFormatter = DateFormat('MMMM d h:mma');
-  String? nullValue = null;
+  String? nullValue;
   Parse convert = Parse();
 
   Future<String> getUsername() async {
@@ -44,48 +50,160 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     }
   }
 
-  Future<List<String>> getWorkerEmployed() async {
-    //kuhaon tanan worker na employed under user collection
-    //return ang username under that collection
-    List<String> userIds = [];
+  Future<String> preferredWorker() async {
     try {
-      final querysnapshot = await _firestore
-          .collectionGroup('experiences')
-          .where('salon', isEqualTo: await getUsername())
+      DocumentSnapshot documentSnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc('${widget.appointment!.id}')
           .get();
-      for (QueryDocumentSnapshot doc in querysnapshot.docs) {
-        String userId = doc.reference.parent.parent!.id;
-        userIds.add(userId);
-      }
-      return userIds;
+      return documentSnapshot['worker'];
     } catch (e) {
-      log('error getting employees $e');
-      return [];
+      log('error getting preferred worker');
+      return '';
     }
   }
 
-  Future<List<String>> workersList() async {
-    List<String> workersList = [];
-    List<String> kuan = await getWorkerEmployed();
+  Future<void> finalComplete() async {
+    //make notification function here
+    String customerID = '';
     try {
-      for (String worker in kuan) {
-        final documentSnapshot =
-            await _firestore.collection('users').doc(worker).get();
-        if (documentSnapshot.exists) {
-          final name = documentSnapshot.data()?['name'];
-          workersList.add(name);
-        } else {
-          return [];
-        }
+      String bookingDocument = widget.appointment!.id.toString();
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('Username', isEqualTo: widget.appointment!.subject)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          customerID = querySnapshot.docs[0].id;
+        });
       }
-      return workersList;
+      //set confirm to customer
+      await _firestore
+          .collection('users')
+          .doc(customerID)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'finished'});
+      //set confirm to client
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'finished'}).then(
+        (value) {
+          if (mounted) {
+            Navigator.pop(context);
+          }
+          setState(() {});
+        },
+      );
     } catch (e) {
-      log('error making list $e');
-      return [];
+      log('error deny appointment $e');
     }
   }
 
-  Future<void> confirmAppointment() async {
+  Future<void> finalDeny() async {
+    //make notification function here
+    String customerID = '';
+    try {
+      String bookingDocument = widget.appointment!.id.toString();
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('Username', isEqualTo: widget.appointment!.subject)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          customerID = querySnapshot.docs[0].id;
+        });
+      }
+      //set confirm to customer
+      await _firestore
+          .collection('users')
+          .doc(customerID)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'denied'});
+      //set confirm to client
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(bookingDocument)
+          .update({'status': 'denied'}).then(
+        (value) {
+          log('finished');
+          if (mounted) {
+            Navigator.pop(context);
+          }
+          setState(() {});
+        },
+      );
+    } catch (e) {
+      log('error deny appointment $e');
+    }
+  }
+
+  Future<void> completeAppointment() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Completion?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('BACK')),
+            TextButton(
+                onPressed: () {
+                  finalComplete();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('CONFIRM')),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> denyAppointment() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Deny?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('BACK')),
+            TextButton(
+                onPressed: () {
+                  finalDeny();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('DENY')),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> finalAppointment() async {
+    //notification function here
     String customerID = '';
     try {
       String bookingDocument = widget.appointment!.id.toString();
@@ -111,9 +229,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           .doc(currentUser!.uid)
           .collection('bookings')
           .doc(bookingDocument)
-          .update({
-        'status': 'confirmed',
-      }).then(
+          .update({'status': 'confirmed'}).then(
         (value) {
           log('finished');
           if (mounted) {
@@ -126,8 +242,76 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     }
   }
 
+  conflictDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: widget.role == 'salon'
+              ? const Text(
+                  'Selected appointment has conflict! Force approve?',
+                  style: TextStyle(fontSize: 16),
+                )
+              : widget.role == 'freelancer'
+                  ? const Text(
+                      'Selected appointment has conflict!',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  : null,
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('BACK')),
+            widget.role == 'salon'
+                ? TextButton(
+                    onPressed: () {
+                      finalAppointment();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('BOOK'))
+                : Container(),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> confirmAppointment() async {
+    log(widget.role!);
+    if (hasConflict(widget.appointment!, widget.existingAppointments!)) {
+      log('has conflict');
+      conflictDialog();
+    } else {
+      log('has no conflict');
+      finalAppointment();
+    }
+  }
+
+  bool hasConflict(
+      Appointment newAppointment, List<Appointment> existingAppointments) {
+    //checks conflict for each existing appointment
+    for (Appointment existingAppointment in existingAppointments) {
+      if (existingAppointment.color == kPrimaryColor) {
+        if (newAppointment.startTime.isBefore(existingAppointment.endTime) &&
+            newAppointment.endTime.isAfter(existingAppointment.startTime)) {
+          //has conflict
+          return true;
+        }
+      }
+    }
+    //has no conflict
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool walapa =
+        widget.appointment?.color == const Color.fromARGB(255, 158, 158, 158);
+    bool paid =
+        widget.appointment?.color == const Color.fromARGB(255, 30, 90, 255);
     List<Map<String, dynamic>> servicesList =
         convert.stringToMap(widget.appointment!.notes.toString());
     double total = double.parse(getTotal(extractPrice(servicesList))) +
@@ -164,8 +348,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                 ),
                 const SizedBox(height: defaultPadding),
                 //////////////////OPTIONAL ASSIGN WORKER///////////////////////////
-                StreamBuilder<List<String>>(
-                  stream: Stream.fromFuture(workersList()),
+                StreamBuilder<String>(
+                  stream: Stream.fromFuture(preferredWorker()),
                   builder: (context, workers) {
                     if (workers.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -247,7 +431,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text('Payment Method'),
-                                  Text('data')
+                                  Text('CASH')
                                 ],
                               ),
                               Row(
@@ -321,6 +505,24 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                               ),
                             ],
                           )),
+                          const SizedBox(height: defaultPadding),
+                          widget.role == 'salon'
+                              ? bookingCard(Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Preferred Stylist'),
+                                    Text(
+                                      workers.data!.isEmpty
+                                          ? 'None'
+                                          : workers.data!,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ))
+                              //shows nothing since client is not a salon
+                              : Container(),
                         ],
                       );
                     }
@@ -328,13 +530,37 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                 ),
               ],
             ),
-            if (widget.appointment?.color != Color(0xff6f35a5))
+            if (walapa)
               Container(
                 margin: const EdgeInsets.only(bottom: defaultPadding),
-                child: ElevatedButton(
-                    onPressed: confirmAppointment,
-                    child: const Text('BOOK',
-                        style: TextStyle(color: kPrimaryLightColor))),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: denyAppointment,
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(kPrimaryLightColor)),
+                      child: const Text('DENY'),
+                    ),
+                    const SizedBox(height: defaultPadding),
+                    ElevatedButton(
+                        onPressed: confirmAppointment,
+                        child: const Text('BOOK',
+                            style: TextStyle(color: kPrimaryLightColor))),
+                  ],
+                ),
+              ),
+            if (paid)
+              Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: completeAppointment,
+                      child: const Text(
+                        'COMPLETE',
+                        style: TextStyle(color: kPrimaryLightColor),
+                      )),
+                  const SizedBox(height: defaultPadding),
+                ],
               ),
           ],
         ),

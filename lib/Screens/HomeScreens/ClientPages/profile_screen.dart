@@ -11,7 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_auth/Screens/HomeScreens/editservices_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/salon_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/add_staff.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -27,133 +28,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
-  var pageController = PageController();
-  List<String> servicesTypes = [
-    'Hair',
-    'Lashes',
-    'Makeup',
-    'Nails',
-    'Spa',
-    'Wax'
-  ];
-  int serviceCount = 0;
-  final ImagePicker picker = ImagePicker();
-  File? profileImage;
   bool isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<String> getUserName() async {
-    try {
-      final dbRef =
-          await _firestore.collection('users').doc(currentUser!.uid).get();
-      return dbRef.data()!['name'];
-    } catch (e) {
-      log('error getting name $e');
-    }
-    return 'Empty Name';
-  }
-
-  Future<String> getUserAddress() async {
-    try {
-      final dbRef =
-          await _firestore.collection('users').doc(currentUser!.uid).get();
-      return dbRef.data()!['address'];
-    } catch (e) {
-      log('error getting address $e');
-    }
-    return 'Empty Address';
-  }
-
-  Future<String> getProfilePicture() async {
-    try {
-      final dbRef =
-          await _firestore.collection('users').doc(currentUser!.uid).get();
-      return dbRef.data()!['profilePicture'];
-    } catch (e) {
-      log('error getting profile picture $e');
-      return 'https://www.gokulagro.com/wp-content/uploads/2023/01/no-images.png';
-    }
-  }
-
-  //get all existing service types
-  Future<List<String>> getAllServiceTypes() async {
-    List<String> existingServices = [];
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .get();
-
-      querySnapshot.docs.forEach((element) {
-        existingServices.add(element.id);
-      });
-      return existingServices;
-    } catch (e) {
-      log('Getting Service Types Error: $e');
-      return [];
-    }
-  }
-
-//returns all services names inside existing service types
-  Future<List<List<String>>> getServiceNames() async {
-    List<List<String>> serviceNames = [];
-    try {
-      var serviceDocuments = await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .get();
-      for (var docs in serviceDocuments.docs) {
-        var serviceCollection =
-            docs.reference.collection('${currentUser!.uid}services');
-        var serviceDocs = await serviceCollection.get();
-        List<String> names = [];
-        for (var serviceDoc in serviceDocs.docs) {
-          names.add(serviceDoc.id);
-        }
-        serviceNames.add(names);
-      }
-      return serviceNames;
-    } catch (e) {
-      log('Error Getting Service Names: $e');
-      return [];
-    }
-  }
-
-  Future<List<List<Map<String, dynamic>>>> getServiceDetails() async {
-    try {
-      final servicesDocuments = await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .collection('services')
-          .get();
-      List<List<Map<String, dynamic>>> serviceData = [];
-      for (final doc in servicesDocuments.docs) {
-        final serviceDocs =
-            await doc.reference.collection('${currentUser!.uid}services').get();
-        List<Map<String, dynamic>> serviceDataList = [];
-        for (final serviceDoc in serviceDocs.docs) {
-          final data = {
-            "description": serviceDoc.get('description'),
-            "duration": serviceDoc.get("duration"),
-            "price": serviceDoc.get("price"),
-            "image": serviceDoc.get("image"),
-          };
-          serviceDataList.add(data);
-        }
-        serviceData.add(serviceDataList);
-      }
-      return serviceData;
-    } catch (e) {
-      log('Error getting service details: $e');
-      return [];
-    }
-  }
+  File? profileImage;
 
   Future<void> _refresh() {
     return Future.delayed(const Duration(seconds: 2));
@@ -194,45 +70,211 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  //salon name and picture
-                  badges.Badge(
-                      badgeContent: const Icon(
-                        Icons.edit,
-                        color: kPrimaryLightColor,
-                        size: 15,
-                      ),
-                      onTap: pickImage,
-                      showBadge: isEditing,
-                      badgeStyle:
-                          const badges.BadgeStyle(badgeColor: kPrimaryColor),
-                      child: salonCard(SalonInfo())),
-                  //salon address
-                  badges.Badge(
-                    badgeContent: const Icon(
-                      Icons.edit,
-                      color: kPrimaryLightColor,
-                      size: 15,
-                    ),
-                    onTap: () {},
-                    showBadge: isEditing,
-                    badgeStyle:
-                        const badges.BadgeStyle(badgeColor: kPrimaryColor),
-                    child: salonCard(SalonPlace()),
-                  ),
-                  //salon phone number
-                ],
+              FutureBuilder<Client?>(
+                future: getClientDetails(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final data = snapshot.data!;
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            //salon name and picture
+                            badges.Badge(
+                                badgeContent: const Icon(
+                                  Icons.edit,
+                                  color: kPrimaryLightColor,
+                                  size: 15,
+                                ),
+                                onTap: pickImage,
+                                showBadge: isEditing,
+                                badgeStyle: const badges.BadgeStyle(
+                                    badgeColor: kPrimaryColor),
+                                child: salonCard(Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    data.profilePicutre.isNotEmpty
+                                        ? CircleAvatar(
+                                            radius: 45,
+                                            backgroundImage: NetworkImage(
+                                                data.profilePicutre),
+                                          )
+                                        : const CircleAvatar(
+                                            radius: 45,
+                                            child: Text('?'),
+                                          ),
+                                    Text(
+                                      data.name,
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ))),
+                            //salon address
+                            badges.Badge(
+                              badgeContent: const Icon(
+                                Icons.edit,
+                                color: kPrimaryLightColor,
+                                size: 15,
+                              ),
+                              onTap: () {},
+                              showBadge: isEditing,
+                              badgeStyle: const badges.BadgeStyle(
+                                  badgeColor: kPrimaryColor),
+                              child: salonCard(Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Icon(
+                                    Icons.location_city_rounded,
+                                    color: kPrimaryColor,
+                                    size: 50,
+                                  ),
+                                  Text(
+                                    data.address,
+                                    textAlign: TextAlign.center,
+                                  )
+                                ],
+                              )),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: defaultPadding),
+                        data.role == 'salon'
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: defaultPadding),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Staff',
+                                          style: TextStyle(
+                                            color: kPrimaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        isEditing
+                                            ? InkWell(
+                                                onTap: () {
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return const AddStaff();
+                                                    },
+                                                  ));
+                                                },
+                                                child: const Icon(
+                                                  Icons.add,
+                                                  color: kPrimaryColor,
+                                                ),
+                                              )
+                                            : Container()
+                                      ],
+                                    ),
+                                    StreamBuilder<QuerySnapshot>(
+                                      stream: _firestore
+                                          .collection('users')
+                                          .doc(currentUser!.uid)
+                                          .collection('staff')
+                                          .snapshots(),
+                                      builder: (context, staff) {
+                                        if (staff.hasData) {
+                                          List<Staff> staffList =
+                                              staff.data!.docs.map((doc) {
+                                            Map<String, dynamic> data = doc
+                                                .data() as Map<String, dynamic>;
+                                            return Staff(
+                                                name: data['name'],
+                                                position: data['role']);
+                                          }).toList();
+                                          return ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: staffList.length,
+                                            itemBuilder: (context, index) {
+                                              return ListTile(
+                                                onTap: () {
+                                                  //view details
+                                                },
+                                                title: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(staffList[index].name),
+                                                    const Text('-'),
+                                                    Text(staffList[index]
+                                                        .position)
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          return const CircularProgressIndicator();
+                                        }
+                                      },
+                                    )
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
               ),
-              const SizedBox(height: defaultPadding),
-              Text(
-                  'salon photo outside, salon photo inside, owner name, gcash number')
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<Client?> getClientDetails() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      if (doc.exists) {
+        if (doc['role'] == 'freelancer') {
+          return Client(
+            address: doc['address'],
+            gender: doc['gender'],
+            birthday: doc['birthday'],
+            email: doc['email'],
+            name: doc['name'],
+            primaryPhoneNum: doc['primaryPhoneNumber'],
+            secondaryPhoneNum: doc['secondaryPhoneNumber'],
+            role: doc['role'],
+            rating: double.parse(doc['rating']),
+            profilePicutre: doc['profilePicture'],
+          );
+        } else if (doc['role'] == 'salon') {
+          return Client(
+            address: doc['address'],
+            email: doc['email'],
+            name: doc['name'],
+            salonNumber: doc['salonNumber'],
+            salonOwner: doc['salonOwner'],
+            salonRepresentative: doc['salonRepresentative'],
+            role: doc['role'],
+            rating: double.parse(doc['rating']),
+            profilePicutre: doc['profilePicture'],
+          );
+        }
+      }
+    } catch (e) {
+      log('error getting worker details $e');
+      return null;
+    }
+    return null;
   }
 
   Future<void> pickImage() async {
@@ -280,175 +322,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-//PageView Widget of Services
-  Widget servicesPageView() {
-    return PageView.builder(
-      itemCount: serviceCount,
-      itemBuilder: (context, serviceIndex) {
-        return FutureBuilder<List<String>>(
-          future: getAllServiceTypes(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData &&
-                snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: kPrimaryColor),
-              );
-            } else if (snapshot.hasError) {
-              log(Error().toString());
-              return Text(Error().toString());
-            } else {
-              return Column(
-                children: [
-                  //service category text widget
-                  Text(
-                    snapshot.data![serviceIndex].isEmpty
-                        ? '???'
-                        : snapshot.data![serviceIndex],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  FutureBuilder<List<List<String>>>(
-                    future: getServiceNames(),
-                    builder: (context, serviceNames) {
-                      if (serviceNames.hasData) {
-                        return FutureBuilder<List<List<Map<String, dynamic>>>>(
-                          future: getServiceDetails(),
-                          builder: (context, serviceDetails) {
-                            if (serviceDetails.hasData) {
-                              return Expanded(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        serviceNames.data![serviceIndex].length,
-                                    itemBuilder: (context, index) {
-                                      return badges.Badge(
-                                        onTap: () {
-                                          deleteService(
-                                            //serviceType
-                                            snapshot.data![serviceIndex],
-                                            //serviceName
-                                            serviceNames.data![serviceIndex]
-                                                [index],
-                                          );
-                                        },
-                                        position: badges.BadgePosition.topEnd(),
-                                        showBadge: isEditing,
-                                        badgeContent: const Icon(
-                                          Icons.close_rounded,
-                                          color: Colors.white,
-                                          size: 10,
-                                        ),
-                                        child: InkWell(
-                                          onTap: isEditing
-                                              ? () => navigateToEditPage(
-                                                  snapshot.data![serviceIndex],
-                                                  serviceNames
-                                                          .data![serviceIndex]
-                                                      [index])
-                                              : null,
-                                          child: serviceCard(
-                                            serviceNames,
-                                            serviceIndex,
-                                            index,
-                                            serviceDetails,
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                              );
-                            } else if (serviceDetails.hasError) {
-                              return Text('Error ${Error().toString}');
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator(
-                                      color: kPrimaryColor));
-                            }
-                          },
-                        );
-                      } else if (serviceNames.hasError) {
-                        return const Text('error getting service names');
-                      } else {
-                        return const LinearProgressIndicator(
-                            color: kPrimaryColor);
-                      }
-                    },
-                  ),
-                ],
-              );
-            }
-          },
-        );
-      },
-      controller: pageController,
-    );
-  }
-
-  navigateToEditPage(String type, String name) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) {
-        return EditServices(
-          serviceType: type,
-          serviceName: name,
-        );
-      },
-    ));
-  }
-
-  Widget serviceCard(
-    AsyncSnapshot<List<List<String>>> serviceNames,
-    int serviceIndex,
-    int index,
-    AsyncSnapshot<List<List<Map<String, dynamic>>>> serviceDetails,
-  ) {
-    String name = serviceNames.data![serviceIndex][index];
-    String duration = serviceDetails.data![serviceIndex][index]['duration'];
-    String price = serviceDetails.data![serviceIndex][index]['price'];
-    String image = serviceDetails.data![serviceIndex][index]['image'];
-    String descrtiption =
-        serviceDetails.data![serviceIndex][index]['description'];
-    return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(vertical: 5),
-        padding: const EdgeInsets.all(defaultPadding),
-        decoration: const BoxDecoration(
-          color: kPrimaryLightColor,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox.square(
-              dimension: 80,
-              child: Image.network(image),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "$name ",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    duration.isEmpty
-                        ? const Text('- Duration')
-                        : Text("- $duration")
-                  ],
-                ),
-                price.isEmpty ? const Text('Price') : Text(price),
-                descrtiption.isEmpty
-                    ? const Text('Description')
-                    : Text(descrtiption),
-              ],
-            )
-          ],
-        ));
-  }
-
   Container salonCard(Widget child) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -460,130 +333,14 @@ class _ProfilePageState extends State<ProfilePage> {
       child: child,
     );
   }
+}
 
-  Future<void> deleteService(String serviceType, String serviceName) async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Delete $serviceName?"),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('No')),
-            TextButton(
-                onPressed: () async {
-                  try {
-                    DocumentReference docRef = _firestore
-                        .collection('users')
-                        .doc(currentUser!.uid)
-                        .collection('services')
-                        .doc(serviceType)
-                        .collection('${currentUser!.uid}services')
-                        .doc(serviceName);
-                    await docRef.delete();
-                    Navigator.pop(context);
-                  } catch (e) {
-                    log('Error deleting document $serviceName: $e');
-                  }
-                },
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                )),
-          ],
-        );
-      },
-    );
-  }
+class Staff {
+  final String name;
+  final String position;
 
-  Widget SalonInfo() {
-    return StreamBuilder<String>(
-      stream: Stream.fromFuture(getUserName()),
-      builder: (context, name) {
-        if (name.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: kPrimaryColor),
-          );
-        } else if (name.hasError) {
-          return Text('Getting Name Error ${name.error}');
-        } else {
-          final salonName = name.data!;
-          return Column(
-            children: [
-              StreamBuilder<String>(
-                stream: Stream.fromFuture(getProfilePicture()),
-                builder: (context, profilePicture) {
-                  if (profilePicture.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                        child: CircularProgressIndicator(color: kPrimaryColor));
-                  } else if (profilePicture.hasError &&
-                      profilePicture == null) {
-                    return Text(
-                        'Error Getting Profile Picutre ${profilePicture.error}');
-                  } else {
-                    final picture = profilePicture.data!;
-                    return SizedBox(
-                      height: 90,
-                      child: Center(
-                        child: picture == null
-                            ? const Text('No Profile\nPicture')
-                            : CircleAvatar(
-                                maxRadius: 200,
-                                backgroundImage: NetworkImage(picture)),
-                      ),
-                    );
-                  }
-                },
-              ),
-              const Spacer(),
-              Text(
-                salonName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: kPrimaryColor),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-
-  Widget SalonPlace() {
-    return StreamBuilder<String>(
-      stream: Stream.fromFuture(getUserAddress()),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: kPrimaryColor),
-          );
-        } else if (snapshot.hasError) {
-          return Text('Getting Name Error ${snapshot.error}');
-        } else {
-          final address = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(
-                height: 10,
-                child: Icon(
-                  Icons.location_city_rounded,
-                  color: kPrimaryColor,
-                  size: 50,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                address,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: kPrimaryColor),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
+  Staff({
+    required this.name,
+    required this.position,
+  });
 }

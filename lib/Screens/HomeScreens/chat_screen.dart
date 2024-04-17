@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/HomeScreens/chatBubble.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/features/chatservice.dart';
+import 'package:flutter_auth/features/firebase/chatservice.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -79,28 +79,32 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.white,
-            )),
-        backgroundColor: kPrimaryColor,
-        title: Text(
-          widget.username,
-          style: const TextStyle(color: Colors.white),
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: SafeArea(
+          child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white,
+              )),
+          backgroundColor: kPrimaryColor,
+          title: Text(
+            widget.username,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-      ),
-      body: Background(
-          child: Column(
-        children: [Expanded(child: messageList()), messageInput()],
+        body: Background(
+            child: Column(
+          children: [Expanded(child: messageList()), messageInput()],
+        )),
       )),
-    ));
+    );
   }
 
   Widget messageList() {

@@ -1,5 +1,7 @@
 // ignore_for_file: camel_case_types
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,34 @@ import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+
+class Client {
+  String about;
+  String address;
+  String gender;
+  String birthday;
+  String email;
+  String name;
+  String primaryPhoneNum;
+  String secondaryPhoneNum;
+  String role;
+  double rating;
+  String profilePicutre;
+
+  Client({
+    required this.about,
+    required this.address,
+    required this.gender,
+    required this.birthday,
+    required this.email,
+    required this.name,
+    required this.primaryPhoneNum,
+    required this.secondaryPhoneNum,
+    required this.role,
+    required this.rating,
+    required this.profilePicutre,
+  });
+}
 
 class WorkerScreen extends StatefulWidget {
   const WorkerScreen({Key? key}) : super(key: key);
@@ -98,14 +128,10 @@ class _WorkerScreenState extends State<WorkerScreen> {
   List<Widget> screens() {
     return [
       const home(),
-      // const WosrkerCalendarPage(),
       const CalendarPage(),
       const ServicesPage(),
       const MessagePage(),
       const ProfilePage(),
-      // const ProfilePage(
-      //   parentDocumentId: 'users',
-      // ),
     ];
   }
 }
@@ -154,21 +180,32 @@ class home extends StatefulWidget {
 
 class _homeState extends State<home> {
   User? currentUser = FirebaseAuth.instance.currentUser;
-  String name = '';
+  final _firestore = FirebaseFirestore.instance;
 
-  @override
-  void initState() {
-    super.initState;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get()
-        .then(((DocumentSnapshot documentSnapshot) {
-      // log(documentSnapshot.get('username'));
-      setState(() {
-        name = documentSnapshot.get('username');
-      });
-    }));
+  Future<Client?> getClientDetails() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      if (doc.exists) {
+        return Client(
+          about: doc['about'],
+          address: doc['address'],
+          gender: doc['gender'],
+          birthday: doc['birthday'],
+          email: doc['email'],
+          name: doc['name'],
+          primaryPhoneNum: doc['primaryPhoneNumber'],
+          secondaryPhoneNum: doc['secondaryPhoneNumber'],
+          role: doc['role'],
+          rating: double.parse(doc['rating']),
+          profilePicutre: doc['profilePicture'],
+        );
+      }
+    } catch (e) {
+      log('error getting worker details $e');
+      return null;
+    }
+    return null;
   }
 
   @override
@@ -208,10 +245,19 @@ class _homeState extends State<home> {
               const SizedBox(
                 height: defaultPadding,
               ),
-              Column(children: [
-                Text('Welcome back, $name!'),
-              ]),
-              //put navbar here
+              FutureBuilder<Client?>(
+                future: getClientDetails(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final data = snapshot.data!;
+                    return Column(
+                      children: [Text('Welcome! ${data.name}')],
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
             ],
           ),
         ),

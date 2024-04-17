@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/ClientPages/salon_screen.dart';
 import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/main.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 CollectionReference users = FirebaseFirestore.instance.collection('users');
 DocumentReference docRef = users.doc('document_id');
@@ -14,6 +20,7 @@ class FirebaseService {
   final TextEditingController _serviceDescription = TextEditingController();
   final TextEditingController _serviceDuration = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final _firestore = FirebaseFirestore.instance;
   User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -218,20 +225,80 @@ class FirebaseService {
         });
   }
 
-  Future<List<String>> getCustomerUsername() async {
+  //function that returns the list of customers who chatted the clients
+  Future<List<String>> getChats() async {
     try {
-      QuerySnapshot querySnapshot = await _firestore
+      //gets current client username to compare
+      String username = '';
+      await _firestore
           .collection('users')
-          .where('role', isEqualTo: 'customer')
-          .get();
-      final customers = <String>[];
-      querySnapshot.docs.forEach((element) {
-        customers.add(element['Username']);
+          .doc(currentUser!.uid)
+          .get()
+          .then((DocumentSnapshot doc) {
+        username = doc.get('name');
       });
-      return customers;
+      //grabs all chat rooms from collection
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('chat_rooms').get();
+      List<String> chats = []; //Aura Salon_cusUsername
+      if (querySnapshot.docs.isNotEmpty) {
+        querySnapshot.docs.forEach((element) {
+          chats.add(element.id);
+        });
+      }
+      //make bool variable to check if current username is existing
+      bool containsCurrentUsername =
+          chats.any((element) => element.contains(username));
+
+      //final method to remove current username from the list of string if containsCurrentUsername is true
+      List<String> chatRooms = [];
+      if (chats.isNotEmpty && containsCurrentUsername) {
+        chats.forEach((element) {
+          List<String> splits = element.split('_');
+          splits.forEach((a) {
+            if (a != username) {
+              chatRooms.add(a);
+            }
+          });
+        });
+        return chatRooms;
+      } else {
+        log('user has no chats');
+        return [];
+      }
     } catch (e) {
       log('Error getting customer username: $e');
       return [];
     }
+  }
+
+  //function to initialize notifications
+  Future<void> initNotifications() async {
+    await _firebaseMessaging.requestPermission();
+    final fCMToken = await _firebaseMessaging.getToken();
+    log('notification token $fCMToken');
+    initPushNotifications();
+    //notif token
+    //cuXMOAlNQE2CpJCJ25Q08v:APA91bHazS3vqr9f_r90UkG2r9FoEGJaPC0b2vRKzrHkqju_3lvh_job893V25IfSrP0UrKawfD2P3e7UZzXOBzLUvnq1VAajmHv0ybSPRFURbvMCcDes2eywK7HbjrtidLz_AA455kx
+  }
+
+  //function to handle recieved notifications
+  void handleMessage(RemoteMessage? message) async {
+    if (message == null) return;
+
+    await FirebaseAuth.instance.signOut();
+    navigatorKey.currentState?.pushNamed(
+      '/login_screen',
+      arguments: message,
+    );
+  }
+
+  //function to initalize foreground and background settings
+  Future initPushNotifications() async {
+    //if app is terminated and opened
+    _firebaseMessaging.getInitialMessage().then(handleMessage);
+
+    //attach event listeners for when a notification opens the app
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 }

@@ -22,6 +22,7 @@ import 'package:flutter_auth/components/widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+  static const route = '/login-screen';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -115,6 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final message = ModalRoute.of(context)!.settings.arguments;
+    // log('${message.notification?.title}');
     return Background(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -22,7 +22,7 @@ class _MessagePageState extends State<MessagePage> {
   @override
   void initState() {
     super.initState();
-    customerStream = firebaseService.getCustomerUsername().asStream();
+    customerStream = firebaseService.getChats().asStream();
   }
 
   @override
@@ -66,7 +66,6 @@ class _MessagePageState extends State<MessagePage> {
                 child: CircularProgressIndicator(color: kPrimaryColor));
           }
           final customerList = snapshot.data!;
-          log(customerList.length.toString());
           return ListView.builder(
             itemCount: customerList.length,
             itemBuilder: (context, index) {

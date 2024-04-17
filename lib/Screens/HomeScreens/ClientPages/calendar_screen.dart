@@ -25,6 +25,28 @@ class _CalendarPageState extends State<CalendarPage> {
   TimeOfDay timeFrom = TimeOfDay.now();
   TimeOfDay timeTo = TimeOfDay.now();
   Parse convert = Parse();
+  String? role;
+
+  getClientRole() async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) => setState(() {
+                role = documentSnapshot['role'];
+              }));
+    } catch (e) {
+      log('$e');
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getClientRole();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +113,7 @@ class _CalendarPageState extends State<CalendarPage> {
             showTodayButton: true,
             view: CalendarView.day,
             allowViewNavigation: true,
-            onTap: calendarTapped,
+            onTap: (details) => calendarTapped(details, appointments.data!),
             allowedViews: const [
               CalendarView.day,
               CalendarView.week,
@@ -126,7 +148,11 @@ class _CalendarPageState extends State<CalendarPage> {
             ? const Color.fromARGB(255, 158, 158, 158)
             : a['status'] == 'confirmed'
                 ? kPrimaryColor
-                : const Color.fromARGB(255, 76, 175, 80);
+                : a['status'] == 'denied'
+                    ? const Color.fromARGB(255, 255, 59, 59)
+                    : a['status'] == 'paid'
+                        ? const Color.fromARGB(255, 30, 90, 255)
+                        : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
           id: a['reference'].toString(),
           subject: a['customerUsername'].toString(),
@@ -146,7 +172,8 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  void calendarTapped(CalendarTapDetails details) {
+  void calendarTapped(
+      CalendarTapDetails details, List<Appointment> appointments) {
     if (details.targetElement == CalendarElement.appointment ||
         details.targetElement == CalendarElement.agenda) {
       Appointment appointment = details.appointments![0];
@@ -155,6 +182,8 @@ class _CalendarPageState extends State<CalendarPage> {
           builder: (context) {
             return SalonAppointmentScreen(
               appointment: appointment,
+              existingAppointments: appointments,
+              role: role,
             );
           },
         ));

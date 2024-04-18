@@ -154,6 +154,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ? const Color.fromARGB(255, 30, 90, 255)
                         : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
+          
           id: a['reference'].toString(),
           subject: a['customerUsername'].toString(),
           notes: a['services'].toString(),

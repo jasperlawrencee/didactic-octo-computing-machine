@@ -9,6 +9,7 @@ import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dar
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/message_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/profile_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/services_screen.dart';
+import 'package:flutter_auth/Screens/HomeScreens/booking_history.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
@@ -223,14 +224,29 @@ class _homeState extends State<home> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return salonHomeCard(
-                      'Appointments',
+                      'Appointments History',
                       ListView.builder(
                         shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
+                        itemCount: 3,
                         itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {},
-                            child: Container(
+                          if (index == 2) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => BookingsHistory(
+                                    bookings: snapshot.data!,
+                                  ),
+                                ));
+                              },
+                              child: const Text(
+                                'View More',
+                                style: TextStyle(
+                                    color: kPrimaryColor,
+                                    decoration: TextDecoration.underline),
+                              ),
+                            );
+                          } else {
+                            return Container(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Row(
                                 mainAxisAlignment:
@@ -241,31 +257,43 @@ class _homeState extends State<home> {
                                       .toUpperCase())
                                 ],
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                       ),
                     );
                   } else {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
               const SizedBox(height: defaultPadding),
-              FutureBuilder(
+              FutureBuilder<List<Staff>>(
                 future: getStaffList(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return salonHomeCard(
-                        'Staff',
+                        'Staff List Preview',
                         ListView.builder(
-                          itemCount: 1,
+                          shrinkWrap: true,
+                          itemCount: 3,
                           itemBuilder: (context, index) {
-                            return Text('data');
+                            if (index == 2) {
+                              return const Text('. . .');
+                            } else {
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(snapshot.data![index].name),
+                                  Text(snapshot.data![index].role),
+                                ],
+                              );
+                            }
                           },
                         ));
                   } else {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
@@ -273,41 +301,6 @@ class _homeState extends State<home> {
           ),
         ),
       ),
-    );
-  }
-
-  Container salonHomeCard(String cardLabel, Widget widget) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(defaultPadding),
-      decoration: const BoxDecoration(
-          color: kPrimaryLightColor,
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            cardLabel,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: defaultPadding),
-          widget,
-        ],
-      ),
-    );
-  }
-
-  Widget dashboardButton(IconData icon, Function() function, String text) {
-    return TextButton.icon(
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return function();
-          },
-        ));
-      },
-      icon: Icon(icon),
-      label: Text(text),
     );
   }
 
@@ -342,27 +335,27 @@ class _homeState extends State<home> {
       return [];
     }
   }
-}
 
-Future<List<Staff>> getStaffList() async {
-  try {
-    List<Staff> staffList = [];
-    QuerySnapshot querySnapshot = await _firestore
-        .collection('users')
-        .doc(currentUser!.uid)
-        .collection('staff')
-        .get();
-    querySnapshot.docs.forEach((element) {
-      staffList.add(Staff(
-        contactNum: element['contact'],
-        name: element['name'],
-        role: element['role'],
-      ));
-    });
-    return staffList;
-  } catch (e) {
-    log('error getting staff list');
-    return [];
+  Future<List<Staff>> getStaffList() async {
+    try {
+      List<Staff> staffList = [];
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('staff')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        staffList.add(Staff(
+          contactNum: element['contact'],
+          name: element['name'],
+          role: element['role'],
+        ));
+      });
+      return staffList;
+    } catch (e) {
+      log('error getting staff list');
+      return [];
+    }
   }
 }
 

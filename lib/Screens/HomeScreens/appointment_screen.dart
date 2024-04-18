@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/components/background.dart';
+import 'package:flutter_auth/components/widgets.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/features/parse.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ class SalonAppointmentScreen extends StatefulWidget {
   Appointment? appointment;
   List<Appointment>? existingAppointments;
   String? role;
+  final TextEditingController denyReasonController = TextEditingController();
 
   SalonAppointmentScreen({
     super.key,
@@ -27,12 +29,22 @@ class SalonAppointmentScreen extends StatefulWidget {
   State<SalonAppointmentScreen> createState() => _SalonAppointmentScreenState();
 }
 
+List<String> reasons = [
+  "Service is currently unavailable",
+  "Equipment or facility issues",
+  "Provider emergency",
+  "Appointment conflict",
+  "Others",
+];
+
 class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
+  String currentReason = reasons.first;
   User? currentUser = FirebaseAuth.instance.currentUser;
   final _firestore = FirebaseFirestore.instance;
   final dateFormatter = DateFormat('MMMM d h:mma');
   String? nullValue;
   Parse convert = Parse();
+  TextEditingController reasonController = TextEditingController();
 
   Future<String> getUsername() async {
     try {
@@ -105,7 +117,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     }
   }
 
-  Future<void> finalDeny() async {
+  Future<void> finalDeny(String reason) async {
     //make notification function here
     String customerID = '';
     try {
@@ -125,14 +137,20 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           .doc(customerID)
           .collection('bookings')
           .doc(bookingDocument)
-          .update({'status': 'denied'});
+          .update({
+        'status': 'denied',
+        'reason': reason,
+      });
       //set confirm to client
       await _firestore
           .collection('users')
           .doc(currentUser!.uid)
           .collection('bookings')
           .doc(bookingDocument)
-          .update({'status': 'denied'}).then(
+          .update({
+        'status': 'denied',
+        'reason': reason,
+      }).then(
         (value) {
           log('finished');
           if (mounted) {
@@ -192,7 +210,97 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                 child: const Text('BACK')),
             TextButton(
                 onPressed: () {
-                  finalDeny();
+                  // finalDeny();
+                  Navigator.of(context).pop();
+                  denyReasonDialog();
+                },
+                child: const Text('DENY')),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> denyReasonDialog() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Reason for denial',
+            style: TextStyle(fontSize: 16),
+          ),
+          content: StatefulBuilder(builder: (context, setState) {
+            return Column(
+              children: [
+                RadioListTile(
+                  title: Text(reasons[0]),
+                  value: reasons[0],
+                  groupValue: currentReason,
+                  onChanged: (value) {
+                    setState(() {
+                      currentReason = value.toString();
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: Text(reasons[1]),
+                  value: reasons[1],
+                  groupValue: currentReason,
+                  onChanged: (value) {
+                    setState(() {
+                      currentReason = value.toString();
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: Text(reasons[2]),
+                  value: reasons[2],
+                  groupValue: currentReason,
+                  onChanged: (value) {
+                    setState(() {
+                      currentReason = value.toString();
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: Text(reasons[3]),
+                  value: reasons[3],
+                  groupValue: currentReason,
+                  onChanged: (value) {
+                    setState(() {
+                      currentReason = value.toString();
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: Text(reasons[4]),
+                  value: reasons[4],
+                  groupValue: currentReason,
+                  onChanged: (value) {
+                    setState(() {
+                      currentReason = value.toString();
+                    });
+                  },
+                ),
+                if (currentReason == "Others")
+                  flatTextField('Reason', reasonController)
+              ],
+            );
+          }),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('BACK')),
+            TextButton(
+                onPressed: () {
+                  if (currentReason == "Others") {
+                    currentReason = reasonController.text;
+                  }
+                  finalDeny(currentReason);
                   Navigator.of(context).pop();
                 },
                 child: const Text('DENY')),
@@ -306,12 +414,59 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
     return false;
   }
 
+  Future<AppointmentDoc?> getSpecificAppointment(String reference) async {
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(reference)
+          .get();
+      if (doc['status'] == 'denied') {
+        return AppointmentDoc(
+            reason: doc['reason'],
+            clientId: doc['clientId'],
+            clientUsername: doc['clientUsername'],
+            customerUsername: doc['customerUsername'],
+            dateFrom: doc['dateFrom'].toDate(),
+            dateTo: doc['dateTo'].toDate(),
+            location: doc['location'],
+            paymentMethod: doc['paymentMethod'],
+            reference: doc['reference'],
+            serviceFee: doc['serviceFee'],
+            services: doc['services'],
+            status: doc['status'],
+            totalAmount: doc['totalAmount']);
+      } else {
+        return AppointmentDoc(
+            clientId: doc['clientId'],
+            clientUsername: doc['clientUsername'],
+            customerUsername: doc['customerUsername'],
+            dateFrom: doc['dateFrom'].toDate(),
+            dateTo: doc['dateTo'].toDate(),
+            location: doc['location'],
+            paymentMethod: doc['paymentMethod'],
+            reference: doc['reference'],
+            serviceFee: doc['serviceFee'],
+            services: doc['services'],
+            status: doc['status'],
+            totalAmount: doc['totalAmount']);
+      }
+    } catch (e) {
+      log('error getting appointment document $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool walapa =
         widget.appointment?.color == const Color.fromARGB(255, 158, 158, 158);
     bool paid =
         widget.appointment?.color == const Color.fromARGB(255, 30, 90, 255);
+    bool confirmed = widget.appointment?.color == kPrimaryColor;
+    bool denied =
+        widget.appointment?.color == const Color.fromARGB(255, 255, 59, 59);
     List<Map<String, dynamic>> servicesList =
         convert.stringToMap(widget.appointment!.notes.toString());
     double total = double.parse(getTotal(extractPrice(servicesList))) +
@@ -321,249 +476,283 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
       body: Background(
           child: Container(
         margin: const EdgeInsets.fromLTRB(15, 50, 15, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: StreamBuilder<AppointmentDoc?>(
+            stream: Stream.fromFuture(
+                getSpecificAppointment(widget.appointment!.id.toString())),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "booking details".toUpperCase(),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: kPrimaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: defaultPadding),
-                  ],
-                ),
-                Text(
-                  'Ref. ${widget.appointment!.id}',
-                  style: const TextStyle(
-                      color: Colors.black54, fontStyle: FontStyle.italic),
-                ),
-                const SizedBox(height: defaultPadding),
-                //////////////////OPTIONAL ASSIGN WORKER///////////////////////////
-                StreamBuilder<String>(
-                  stream: Stream.fromFuture(preferredWorker()),
-                  builder: (context, workers) {
-                    if (workers.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: kPrimaryColor,
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "booking details".toUpperCase(),
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                          ],
                         ),
-                      );
-                    } else if (workers.hasError) {
-                      return Center(
-                        child:
-                            Text("Error getting worker list ${workers.error}"),
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          bookingCard(
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Customer Name'),
-                                const SizedBox(height: 1),
-                                Text(
-                                  widget.appointment!.subject,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                        Text(
+                          'Ref. ${widget.appointment!.id}',
+                          style: const TextStyle(
+                              color: Colors.black54,
+                              fontStyle: FontStyle.italic),
+                        ),
+                        const SizedBox(height: defaultPadding),
+                        //////////////////OPTIONAL ASSIGN WORKER///////////////////////////
+                        StreamBuilder<String>(
+                          stream: Stream.fromFuture(preferredWorker()),
+                          builder: (context, workers) {
+                            if (workers.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: kPrimaryColor,
                                 ),
-                                const SizedBox(height: defaultPadding),
-                                const Text('Salon Place'),
-                                const SizedBox(height: 1),
-                                Text(
-                                  widget.appointment!.location.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: defaultPadding),
-                                const Text('Time & Date'),
-                                const SizedBox(height: 1),
-                                Text(
-                                  '${DateFormat.jm().format(widget.appointment!.startTime)} - ${DateFormat.jm().format(widget.appointment!.endTime)} | ${DateFormat('MMMMd').format(widget.appointment!.endTime)}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: defaultPadding),
-                                const Text('Service Appointment'),
-                                const SizedBox(height: 1),
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    return SizedBox(
-                                      width: constraints.maxWidth,
-                                      height: 30,
-                                      child: ListView.builder(
+                              );
+                            } else if (workers.hasError) {
+                              return Center(
+                                child: Text(
+                                    "Error getting worker list ${workers.error}"),
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  bookingCard(
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Customer Name'),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          widget.appointment!.subject,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: defaultPadding),
+                                        const Text('Salon Place'),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          widget.appointment!.location
+                                              .toString(),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: defaultPadding),
+                                        const Text('Time & Date'),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          '${DateFormat.jm().format(widget.appointment!.startTime)} - ${DateFormat.jm().format(widget.appointment!.endTime)} | ${DateFormat('MMMMd').format(widget.appointment!.endTime)}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: defaultPadding),
+                                        const Text('Service Appointment'),
+                                        const SizedBox(height: 1),
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            return SizedBox(
+                                              width: constraints.maxWidth,
+                                              height: 30,
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: convert
+                                                    .stringToMap(widget
+                                                        .appointment!.notes
+                                                        .toString())
+                                                    .length,
+                                                itemBuilder: (context, index) {
+                                                  String services =
+                                                      convert.stringToMap(widget
+                                                              .appointment!.notes
+                                                              .toString())[
+                                                          index]["serviceName"];
+                                                  return serviceCard(services);
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: defaultPadding),
+                                  bookingCard(Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('Payment Method'),
+                                          Text('CASH')
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            'Total',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            total.toStringAsFixed(2),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 1),
+                                      const Divider(
+                                        color: kPrimaryLightColor,
+                                      ),
+                                      ListView.builder(
                                         shrinkWrap: true,
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: convert
-                                            .stringToMap(widget
-                                                .appointment!.notes
-                                                .toString())
-                                            .length,
+                                        itemCount: servicesList.length + 1,
                                         itemBuilder: (context, index) {
-                                          String services = convert.stringToMap(
-                                                  widget.appointment!.notes
-                                                      .toString())[index]
-                                              ["serviceName"];
-                                          return serviceCard(services);
+                                          if (index == servicesList.length) {
+                                            List<double> prices = extractPrice(
+                                                convert.stringToMap(widget
+                                                    .appointment!.notes
+                                                    .toString()));
+                                            return Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                const Text(
+                                                  "Service Fee",
+                                                  style: TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                                Text(
+                                                  "PHP ${getServicesFee(prices)}",
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                              ],
+                                            );
+                                          } else {
+                                            String services =
+                                                convert.stringToMap(widget
+                                                        .appointment!.notes
+                                                        .toString())[index]
+                                                    ["serviceName"];
+                                            String price = convert.stringToMap(
+                                                    widget.appointment!.notes
+                                                        .toString())[index]
+                                                ["price"];
+                                            return Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  services,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                                Text(
+                                                  'PHP ${convert.intStringToDouble(price)}',
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                              ],
+                                            );
+                                          }
                                         },
                                       ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: defaultPadding),
-                          bookingCard(Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Payment Method'),
-                                  Text('CASH')
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'Total',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    total.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 1),
-                              const Divider(
-                                color: kPrimaryLightColor,
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: servicesList.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == servicesList.length) {
-                                    List<double> prices = extractPrice(convert
-                                        .stringToMap(widget.appointment!.notes
-                                            .toString()));
-                                    return Row(
+                                    ],
+                                  )),
+                                  const SizedBox(height: defaultPadding),
+                                  widget.role == 'salon'
+                                      ? bookingCard(Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Text('Preferred Stylist'),
+                                            Text(
+                                              workers.data!.isEmpty
+                                                  ? 'None'
+                                                  : workers.data!,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ))
+                                      //shows nothing since client is not a salon
+                                      : Container(),
+                                  if (denied)
+                                    bookingCard(Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text(
-                                          "Service Fee",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                        Text(
-                                          "PHP ${getServicesFee(prices)}",
-                                          style: const TextStyle(
-                                              color: Colors.grey),
-                                        ),
+                                        const Text('Deny Reason'),
+                                        Text(snapshot.data!.reason!),
                                       ],
-                                    );
-                                  } else {
-                                    String services = convert.stringToMap(widget
-                                        .appointment!.notes
-                                        .toString())[index]["serviceName"];
-                                    String price = convert.stringToMap(widget
-                                        .appointment!.notes
-                                        .toString())[index]["price"];
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          services,
-                                          style: const TextStyle(
-                                              color: Colors.grey),
-                                        ),
-                                        Text(
-                                          'PHP ${convert.intStringToDouble(price)}',
-                                          style: const TextStyle(
-                                              color: Colors.grey),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
-                          )),
-                          const SizedBox(height: defaultPadding),
-                          widget.role == 'salon'
-                              ? bookingCard(Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Preferred Stylist'),
-                                    Text(
-                                      workers.data!.isEmpty
-                                          ? 'None'
-                                          : workers.data!,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ))
-                              //shows nothing since client is not a salon
-                              : Container(),
-                        ],
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
-            if (walapa)
-              Container(
-                margin: const EdgeInsets.only(bottom: defaultPadding),
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: denyAppointment,
-                      style: const ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(kPrimaryLightColor)),
-                      child: const Text('DENY'),
+                                    ))
+                                ],
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: defaultPadding),
-                    ElevatedButton(
-                        onPressed: confirmAppointment,
-                        child: const Text('BOOK',
-                            style: TextStyle(color: kPrimaryLightColor))),
+                    if (walapa &&
+                        widget.appointment!.startTime.isAfter(DateTime.now()))
+                      Container(
+                        margin: const EdgeInsets.only(bottom: defaultPadding),
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: denyAppointment,
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      kPrimaryLightColor)),
+                              child: const Text('DENY'),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            ElevatedButton(
+                                onPressed: confirmAppointment,
+                                child: const Text('BOOK',
+                                    style:
+                                        TextStyle(color: kPrimaryLightColor))),
+                          ],
+                        ),
+                      ),
+                    if (paid)
+                      Column(
+                        children: [
+                          ElevatedButton(
+                              onPressed: completeAppointment,
+                              child: const Text(
+                                'COMPLETE',
+                                style: TextStyle(color: kPrimaryLightColor),
+                              )),
+                          const SizedBox(height: defaultPadding),
+                        ],
+                      ),
                   ],
-                ),
-              ),
-            if (paid)
-              Column(
-                children: [
-                  ElevatedButton(
-                      onPressed: completeAppointment,
-                      child: const Text(
-                        'COMPLETE',
-                        style: TextStyle(color: kPrimaryLightColor),
-                      )),
-                  const SizedBox(height: defaultPadding),
-                ],
-              ),
-          ],
-        ),
+                );
+              } else {
+                return Container();
+              }
+            }),
       )),
     );
   }
@@ -631,4 +820,36 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
       child: child,
     );
   }
+}
+
+class AppointmentDoc {
+  String clientId;
+  String clientUsername;
+  String customerUsername;
+  DateTime dateFrom;
+  DateTime dateTo;
+  String location;
+  String paymentMethod;
+  String? reason;
+  String reference;
+  String serviceFee;
+  List<dynamic> services;
+  String status;
+  String totalAmount;
+
+  AppointmentDoc({
+    required this.clientId,
+    required this.clientUsername,
+    required this.customerUsername,
+    required this.dateFrom,
+    required this.dateTo,
+    required this.location,
+    required this.paymentMethod,
+    this.reason,
+    required this.reference,
+    required this.serviceFee,
+    required this.services,
+    required this.status,
+    required this.totalAmount,
+  });
 }

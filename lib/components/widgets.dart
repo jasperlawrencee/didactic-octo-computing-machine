@@ -133,6 +133,27 @@ Container addImage(BuildContext context, String label) {
   );
 }
 
+Container salonHomeCard(String cardLabel, Widget widget) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(defaultPadding),
+    decoration: const BoxDecoration(
+        color: kPrimaryLightColor,
+        borderRadius: BorderRadius.all(Radius.circular(10))),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          cardLabel,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: defaultPadding),
+        widget,
+      ],
+    ),
+  );
+}
+
 SizedBox logOutButton(BuildContext context) {
   return SizedBox(
     child: InkWell(

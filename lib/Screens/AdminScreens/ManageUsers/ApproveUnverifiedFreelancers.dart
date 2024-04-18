@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/InfoTabs/FreelancerBasicInfo.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ServicesOffered/FreelancersServices.dart';
 import 'package:flutter_auth/constants.dart';
 
 class UnverifiedInfoFreelancers extends StatefulWidget {
@@ -90,9 +91,7 @@ class _UnverifiedInfoFreelancersState extends State<UnverifiedInfoFreelancers> {
           Center(
             child: Text('Portfolio'),
           ),
-          Center(
-            child: Text('Services Offered'),
-          ),
+          FreelancerServices(currentID: widget.currentID)
         ]),
       ),
     );

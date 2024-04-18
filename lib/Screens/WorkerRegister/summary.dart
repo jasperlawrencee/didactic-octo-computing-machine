@@ -631,6 +631,10 @@ class _SummaryState extends State<Summary> {
         'gender': workerForm.gender,
         'primaryPhoneNumber': workerForm.phoneNum1,
         'secondaryPhoneNumber': workerForm.phoneNum2,
+        'stAddress': workerForm.stAddress,
+        'extAddress': workerForm.extAddress,
+        'city': workerForm.city,
+        'brgy': workerForm.barangay,
         'address':
             "${workerForm.barangay} ${workerForm.stAddress} ${workerForm.extAddress} ${workerForm.city}",
         'birthday': '${workerForm.birthday}',

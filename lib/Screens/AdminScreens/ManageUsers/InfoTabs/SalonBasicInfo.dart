@@ -11,6 +11,10 @@ class ClassSalonBasicInfo {
   final String salonName;
   final String salonContactNum;
   final String address;
+  final String room_bldg;
+  final String street;
+  final String brgy;
+  final String city;
   final String salonRep;
   final String repContact;
   final String repEmail;
@@ -27,7 +31,11 @@ class ClassSalonBasicInfo {
       required this.salonRep,
       required this.salonOwner,
       required this.profPic,
-      required this.repID});
+      required this.repID,
+      required this.room_bldg,
+      required this.street,
+      required this.brgy,
+      required this.city});
 }
 
 class SalonBasicInfo extends StatefulWidget {
@@ -62,7 +70,11 @@ class _SalonBasicInfoState extends State<SalonBasicInfo> {
         salonRep: salonBasicInfo.get('salonRepresentative'),
         salonOwner: salonBasicInfo.get('salonOwner'),
         profPic: salonBasicInfo.get('profilePicture'),
-        repID: salonBasicInfo.get('representativeID'));
+        repID: salonBasicInfo.get('representativeID'),
+        room_bldg: salonBasicInfo.get('room/bldg'),
+        street: salonBasicInfo.get('street'),
+        brgy: salonBasicInfo.get('brgy'),
+        city: salonBasicInfo.get('city'));
   }
 
   @override
@@ -172,7 +184,10 @@ class _SalonBasicInfoState extends State<SalonBasicInfo> {
                   Row(children: [
                     Expanded(
                         child: adminTextField(
-                            'Address', basicInfo.address, _address))
+                            'Address', basicInfo.address, _address)),
+                    // Expanded(
+                    // child: adminTextField(
+                    // 'Room No./Building', basicInfo., controller))
                   ])
                 ],
               ),

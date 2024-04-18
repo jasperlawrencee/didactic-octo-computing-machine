@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/calendar_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/salon_screen.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
-import 'package:flutter_auth/features/firebase/firebase_services.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
@@ -15,7 +14,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseService().initNotifications();
   runApp(const MyApp());
 }
 

@@ -218,34 +218,81 @@ class _homeState extends State<home> {
                   ),
                 ],
               ),
-              const SizedBox(height: defaultPadding),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(defaultPadding),
-                decoration: const BoxDecoration(
-                    color: kPrimaryLightColor,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+              FutureBuilder<List<Booking>>(
+                future: getBookingHistory(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return salonHomeCard(
                       'Appointments',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Staff',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Feedbacks',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {},
+                            child: Container(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(snapshot.data![index].customerUsername),
+                                  Text(snapshot.data![index].status
+                                      .toUpperCase())
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
+              const SizedBox(height: defaultPadding),
+              FutureBuilder(
+                future: getStaffList(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return salonHomeCard(
+                        'Staff',
+                        ListView.builder(
+                          itemCount: 1,
+                          itemBuilder: (context, index) {
+                            return Text('data');
+                          },
+                        ));
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Container salonHomeCard(String cardLabel, Widget widget) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            cardLabel,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: defaultPadding),
+          widget,
+        ],
       ),
     );
   }
@@ -263,6 +310,104 @@ class _homeState extends State<home> {
       label: Text(text),
     );
   }
+
+  Future<List<Booking>> getBookingHistory() async {
+    try {
+      List<Booking> history = [];
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        history.add(Booking(
+          clientId: element['clientId'],
+          clientUsername: element['clientUsername'],
+          customerUsername: element['customerUsername'],
+          dateFrom: element['dateFrom'].toDate(),
+          dateTo: element['dateTo'].toDate(),
+          location: element['location'],
+          paymentMethod: element['paymentMethod'],
+          reference: element['reference'],
+          serviceFee: element['serviceFee'],
+          services: element['services'],
+          status: element['status'],
+          totalAmount: element['totalAmount'],
+          worker: element['worker'],
+        ));
+      });
+      return history;
+    } catch (e) {
+      log('error getting booking history $e');
+      return [];
+    }
+  }
+}
+
+Future<List<Staff>> getStaffList() async {
+  try {
+    List<Staff> staffList = [];
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('staff')
+        .get();
+    querySnapshot.docs.forEach((element) {
+      staffList.add(Staff(
+        contactNum: element['contact'],
+        name: element['name'],
+        role: element['role'],
+      ));
+    });
+    return staffList;
+  } catch (e) {
+    log('error getting staff list');
+    return [];
+  }
+}
+
+class Booking {
+  String clientId;
+  String clientUsername;
+  String customerUsername;
+  DateTime dateFrom;
+  DateTime dateTo;
+  String location;
+  String paymentMethod;
+  String reference;
+  String serviceFee;
+  List<dynamic> services;
+  String status;
+  String totalAmount;
+  String? worker;
+
+  Booking({
+    required this.clientId,
+    required this.clientUsername,
+    required this.customerUsername,
+    required this.dateFrom,
+    required this.dateTo,
+    required this.location,
+    required this.paymentMethod,
+    required this.reference,
+    required this.serviceFee,
+    required this.services,
+    required this.status,
+    required this.totalAmount,
+    required this.worker,
+  });
+}
+
+class Staff {
+  String contactNum;
+  String name;
+  String role;
+
+  Staff({
+    required this.contactNum,
+    required this.name,
+    required this.role,
+  });
 }
 
 class Client {

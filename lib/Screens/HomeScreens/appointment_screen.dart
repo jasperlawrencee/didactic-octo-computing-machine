@@ -72,7 +72,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           .get();
       return documentSnapshot['worker'];
     } catch (e) {
-      log('error getting preferred worker');
+      log('error getting preferred worker $e');
       return '';
     }
   }
@@ -178,6 +178,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
             TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
+                  setState(() {});
                 },
                 child: const Text('BACK')),
             TextButton(
@@ -688,7 +689,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                             const Text('Preferred Stylist'),
                                             Text(
                                               workers.data!.isEmpty
-                                                  ? 'None'
+                                                  ? 'Any'
                                                   : workers.data!,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold),
@@ -714,7 +715,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                       ],
                     ),
                     if (walapa &&
-                        widget.appointment!.startTime.isAfter(DateTime.now()))
+                        DateTime.now().isBefore(widget.appointment!.startTime
+                            .add(const Duration(minutes: 15))))
                       Container(
                         margin: const EdgeInsets.only(bottom: defaultPadding),
                         child: Column(

@@ -312,21 +312,22 @@ class _homeState extends State<home> {
           .doc(currentUser!.uid)
           .collection('bookings')
           .get();
-      querySnapshot.docs.forEach((element) {
+      querySnapshot.docs.forEach((doc) {
+        // String? worker = doc['worker'];
+
         history.add(Booking(
-          clientId: element['clientId'],
-          clientUsername: element['clientUsername'],
-          customerUsername: element['customerUsername'],
-          dateFrom: element['dateFrom'].toDate(),
-          dateTo: element['dateTo'].toDate(),
-          location: element['location'],
-          paymentMethod: element['paymentMethod'],
-          reference: element['reference'],
-          serviceFee: element['serviceFee'],
-          services: element['services'],
-          status: element['status'],
-          totalAmount: element['totalAmount'],
-          worker: element['worker'],
+          clientId: doc['clientId'],
+          clientUsername: doc['clientUsername'],
+          customerUsername: doc['customerUsername'],
+          dateFrom: doc['dateFrom'].toDate(),
+          dateTo: doc['dateTo'].toDate(),
+          location: doc['location'],
+          paymentMethod: doc['paymentMethod'],
+          reference: doc['reference'],
+          serviceFee: doc['serviceFee'],
+          services: doc['services'],
+          status: doc['status'],
+          totalAmount: doc['totalAmount'],
         ));
       });
       return history;
@@ -387,7 +388,7 @@ class Booking {
     required this.services,
     required this.status,
     required this.totalAmount,
-    required this.worker,
+    this.worker,
   });
 }
 

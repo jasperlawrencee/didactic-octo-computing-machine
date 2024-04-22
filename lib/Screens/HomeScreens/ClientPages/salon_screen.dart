@@ -169,13 +169,6 @@ final _firestore = FirebaseFirestore.instance;
 User? currentUser = FirebaseAuth.instance.currentUser;
 
 class _homeState extends State<home> {
-  String salonName = '';
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -208,17 +201,6 @@ class _homeState extends State<home> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              Row(
-                children: [
-                  Text(
-                    salonName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                ],
-              ),
               FutureBuilder<List<Booking>>(
                 future: getBookingHistory(),
                 builder: (context, snapshot) {

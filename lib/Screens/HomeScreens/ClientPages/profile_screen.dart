@@ -333,6 +333,16 @@ class _ProfilePageState extends State<ProfilePage> {
       child: child,
     );
   }
+
+  Future<List<String>> getCertificates() async {
+    try {
+      List<String> certs = [];
+      return certs;
+    } catch (e) {
+      log('error getting certificate links $e');
+      return [];
+    }
+  }
 }
 
 class Staff {

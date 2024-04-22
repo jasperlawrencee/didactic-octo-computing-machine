@@ -425,6 +425,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           .get();
       if (doc['status'] == 'denied') {
         return AppointmentDoc(
+            // customerName: doc['customerName'],
             reason: doc['reason'],
             clientId: doc['clientId'],
             clientUsername: doc['clientUsername'],
@@ -440,6 +441,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
             totalAmount: doc['totalAmount']);
       } else {
         return AppointmentDoc(
+            // customerName: doc['customerName'],
             clientId: doc['clientId'],
             clientUsername: doc['clientUsername'],
             customerUsername: doc['customerUsername'],
@@ -594,12 +596,12 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Row(
+                                      Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('Payment Method'),
-                                          Text('CASH')
+                                          const Text('Payment Method'),
+                                          Text(snapshot.data!.paymentMethod)
                                         ],
                                       ),
                                       Row(
@@ -789,45 +791,13 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
 
     return prices;
   }
-
-  Container serviceCard(String service) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-      decoration: const BoxDecoration(
-          color: kPrimaryLightColor,
-          borderRadius: BorderRadius.all(Radius.circular(30))),
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      child: Text(
-        service,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget bookingCard(Widget child) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 32),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 8,
-            offset: Offset(8, 8),
-          )
-        ],
-      ),
-      child: child,
-    );
-  }
 }
 
 class AppointmentDoc {
   String clientId;
   String clientUsername;
   String customerUsername;
+  // String customerName;
   DateTime dateFrom;
   DateTime dateTo;
   String location;
@@ -843,6 +813,7 @@ class AppointmentDoc {
     required this.clientId,
     required this.clientUsername,
     required this.customerUsername,
+    // required this.customerName,
     required this.dateFrom,
     required this.dateTo,
     required this.location,

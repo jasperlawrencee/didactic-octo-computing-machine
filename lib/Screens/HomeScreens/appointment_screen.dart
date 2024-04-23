@@ -108,8 +108,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
         (value) {
           if (mounted) {
             Navigator.pop(context);
+            setState(() {});
           }
-          setState(() {});
         },
       );
     } catch (e) {
@@ -155,8 +155,8 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           log('finished');
           if (mounted) {
             Navigator.pop(context);
+            setState(() {});
           }
-          setState(() {});
         },
       );
     } catch (e) {
@@ -185,6 +185,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                 onPressed: () {
                   finalComplete();
                   Navigator.of(context).pop();
+                  setState(() {});
                 },
                 child: const Text('CONFIRM')),
           ],
@@ -303,6 +304,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                   }
                   finalDeny(currentReason);
                   Navigator.of(context).pop();
+                  setState(() {});
                 },
                 child: const Text('DENY')),
           ],
@@ -343,6 +345,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
           log('finished');
           if (mounted) {
             Navigator.pop(context);
+            setState(() {});
           }
         },
       );
@@ -379,6 +382,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                     onPressed: () {
                       finalAppointment();
                       Navigator.of(context).pop();
+                      setState(() {});
                     },
                     child: const Text('BOOK'))
                 : Container(),

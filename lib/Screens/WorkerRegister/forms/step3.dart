@@ -66,32 +66,32 @@ class _thirdStepState extends State<thirdStep> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: defaultPadding),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Currently Employed',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Check if salon or parlor is listed',
-                ),
-              ],
-            ),
-            Checkbox(
-              value: workerForm.isExperienceClicked,
-              onChanged: (value) {
-                setState(() {
-                  workerForm.isExperienceClicked = value!;
-                });
-              },
-            )
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     const Column(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         Text(
+        //           'Currently Employed',
+        //           style: TextStyle(fontWeight: FontWeight.bold),
+        //         ),
+        //         Text(
+        //           'Check if salon or parlor is listed',
+        //         ),
+        //       ],
+        //     ),
+        //     Checkbox(
+        //       value: workerForm.isExperienceClicked,
+        //       onChanged: (value) {
+        //         setState(() {
+        //           workerForm.isExperienceClicked = value!;
+        //         });
+        //       },
+        //     )
+        //   ],
+        // ),
         if (workerForm.isExperienceClicked == false)
           Column(
             children: [

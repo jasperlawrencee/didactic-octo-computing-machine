@@ -24,27 +24,30 @@ class BookingsHistory extends StatelessWidget {
                 color: kPrimaryColor,
                 fontSize: 16),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: bookings.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(bookings[index].customerUsername),
-                    Text(bookings[index].status),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => History(booking: bookings[index]),
-                      ));
-                },
-              );
-            },
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: bookings.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(bookings[index].customerUsername),
+                      Text(bookings[index].status),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              History(booking: bookings[index]),
+                        ));
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),

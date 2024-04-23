@@ -55,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void sendImage() async {
-    if (!imageAdded || image.toString().isEmpty) {
+    if (imageAdded || image.toString().isNotEmpty) {
       Reference referenceRoot = FirebaseStorage.instance.ref();
       Reference dirImages =
           referenceRoot.child('chatImages').child(currentUser!.uid);

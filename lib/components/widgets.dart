@@ -67,6 +67,82 @@ TextFormField flatTextField(String text, TextEditingController? controller,
   );
 }
 
+Container adminTextField(
+    String label, String text, TextEditingController? controller,
+    {bool istext = true}) {
+  return Container(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            SizedBox(
+              width: 10,
+            ),
+            Text(label),
+          ],
+        ),
+        TextFormField(
+            readOnly: true,
+            inputFormatters: [LengthLimitingTextInputFormatter(50)],
+            controller: controller,
+            style: const TextStyle(
+              fontSize: 13,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
+            cursorColor: kPrimaryColor,
+            decoration: InputDecoration(hintText: text))
+      ],
+    ),
+  );
+}
+
+Container adminImageContainer(String label, String url) {
+  DecoratedBox? imageBox;
+  try {
+    imageBox = DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        image: DecorationImage(
+          image: NetworkImage(url),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  } catch (error) {
+    // Handle network or other exceptions here
+    print('Error loading image: $error'); // Log the error for debugging
+  }
+  return Container(
+    height: 250,
+    width: 300,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(label),
+        if (imageBox != null) imageBox, // Only return the imageBox if it exists
+        Text(
+            'Error loading image'), // Display error message if imageBox is null
+      ],
+    ),
+  );
+}
+
+Text adminHeading(String text) {
+  return Text(
+    text,
+    style: TextStyle(
+      color: kPrimaryColor,
+      fontSize: 24,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w500,
+    ),
+  );
+}
+
 Container nextButton(BuildContext context, Function onTap, String text) {
   return Container(
     width: MediaQuery.of(context).size.width,

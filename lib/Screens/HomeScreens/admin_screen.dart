@@ -1,6 +1,10 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/AdminScreens/Dashboard.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
 import 'package:flutter_auth/asset_strings.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
@@ -14,12 +18,22 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
+  Future<void> signUserOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(builder: (context) => const WelcomeScreen()));
+    } catch (e) {
+      log('error signing out $e');
+    }
+  }
+
   List<Widget> views = const [
     AdminDashboard(),
     ManageUsers(),
-    Center(
-      child: Text('Settings'),
-    ),
+    // Center(
+    // child: Text('Settings'),
+    // ),
   ];
   int selectedIndex = 0;
   @override
@@ -42,7 +56,7 @@ class _AdminScreenState extends State<AdminScreen> {
             footer: SideNavigationBarFooter(
                 label: TextButton(
               child: Text('Logout'),
-              onPressed: () {},
+              onPressed: signUserOut,
               onHover: (value) {},
             )),
             selectedIndex: selectedIndex,
@@ -55,10 +69,10 @@ class _AdminScreenState extends State<AdminScreen> {
                 icon: Icons.people,
                 label: 'Manage Users',
               ),
-              SideNavigationBarItem(
-                icon: Icons.settings,
-                label: 'Settings',
-              ),
+              // SideNavigationBarItem(
+              // icon: Icons.settings,
+              // label: 'Settings',
+              // ),
             ],
             onTap: (index) {
               setState(() {

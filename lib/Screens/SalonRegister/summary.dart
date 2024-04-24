@@ -558,7 +558,7 @@ class _SummaryState extends State<Summary> {
 
   Map<String, dynamic> step1() => {
         'name': salonForm.salonName,
-        'room/bldg': salonForm.roomBuilding,
+        'room_bldg': salonForm.roomBuilding,
         'street': salonForm.streetRoad,
         'brgy': salonForm.barangay,
         'city': salonForm.city,

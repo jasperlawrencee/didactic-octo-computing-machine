@@ -84,13 +84,14 @@ class _FreelancerBasicState extends State<FreelancerBasic> {
                 child: Container(
                     padding: EdgeInsets.fromLTRB(50, 30, 50, 0),
                     child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           SizedBox(
                             height: 40,
                           ),
                           Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 adminHeading('Freelancer Personal Information'),

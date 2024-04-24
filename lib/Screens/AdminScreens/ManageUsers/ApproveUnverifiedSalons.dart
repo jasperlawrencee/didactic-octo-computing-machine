@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/IDs/SalonIDs.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/InfoTabs/SalonBasicInfo.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ServicesOffered/GetClientServices.dart';
 import 'package:flutter_auth/constants.dart';
-
 import 'Unverified.dart';
 import 'Verified.dart';
 
 class UnverifiedInfo extends StatefulWidget {
+  final String status;
   final String currentID;
   final String role;
 
   const UnverifiedInfo(
-      {super.key, required this.currentID, required this.role});
+      {super.key,
+      required this.currentID,
+      required this.role,
+      required this.status});
 
   @override
   State<UnverifiedInfo> createState() => _UnverifiedInfoState();
@@ -40,26 +44,47 @@ class _UnverifiedInfoState extends State<UnverifiedInfo> {
           toolbarHeight: 80,
           automaticallyImplyLeading: true,
           actions: [
-            Padding(
-              padding: EdgeInsetsDirectional.only(end: 40),
-              child: TextButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.deepPurple[300];
-                      }
-                      return kPrimaryColor;
-                    }),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(kPrimaryLightColor),
-                    iconColor:
-                        MaterialStateProperty.all<Color>(kPrimaryLightColor),
-                  ),
-                  onPressed: verifySalon,
-                  icon: Icon(Icons.check),
-                  label: Text('Approve')),
-            )
+            widget.status == 'unverified'
+                ? Padding(
+                    padding: EdgeInsetsDirectional.only(end: 40),
+                    child: TextButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.deepPurple[300];
+                            }
+                            return kPrimaryColor;
+                          }),
+                          foregroundColor: MaterialStateProperty.all<Color>(
+                              kPrimaryLightColor),
+                          iconColor: MaterialStateProperty.all<Color>(
+                              kPrimaryLightColor),
+                        ),
+                        onPressed: verifySalon,
+                        icon: Icon(Icons.check),
+                        label: Text('Approve')),
+                  )
+                : Padding(
+                    padding: EdgeInsetsDirectional.only(end: 40),
+                    child: TextButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.green[300];
+                            }
+                            return Colors.green[800];
+                          }),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          iconColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                        ),
+                        onPressed: () {},
+                        icon: Icon(Icons.check_circle_outline_outlined),
+                        label: Text('Verified')),
+                  )
           ],
           title: Text(
             "Salon Information",
@@ -88,9 +113,10 @@ class _UnverifiedInfoState extends State<UnverifiedInfo> {
               role: widget.role,
             ),
             SalonIDs(currentID: widget.currentID),
-            Center(
-              child: Text('Services Offered'),
-            ),
+            GetClientServices(
+              currentID: widget.currentID,
+              role: widget.role,
+            )
           ],
         ),
       ),

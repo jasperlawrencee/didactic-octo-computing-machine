@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/InfoTabs/FreelancerBasicInfo.dart';
-import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ServicesOffered/FreelancersServices.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ServicesOffered/GetClientServices.dart';
 import 'package:flutter_auth/constants.dart';
 
 class UnverifiedInfoFreelancers extends StatefulWidget {
+  final String status;
   final String currentID;
   final String role;
   const UnverifiedInfoFreelancers(
-      {super.key, required this.currentID, required this.role});
+      {super.key,
+      required this.currentID,
+      required this.role,
+      required this.status});
 
   @override
   State<UnverifiedInfoFreelancers> createState() =>
@@ -36,26 +40,47 @@ class _UnverifiedInfoFreelancersState extends State<UnverifiedInfoFreelancers> {
           toolbarHeight: 80,
           automaticallyImplyLeading: true,
           actions: [
-            Padding(
-              padding: EdgeInsetsDirectional.only(end: 40),
-              child: TextButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.deepPurple[300];
-                      }
-                      return kPrimaryColor;
-                    }),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(kPrimaryLightColor),
-                    iconColor:
-                        MaterialStateProperty.all<Color>(kPrimaryLightColor),
-                  ),
-                  onPressed: verifyFreelancer,
-                  icon: Icon(Icons.check),
-                  label: Text('Approve')),
-            )
+            widget.status == 'unverified'
+                ? Padding(
+                    padding: EdgeInsetsDirectional.only(end: 40),
+                    child: TextButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.deepPurple[300];
+                            }
+                            return kPrimaryColor;
+                          }),
+                          foregroundColor: MaterialStateProperty.all<Color>(
+                              kPrimaryLightColor),
+                          iconColor: MaterialStateProperty.all<Color>(
+                              kPrimaryLightColor),
+                        ),
+                        onPressed: verifyFreelancer,
+                        icon: Icon(Icons.check),
+                        label: Text('Approve')),
+                  )
+                : Padding(
+                    padding: EdgeInsetsDirectional.only(end: 40),
+                    child: TextButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.green[300];
+                            }
+                            return Colors.green[800];
+                          }),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white54),
+                          iconColor:
+                              MaterialStateProperty.all<Color>(Colors.white54),
+                        ),
+                        onPressed: () {},
+                        icon: Icon(Icons.check_circle_outline_outlined),
+                        label: Text('Verified')),
+                  )
           ],
           title: Text(
             "Freelancer Information",
@@ -91,7 +116,10 @@ class _UnverifiedInfoFreelancersState extends State<UnverifiedInfoFreelancers> {
           Center(
             child: Text('Portfolio'),
           ),
-          FreelancerServices(currentID: widget.currentID)
+          GetClientServices(
+            currentID: widget.currentID,
+            role: widget.role,
+          )
         ]),
       ),
     );

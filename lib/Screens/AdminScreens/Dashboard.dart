@@ -1,8 +1,26 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_auth/asset_strings.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+class DashboardValues {
+  String verifiedFreelancers;
+  String verifiedSalons;
+  String unverifiedFreelancers;
+  String unverifiedSalons;
+  String allClients;
+
+  DashboardValues(
+      {required this.verifiedSalons,
+      required this.verifiedFreelancers,
+      required this.unverifiedSalons,
+      required this.unverifiedFreelancers,
+      required this.allClients});
+}
+
+final db = FirebaseFirestore.instance;
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -12,6 +30,56 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  List<String> status = ['verified', 'unverified'];
+
+  Future<DashboardValues> getDashboardValues() async {
+    QuerySnapshot clients = await db
+        .collection('users')
+        .where('status', whereIn: List.from(status))
+        .get();
+
+    final clientsCount = clients.docs.length;
+
+    QuerySnapshot uvFreelancers = await db
+        .collection('users')
+        .where('status', isEqualTo: 'unverified')
+        .where('role', isEqualTo: 'freelancer')
+        .get();
+
+    final uvFreelancersCount = uvFreelancers.docs.length;
+
+    QuerySnapshot uvSalons = await db
+        .collection('users')
+        .where('status', isEqualTo: 'unverified')
+        .where('role', isEqualTo: 'salon')
+        .get();
+
+    final uvSalonsCount = uvSalons.docs.length;
+
+    QuerySnapshot verFreelancers = await db
+        .collection('users')
+        .where('status', isEqualTo: 'verified')
+        .where('role', isEqualTo: 'freelancer')
+        .get();
+
+    final verFreelancersCount = verFreelancers.docs.length;
+
+    QuerySnapshot verSalons = await db
+        .collection('users')
+        .where('status', isEqualTo: 'verified')
+        .where('role', isEqualTo: 'salon')
+        .get();
+
+    final verSalonsCount = verSalons.docs.length;
+
+    return DashboardValues(
+        verifiedSalons: verSalonsCount.toString(),
+        verifiedFreelancers: verFreelancersCount.toString(),
+        unverifiedSalons: uvSalonsCount.toString(),
+        unverifiedFreelancers: uvFreelancersCount.toString(),
+        allClients: clientsCount.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,69 +95,82 @@ class _AdminDashboardState extends State<AdminDashboard> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
                 defaultPadding, 20, defaultPadding, defaultPadding),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    DashboardCard(
-                      name: 'Total Service Fee \nEarnings',
-                      image: cash,
-                      value: 'PHP 50,000',
-                      verified: true,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    DashboardCard(
-                      name: 'All Verified \nFreelancers',
-                      image: worker,
-                      value: '200',
-                      verified: true,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    DashboardCard(
-                      name: 'All Verified \nSalons',
-                      image: salon,
-                      value: '350',
-                      verified: true,
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: defaultPadding,
-                ),
-                Row(
-                  children: [
-                    DashboardCard(
-                      name: 'ALL REGISTERED \nCLIENTS',
-                      image: user,
-                      value: '800',
-                      verified: true,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    DashboardCard(
-                      name: 'ALL UNVERIFIED \nFREELANCERS',
-                      image: worker,
-                      value: '120',
-                      verified: false,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    DashboardCard(
-                      name: 'ALL UNVERIFIED \nSALONS',
-                      image: salon,
-                      value: '150',
-                      verified: false,
-                    )
-                  ],
-                )
-              ],
-            ),
+            child: FutureBuilder<DashboardValues>(
+                future: getDashboardValues(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var dashboardValues = snapshot.data!;
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            // DashboardCard(
+                            // name: 'Total Service Fee \nEarnings',
+                            // image: cash,
+                            // value: 'PHP 50,000',
+                            // verified: true,
+                            // ),
+                            // SizedBox(
+                            // width: 20,
+                            // ),
+                            DashboardCard(
+                              name: 'All Verified \nFreelancers',
+                              image: worker,
+                              value: dashboardValues.verifiedFreelancers,
+                              verified: true,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            DashboardCard(
+                              name: 'All Verified \nSalons',
+                              image: salon,
+                              value: dashboardValues.verifiedSalons,
+                              verified: true,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            DashboardCard(
+                              name: 'ALL REGISTERED \nCLIENTS',
+                              image: user,
+                              value: dashboardValues.allClients,
+                              verified: true,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: defaultPadding,
+                        ),
+                        Row(
+                          children: [
+                            // SizedBox(
+                            // width: 20,
+                            // ),
+                            DashboardCard(
+                              name: 'ALL UNVERIFIED \nFREELANCERS',
+                              image: worker,
+                              value: dashboardValues.unverifiedFreelancers,
+                              verified: false,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            DashboardCard(
+                              name: 'ALL UNVERIFIED \nSALONS',
+                              image: salon,
+                              value: dashboardValues.unverifiedSalons,
+                              verified: false,
+                            )
+                          ],
+                        )
+                      ],
+                    );
+                  } else {
+                    return Center(
+                        child: CircularProgressIndicator(color: kPrimaryColor));
+                  }
+                }),
           ),
         ));
   }

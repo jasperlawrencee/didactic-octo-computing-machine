@@ -1,15 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ApproveUnverifiedFreelancers.dart';
+import 'package:flutter_auth/Screens/AdminScreens/ManageUsers/ApproveUnverifiedSalons.dart';
 import 'package:flutter_auth/constants.dart';
 
 final db = FirebaseFirestore.instance;
 
 class VerifiedTile {
+  final String id;
   final String name;
   final String type;
   final String status;
 
-  VerifiedTile({required this.name, required this.type, required this.status});
+  VerifiedTile(
+      {required this.id,
+      required this.name,
+      required this.type,
+      required this.status});
 }
 
 class VerifiedRegistrants extends StatefulWidget {
@@ -42,6 +49,7 @@ class _VerifiedRegistrantsState extends State<VerifiedRegistrants> {
     }
 
     return VerifiedTile(
+        id: verifiedUser.id.toString(),
         name: verifiedUser.get('name'),
         type: verifiedUser.get('role'),
         status: verifiedUser.get('status'));
@@ -109,7 +117,30 @@ class _VerifiedRegistrantsState extends State<VerifiedRegistrants> {
                                 iconColor: MaterialStateProperty.all<Color>(
                                     kPrimaryLightColor),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                if (item.type == 'salon') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => UnverifiedInfo(
+                                              status: item.status,
+                                              currentID: item.id,
+                                              role: item.type,
+                                            )),
+                                  );
+                                } else if (item.type == 'freelancer') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            UnverifiedInfoFreelancers(
+                                              status: item.status,
+                                              currentID: item.id,
+                                              role: item.type,
+                                            )),
+                                  );
+                                }
+                              },
                               icon: Icon(Icons.visibility),
                               label: Text('View')))
                         ]))
@@ -117,21 +148,4 @@ class _VerifiedRegistrantsState extends State<VerifiedRegistrants> {
           }
         });
   }
-}
-
-DataRow _buildDataRow(VerifiedTile item) {
-  final capitalRole =
-      item.type.substring(0, 1).toUpperCase() + item.type.substring(1);
-  return DataRow(cells: [
-    DataCell(Text(item.name)),
-    DataCell(Text(capitalRole)),
-    DataCell(Text(
-      item.status.toUpperCase(),
-      style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
-    )),
-    DataCell(TextButton.icon(
-        onPressed: () {},
-        icon: Icon(Icons.edit_attributes),
-        label: Text('Review')))
-  ]);
 }

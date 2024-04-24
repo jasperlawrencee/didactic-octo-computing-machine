@@ -1,4 +1,4 @@
-import 'dart:js';
+// import 'dart:js';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -120,6 +120,7 @@ class _UnverifiedRegistreesState extends State<UnverifiedRegistrees> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => UnverifiedInfo(
+                                              status: item.status,
                                               currentID: item.id,
                                               role: item.type,
                                             )),
@@ -130,6 +131,7 @@ class _UnverifiedRegistreesState extends State<UnverifiedRegistrees> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             UnverifiedInfoFreelancers(
+                                              status: item.status,
                                               currentID: item.id,
                                               role: item.type,
                                             )),

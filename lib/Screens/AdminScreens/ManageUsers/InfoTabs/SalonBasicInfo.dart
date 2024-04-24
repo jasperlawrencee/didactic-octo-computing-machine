@@ -71,7 +71,7 @@ class _SalonBasicInfoState extends State<SalonBasicInfo> {
         salonOwner: salonBasicInfo.get('salonOwner'),
         profPic: salonBasicInfo.get('profilePicture'),
         repID: salonBasicInfo.get('representativeID'),
-        room_bldg: salonBasicInfo.get('room/bldg'),
+        room_bldg: salonBasicInfo.get('room_bldg'),
         street: salonBasicInfo.get('street'),
         brgy: salonBasicInfo.get('brgy'),
         city: salonBasicInfo.get('city'));
@@ -83,7 +83,7 @@ class _SalonBasicInfoState extends State<SalonBasicInfo> {
         future: getSalonSalonBasicInfo(),
         builder: (context, AsyncSnapshot<ClassSalonBasicInfo> snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Snapshot Error: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData) {
@@ -102,6 +102,7 @@ class _SalonBasicInfoState extends State<SalonBasicInfo> {
                     height: 40,
                   ),
                   Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         adminHeading('Salon Basic Information'),

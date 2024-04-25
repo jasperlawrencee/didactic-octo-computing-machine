@@ -756,7 +756,7 @@ class _SalonAppointmentScreenState extends State<SalonAppointmentScreen> {
                       if (paid)
                         Column(
                           children: [
-                            TextButton(
+                            ElevatedButton(
                                 onPressed: completeAppointment,
                                 child: const Text(
                                   'COMPLETE',

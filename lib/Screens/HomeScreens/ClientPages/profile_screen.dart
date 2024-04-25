@@ -324,9 +324,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Container salonCard(Widget child) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(
+          vertical: defaultPadding, horizontal: defaultPadding / 2),
       height: 160,
-      width: 160,
+      width: 150,
       decoration: const BoxDecoration(
           color: kPrimaryLightColor,
           borderRadius: BorderRadius.all(Radius.circular(8))),

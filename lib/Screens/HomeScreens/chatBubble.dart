@@ -14,7 +14,7 @@ class ChatBubble extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(10)),
         color: kPrimaryLightColor,
       ),
-      child: message.substring(0, 4) == 'http'
+      child: message.length >= 4 && message.substring(0, 4) == 'http'
           ? Image.network(message, height: 100)
           : Text(
               message,

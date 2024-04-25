@@ -108,21 +108,26 @@ class _CalendarPageState extends State<CalendarPage> {
             child: Text("Error getting appointments ${appointments.error}"),
           );
         } else {
-          return SfCalendar(
-            showNavigationArrow: true,
-            showTodayButton: true,
-            view: CalendarView.day,
-            allowViewNavigation: true,
-            onTap: (details) => calendarTapped(details, appointments.data!),
-            allowedViews: const [
-              CalendarView.day,
-              CalendarView.week,
-              CalendarView.month,
-            ],
-            dataSource: MeetingDataSource(appointments.data!),
-            monthViewSettings: const MonthViewSettings(
-                appointmentDisplayMode:
-                    MonthAppointmentDisplayMode.appointment),
+          return RefreshIndicator(
+            onRefresh: () async {
+              setState(() {});
+            },
+            child: SfCalendar(
+              showNavigationArrow: true,
+              showTodayButton: true,
+              view: CalendarView.day,
+              allowViewNavigation: true,
+              onTap: (details) => calendarTapped(details, appointments.data!),
+              allowedViews: const [
+                CalendarView.day,
+                CalendarView.week,
+                CalendarView.month,
+              ],
+              dataSource: MeetingDataSource(appointments.data!),
+              monthViewSettings: const MonthViewSettings(
+                  appointmentDisplayMode:
+                      MonthAppointmentDisplayMode.appointment),
+            ),
           );
         }
       },
@@ -154,7 +159,6 @@ class _CalendarPageState extends State<CalendarPage> {
                         ? const Color.fromARGB(255, 30, 90, 255)
                         : const Color.fromARGB(255, 76, 175, 80);
         final appointment = Appointment(
-          
           id: a['reference'].toString(),
           subject: a['customerUsername'].toString(),
           notes: a['services'].toString(),

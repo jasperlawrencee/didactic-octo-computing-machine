@@ -42,119 +42,126 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Background(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              children: [
-                const SizedBox(width: defaultPadding),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const WelcomeScreen(),
-                        ));
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                  color: kPrimaryColor,
+    return Scaffold(
+      body: Background(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  children: [
+                    const SizedBox(width: defaultPadding),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WelcomeScreen(),
+                            ));
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                      color: kPrimaryColor,
+                    ),
+                  ],
+                ),
+                const SignUpScreenTopImage(),
+                Row(
+                  children: [
+                    const Spacer(),
+                    Expanded(
+                        flex: 8,
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: <Widget>[
+                              textField(
+                                "Username",
+                                Icons.person,
+                                false,
+                                _username,
+                                emailType: false,
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              textField(
+                                "Email Address",
+                                Icons.mail,
+                                false,
+                                _email,
+                                emailType: RegExp(
+                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                    .hasMatch(_email.text),
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              textField(
+                                "Password",
+                                Icons.lock,
+                                true,
+                                _password,
+                                emailType: false,
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              SizedBox(
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 50,
+                                  margin:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(90)),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                        log("${_email.text} ${_password.text}");
+                                        _signup(_email.text, _password.text);
+                                      }
+                                    },
+                                    child: isLoading
+                                        ? const Center(
+                                            child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ))
+                                        : const Text(
+                                            'SIGN UP',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              AlreadyHaveAnAccountCheck(
+                                login: false,
+                                press: () {
+                                  Navigator.pushAndRemoveUntil(context,
+                                      MaterialPageRoute(
+                                    builder: (context) {
+                                      return const LoginScreen();
+                                    },
+                                  ), (route) => route.isFirst);
+                                },
+                              ),
+                              const SizedBox(height: defaultPadding),
+                            ],
+                          ),
+                        )),
+                    const Spacer(),
+                  ],
                 ),
               ],
             ),
-            const SignUpScreenTopImage(),
-            Row(
-              children: [
-                const Spacer(),
-                Expanded(
-                    flex: 8,
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        children: <Widget>[
-                          textField(
-                            "Username",
-                            Icons.person,
-                            false,
-                            _username,
-                            emailType: false,
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          textField(
-                            "Email Address",
-                            Icons.mail,
-                            false,
-                            _email,
-                            emailType: RegExp(
-                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                .hasMatch(_email.text),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          textField(
-                            "Password",
-                            Icons.lock,
-                            true,
-                            _password,
-                            emailType: false,
-                          ),
-                          const SizedBox(
-                            height: defaultPadding,
-                          ),
-                          SizedBox(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 50,
-                              margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(90)),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (formKey.currentState!.validate()) {
-                                    log("${_email.text} ${_password.text}");
-                                    _signup(_email.text, _password.text);
-                                  }
-                                },
-                                child: isLoading
-                                    ? const Center(
-                                        child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ))
-                                    : const Text(
-                                        'SIGN UP',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                          ),
-                          AlreadyHaveAnAccountCheck(
-                            login: false,
-                            press: () {
-                              Navigator.pushAndRemoveUntil(context,
-                                  MaterialPageRoute(
-                                builder: (context) {
-                                  return const LoginScreen();
-                                },
-                              ), (route) => route.isFirst);
-                            },
-                          ),
-                          const SizedBox(height: defaultPadding),
-                        ],
-                      ),
-                    )),
-                const Spacer(),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

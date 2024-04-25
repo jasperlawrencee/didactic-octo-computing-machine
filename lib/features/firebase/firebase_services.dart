@@ -27,6 +27,7 @@ class FirebaseService {
   Future<User?> signUpWithEmailAndPassword(
       String email, String password) async {
     try {
+      //_auth is an instance of FirebaseAuth
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -45,8 +46,8 @@ class FirebaseService {
   Future<User?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -254,12 +255,14 @@ class FirebaseService {
       List<String> chatRooms = [];
       if (chats.isNotEmpty && containsCurrentUsername) {
         chats.forEach((element) {
-          List<String> splits = element.split('_');
-          splits.forEach((a) {
-            if (a != username) {
-              chatRooms.add(a);
-            }
-          });
+          if (element.contains(username)) {
+            List<String> splits = element.split('_');
+            splits.forEach((a) {
+              if (a != username) {
+                chatRooms.add(a);
+              }
+            });
+          }
         });
         return chatRooms;
       } else {

@@ -22,7 +22,7 @@ class _MessagePageState extends State<MessagePage> {
   @override
   void initState() {
     super.initState();
-    customerStream = firebaseService.getChats().asStream();
+    // customerStream = firebaseService.getChats().asStream();
   }
 
   @override
@@ -55,8 +55,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget usersChatList() {
-    return StreamBuilder<List<String>>(
-      stream: customerStream,
+    return FutureBuilder<List<String>>(
+      future: firebaseService.getChats(),
       builder: (context, snapshot) {
         try {
           if (snapshot.hasError) {
@@ -66,21 +66,26 @@ class _MessagePageState extends State<MessagePage> {
                 child: CircularProgressIndicator(color: kPrimaryColor));
           }
           final customerList = snapshot.data!;
-          return ListView.builder(
-            itemCount: customerList.length,
-            itemBuilder: (context, index) {
-              final customer = customerList[index];
-              return ListTile(
-                title: Text(customer),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return ChatScreen(username: customer);
-                    },
-                  ));
-                },
-              );
+          return RefreshIndicator(
+            onRefresh: () async {
+              setState(() {});
             },
+            child: ListView.builder(
+              itemCount: customerList.length,
+              itemBuilder: (context, index) {
+                final customer = customerList[index];
+                return ListTile(
+                  title: Text(customer),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return ChatScreen(username: customer);
+                      },
+                    ));
+                  },
+                );
+              },
+            ),
           );
         } catch (e) {
           log('Error: $e');

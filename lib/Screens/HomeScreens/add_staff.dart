@@ -64,7 +64,7 @@ class _AddStaffState extends State<AddStaff> {
     ));
   }
 
-  addStaffToFirestore() async {
+  Future<void> addStaffToFirestore() async {
     try {
       if (nameController.text.isNotEmpty &&
           roleController.text.isNotEmpty &&
@@ -79,7 +79,9 @@ class _AddStaffState extends State<AddStaff> {
           'role': roleController.text,
           'contact': contactController.text,
         });
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Incomplete Forms')));

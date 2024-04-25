@@ -116,105 +116,112 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final message = ModalRoute.of(context)!.settings.arguments;
-    // log('${message.notification?.title}');
-    return Background(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Row(
-            children: [
-              const SizedBox(width: defaultPadding),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const WelcomeScreen(),
-                      ));
-                },
-                icon: const Icon(Icons.arrow_back),
-                color: kPrimaryColor,
-              ),
-            ],
-          ),
-          const LoginScreenTopImage(),
-          Row(
-            children: [
-              const Spacer(),
-              Expanded(
-                  flex: 8,
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      children: <Widget>[
-                        const SizedBox(height: defaultPadding),
-                        textField(
-                          "Email Address",
-                          Icons.person,
-                          false,
-                          _email,
-                          emailType: false,
-                        ),
-                        const SizedBox(height: defaultPadding),
-                        textField(
-                          "Password",
-                          Icons.lock,
-                          true,
-                          _password,
-                          emailType: false,
-                        ),
-                        const SizedBox(
-                          height: defaultPadding,
-                        ),
-                        SizedBox(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 50,
-                            margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(90)),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  _login();
-                                }
-                              },
-                              child: isLoading
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ))
-                                  : const Text(
-                                      'LOG IN',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 13,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ),
-                        AlreadyHaveAnAccountCheck(
-                          login: true,
-                          press: () {
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(
-                              builder: (context) {
-                                return const SignupScreen();
-                              },
-                            ), (route) => route.isFirst);
-                          },
-                        ),
-                      ],
+    return Scaffold(
+      body: Background(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  children: [
+                    const SizedBox(width: defaultPadding),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WelcomeScreen(),
+                            ));
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                      color: kPrimaryColor,
                     ),
-                  )),
-              const Spacer(),
-            ],
+                  ],
+                ),
+                const LoginScreenTopImage(),
+                Row(
+                  children: [
+                    const Spacer(),
+                    Expanded(
+                        flex: 8,
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: <Widget>[
+                              const SizedBox(height: defaultPadding),
+                              textField(
+                                "Email Address",
+                                Icons.person,
+                                false,
+                                _email,
+                                emailType: false,
+                              ),
+                              const SizedBox(height: defaultPadding),
+                              textField(
+                                "Password",
+                                Icons.lock,
+                                true,
+                                _password,
+                                emailType: false,
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              SizedBox(
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 50,
+                                  margin:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(90)),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                        _login();
+                                      }
+                                    },
+                                    child: isLoading
+                                        ? const Center(
+                                            child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ))
+                                        : const Text(
+                                            'LOG IN',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              AlreadyHaveAnAccountCheck(
+                                login: true,
+                                press: () {
+                                  Navigator.pushAndRemoveUntil(context,
+                                      MaterialPageRoute(
+                                    builder: (context) {
+                                      return const SignupScreen();
+                                    },
+                                  ), (route) => route.isFirst);
+                                },
+                              ),
+                            ],
+                          ),
+                        )),
+                    const Spacer(),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

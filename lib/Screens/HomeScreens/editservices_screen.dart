@@ -78,7 +78,19 @@ class _EditServicesState extends State<EditServices> {
           ),
           Text("${widget.serviceType} - ${widget.serviceName}"),
           const SizedBox(height: defaultPadding),
-          flatTextField('Description', _descriptionController),
+          // flatTextField('Description', _descriptionController),
+          TextFormField(
+            controller: _descriptionController,
+            maxLength: 25,
+            style: const TextStyle(
+              fontSize: 13,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: const InputDecoration(
+              hintText: 'Description',
+            ),
+          ),
           const SizedBox(height: defaultPadding),
           flatTextField('Price', _priceController, istext: false),
           const SizedBox(height: defaultPadding),

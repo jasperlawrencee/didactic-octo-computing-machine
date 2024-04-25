@@ -67,58 +67,61 @@ class _SalonRegisterScreenState extends State<SalonRegisterScreen> {
               content: const step3())
         ];
 
-    return Background(
-      child: Theme(
-        data: ThemeData(
-            canvasColor: Colors.transparent,
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: kPrimaryColor,
-                  background: Colors.white,
-                  secondary: kPrimaryLightColor,
-                )),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Stepper(
-            controlsBuilder: (BuildContext context, ControlsDetails controls) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  children: <Widget>[
-                    if (currentStep != 0)
-                      TextButton(
-                        onPressed: controls.onStepCancel,
-                        child: const Text(
-                          "BACK",
-                          style: TextStyle(color: kPrimaryColor),
+    return Scaffold(
+      body: Background(
+        child: Theme(
+          data: ThemeData(
+              canvasColor: Colors.transparent,
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                    primary: kPrimaryColor,
+                    background: Colors.white,
+                    secondary: kPrimaryLightColor,
+                  )),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Stepper(
+              controlsBuilder:
+                  (BuildContext context, ControlsDetails controls) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Row(
+                    children: <Widget>[
+                      if (currentStep != 0)
+                        TextButton(
+                          onPressed: controls.onStepCancel,
+                          child: const Text(
+                            "BACK",
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
                         ),
-                      ),
-                    if (currentStep <= 0)
-                      ElevatedButton(
-                        onPressed: controls.onStepContinue,
-                        child: const Text("NEXT"),
-                      ),
-                    if (currentStep == 1)
-                      ElevatedButton(
-                        onPressed: controls.onStepContinue,
-                        child: const Text("NEXT"),
-                      ),
-                    if (currentStep == 2)
-                      ElevatedButton(
-                          onPressed: () {
-                            _dialogBuilder(context);
-                          },
-                          child: const Text("NEXT"))
-                  ],
-                ),
-              );
-            },
-            elevation: 0,
-            type: StepperType.horizontal,
-            steps: getSteps(),
-            currentStep: currentStep,
-            onStepTapped: (step) => tapped(step),
-            onStepContinue: continued,
-            onStepCancel: cancel,
+                      if (currentStep <= 0)
+                        ElevatedButton(
+                          onPressed: controls.onStepContinue,
+                          child: const Text("NEXT"),
+                        ),
+                      if (currentStep == 1)
+                        ElevatedButton(
+                          onPressed: controls.onStepContinue,
+                          child: const Text("NEXT"),
+                        ),
+                      if (currentStep == 2)
+                        ElevatedButton(
+                            onPressed: () {
+                              _dialogBuilder(context);
+                            },
+                            child: const Text("NEXT"))
+                    ],
+                  ),
+                );
+              },
+              elevation: 0,
+              type: StepperType.horizontal,
+              steps: getSteps(),
+              currentStep: currentStep,
+              onStepTapped: (step) => tapped(step),
+              onStepContinue: continued,
+              onStepCancel: cancel,
+            ),
           ),
         ),
       ),

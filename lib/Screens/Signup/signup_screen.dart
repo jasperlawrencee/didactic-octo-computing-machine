@@ -169,28 +169,26 @@ class _SignupScreenState extends State<SignupScreen> {
 
   // kulang og snackbar if invalid login
   void _signup(String email, String password) async {
-    const CircularProgressIndicator();
-    String email = _email.text;
-    String password = _password.text;
+    try {
+      String email = _email.text;
+      String password = _password.text;
 
-    User? user = await _authService.signUpWithEmailAndPassword(email, password);
+      User? user =
+          await _authService.signUpWithEmailAndPassword(email, password);
 
-    //add email and username to firestore
-    postEmailToFireStore();
+      //add email and username to firestore
+      postEmailToFireStore();
 
-    if (user != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const SignupLogout();
-      }));
-    } else {
-      showDialog<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return SnackBar(
-              content: const Text('Login Error'),
-              action: SnackBarAction(label: 'Close', onPressed: () {}),
-            );
-          });
+      if (user != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return const SignupLogout();
+        }));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email or Username already exists')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 

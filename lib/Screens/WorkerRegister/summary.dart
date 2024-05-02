@@ -369,8 +369,7 @@ class _SummaryState extends State<Summary> {
                     const SizedBox(height: defaultPadding),
                 ],
               ),
-            if (workerForm.experiences.isEmpty)
-              const SizedBox(height: defaultPadding),
+            if (workerForm.experiences.isEmpty) const Text('None'),
             const Text(
               'Requirements',
               style: TextStyle(fontWeight: FontWeight.bold),

@@ -253,7 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
             primaryPhoneNum: doc['primaryPhoneNumber'],
             secondaryPhoneNum: doc['secondaryPhoneNumber'],
             role: doc['role'],
-            rating: double.parse(doc['rating']),
+            rating: doc['rating'],
             profilePicutre: doc['profilePicture'],
           );
         } else if (doc['role'] == 'salon') {

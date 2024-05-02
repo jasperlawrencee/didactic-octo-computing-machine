@@ -305,9 +305,9 @@ class _ExperienceSectionState extends State<ExperienceSection> {
               child: const Text('Select Dates'),
               onPressed: () async {
                 final DateTimeRange? dateTimeRange = await showDateRangePicker(
-                    initialEntryMode: DatePickerEntryMode.inputOnly,
+                    initialEntryMode: DatePickerEntryMode.calendar,
                     context: context,
-                    firstDate: DateTime(2000),
+                    firstDate: DateTime(1900),
                     lastDate: DateTime(2500));
                 if (dateTimeRange != null) {
                   setState(() {

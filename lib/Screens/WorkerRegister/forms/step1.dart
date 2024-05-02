@@ -118,7 +118,7 @@ class _firstStepState extends State<firstStep> {
                 showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
+                        firstDate: DateTime(1900),
                         lastDate: DateTime(2500))
                     .then((value) {
                   try {

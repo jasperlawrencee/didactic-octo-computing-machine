@@ -23,7 +23,6 @@ bool workerFormComplete() {
     workerForm.governmentID,
     workerForm.vaxCard,
     workerForm.nbiClearance,
-    workerForm.tinID,
     workerForm.certificates,
   ];
 

@@ -24,7 +24,7 @@ class Client {
   String primaryPhoneNum;
   String secondaryPhoneNum;
   String role;
-  double rating;
+  num rating;
   String profilePicutre;
 
   Client({
@@ -197,7 +197,7 @@ class _homeState extends State<home> {
           primaryPhoneNum: doc['primaryPhoneNumber'],
           secondaryPhoneNum: doc['secondaryPhoneNumber'],
           role: doc['role'],
-          rating: double.parse(doc['rating']),
+          rating: doc['rating'],
           profilePicutre: doc['profilePicture'],
         );
       }

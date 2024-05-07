@@ -265,7 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
             salonOwner: doc['salonOwner'],
             salonRepresentative: doc['salonRepresentative'],
             role: doc['role'],
-            rating: double.parse(doc['rating']),
+            rating: doc['rating'],
             profilePicutre: doc['profilePicture'],
           );
         }

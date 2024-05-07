@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/AdminScreens/Dashboard.dart';
 import 'package:flutter_auth/Screens/AdminScreens/ManageUsers.dart';
+import 'package:flutter_auth/Screens/AdminScreens/Transactions.dart';
 import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
 import 'package:flutter_auth/asset_strings.dart';
-import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:side_navigation/side_navigation.dart';
 
@@ -31,9 +31,7 @@ class _AdminScreenState extends State<AdminScreen> {
   List<Widget> views = const [
     AdminDashboard(),
     ManageUsers(),
-    // Center(
-    // child: Text('Settings'),
-    // ),
+    Transactions(),
   ];
   int selectedIndex = 0;
   @override
@@ -48,16 +46,16 @@ class _AdminScreenState extends State<AdminScreen> {
                   Logo,
                   width: 60,
                 ),
-                title: Text(
+                title: const Text(
                   'Admin',
                   style: TextStyle(fontSize: 25),
                 ),
-                subtitle: Text('Manage your users')),
+                subtitle: const Text('Manage your users')),
             footer: SideNavigationBarFooter(
                 label: TextButton(
-              child: Text('Logout'),
               onPressed: signUserOut,
               onHover: (value) {},
+              child: const Text('Logout'),
             )),
             selectedIndex: selectedIndex,
             items: const [
@@ -69,10 +67,10 @@ class _AdminScreenState extends State<AdminScreen> {
                 icon: Icons.people,
                 label: 'Manage Users',
               ),
-              // SideNavigationBarItem(
-              // icon: Icons.settings,
-              // label: 'Settings',
-              // ),
+              SideNavigationBarItem(
+                icon: Icons.monetization_on,
+                label: 'Transactions',
+              ),
             ],
             onTap: (index) {
               setState(() {
@@ -83,7 +81,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 itemTheme: SideNavigationBarItemTheme(
                     selectedItemColor: kPrimaryColor,
                     selectedBackgroundColor: kPrimaryLightColor),
-                togglerTheme: SideNavigationBarTogglerTheme(
+                togglerTheme: const SideNavigationBarTogglerTheme(
                     expandIconColor: kPrimaryColor),
                 dividerTheme: SideNavigationBarDividerTheme.standard()),
           ),

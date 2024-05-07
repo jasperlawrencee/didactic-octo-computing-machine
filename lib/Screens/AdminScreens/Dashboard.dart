@@ -5,19 +5,24 @@ import 'package:flutter_auth/asset_strings.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+String adminID = 'A5iQcK5n75M5BsmGeqoi7hHcgja2';
+
 class DashboardValues {
   String verifiedFreelancers;
   String verifiedSalons;
   String unverifiedFreelancers;
   String unverifiedSalons;
   String allClients;
+  String earnings;
 
-  DashboardValues(
-      {required this.verifiedSalons,
-      required this.verifiedFreelancers,
-      required this.unverifiedSalons,
-      required this.unverifiedFreelancers,
-      required this.allClients});
+  DashboardValues({
+    required this.verifiedSalons,
+    required this.verifiedFreelancers,
+    required this.unverifiedSalons,
+    required this.unverifiedFreelancers,
+    required this.allClients,
+    required this.earnings,
+  });
 }
 
 final db = FirebaseFirestore.instance;
@@ -72,12 +77,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     final verSalonsCount = verSalons.docs.length;
 
+    List<String> amount = [];
+    QuerySnapshot earnings =
+        await db.collection('users').doc(adminID).collection('earnings').get();
+
+    earnings.docs.forEach((a) {
+      amount.add(a['serviceFee']);
+    });
+
+    String totalAmount = amount.reduce((a, b) => a + b);
+
     return DashboardValues(
-        verifiedSalons: verSalonsCount.toString(),
-        verifiedFreelancers: verFreelancersCount.toString(),
-        unverifiedSalons: uvSalonsCount.toString(),
-        unverifiedFreelancers: uvFreelancersCount.toString(),
-        allClients: clientsCount.toString());
+      verifiedSalons: verSalonsCount.toString(),
+      verifiedFreelancers: verFreelancersCount.toString(),
+      unverifiedSalons: uvSalonsCount.toString(),
+      unverifiedFreelancers: uvFreelancersCount.toString(),
+      allClients: clientsCount.toString(),
+      earnings: totalAmount,
+    );
   }
 
   @override
@@ -86,7 +103,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         backgroundColor: AdminBG,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Text(
+          title: const Text(
             'Welcome, Admin!',
             style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
           ),
@@ -104,33 +121,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       children: [
                         Row(
                           children: [
-                            // DashboardCard(
-                            // name: 'Total Service Fee \nEarnings',
-                            // image: cash,
-                            // value: 'PHP 50,000',
-                            // verified: true,
-                            // ),
-                            // SizedBox(
-                            // width: 20,
-                            // ),
                             DashboardCard(
                               name: 'All Verified \nFreelancers',
                               image: worker,
                               value: dashboardValues.verifiedFreelancers,
                               verified: true,
                             ),
-                            SizedBox(
-                              width: 20,
-                            ),
+                            SizedBox(width: 20),
                             DashboardCard(
                               name: 'All Verified \nSalons',
                               image: salon,
                               value: dashboardValues.verifiedSalons,
                               verified: true,
                             ),
-                            SizedBox(
-                              width: 20,
-                            ),
+                            SizedBox(width: 20),
                             DashboardCard(
                               name: 'ALL REGISTERED \nCLIENTS',
                               image: user,
@@ -139,35 +143,35 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: defaultPadding,
-                        ),
+                        SizedBox(height: defaultPadding),
                         Row(
                           children: [
-                            // SizedBox(
-                            // width: 20,
-                            // ),
                             DashboardCard(
                               name: 'ALL UNVERIFIED \nFREELANCERS',
                               image: worker,
                               value: dashboardValues.unverifiedFreelancers,
                               verified: false,
                             ),
-                            SizedBox(
-                              width: 20,
-                            ),
+                            SizedBox(width: 20),
                             DashboardCard(
                               name: 'ALL UNVERIFIED \nSALONS',
                               image: salon,
                               value: dashboardValues.unverifiedSalons,
                               verified: false,
-                            )
+                            ),
+                            SizedBox(width: 20),
+                            DashboardCard(
+                              name: 'Total Service Fee \nEarnings',
+                              image: cash,
+                              value: "PHP ${dashboardValues.earnings}",
+                              verified: true,
+                            ),
                           ],
-                        )
+                        ),
                       ],
                     );
                   } else {
-                    return Center(
+                    return const Center(
                         child: CircularProgressIndicator(color: kPrimaryColor));
                   }
                 }),

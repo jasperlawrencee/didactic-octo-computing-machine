@@ -246,10 +246,9 @@ packages:
     description:
       name: firebase_core_web
       sha256: "67f2fcc600fc78c2f731c370a3a5e6c87ee862e3a2fba6f951eca6d5dafe5c29"
-      sha256: c8b02226e548f35aace298e2bb2e6c24e34e8a203d614e742bb1146e5a4ad3c8
       url: "https://pub.dev"
     source: hosted
-    version: "2.15.0"
+    version: "2.16.0"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -273,7 +272,7 @@ packages:
       sha256: "9224aa4db1ce6f08d96a82978453d37e9980204a20e410a11d9b774b24c6841c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.16.0"
+    version: "3.8.1"
   firebase_storage:
     dependency: "direct main"
     description:

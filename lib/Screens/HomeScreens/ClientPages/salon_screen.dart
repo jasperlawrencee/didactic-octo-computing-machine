@@ -295,8 +295,11 @@ class _homeState extends State<home> {
           .collection('bookings')
           .get();
       querySnapshot.docs.forEach((doc) {
-        // String? worker = doc['worker'];
-
+        List<Map<String, dynamic>> bookings = [];
+        List<dynamic> bookingsData = doc['services'];
+        bookingsData.forEach((element) {
+          bookings.add(Map<String, dynamic>.from(element));
+        });
         history.add(Booking(
           clientId: doc['clientId'],
           clientUsername: doc['clientUsername'],
@@ -307,7 +310,7 @@ class _homeState extends State<home> {
           paymentMethod: doc['paymentMethod'],
           reference: doc['reference'],
           serviceFee: doc['serviceFee'],
-          services: doc['services'],
+          services: bookings,
           status: doc['status'],
           totalAmount: doc['totalAmount'],
         ));
@@ -352,7 +355,7 @@ class Booking {
   String paymentMethod;
   String reference;
   String serviceFee;
-  List<dynamic> services;
+  List<Map<String, dynamic>> services;
   String status;
   String totalAmount;
   String? worker;

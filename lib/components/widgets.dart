@@ -292,6 +292,13 @@ SizedBox logOutButton(BuildContext context) {
   );
 }
 
+Row rowdetails({required List<Widget> children}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: children,
+  );
+}
+
 Widget bookingCard(Widget child) {
   return Container(
     width: double.infinity,

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_auth/Screens/HomeScreens/ClientPages/salon_screen.dart';
 import 'package:flutter_auth/Screens/HomeScreens/add_staff.dart';
+import 'package:flutter_auth/Screens/HomeScreens/analytics.dart';
 import 'package:flutter_auth/components/background.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -177,53 +178,92 @@ class _ProfilePageState extends State<ProfilePage> {
                                             : Container()
                                       ],
                                     ),
-                                    StreamBuilder<QuerySnapshot>(
-                                      stream: _firestore
-                                          .collection('users')
-                                          .doc(currentUser!.uid)
-                                          .collection('staff')
-                                          .snapshots(),
-                                      builder: (context, staff) {
-                                        if (staff.hasData) {
-                                          List<Staff> staffList =
-                                              staff.data!.docs.map((doc) {
-                                            Map<String, dynamic> data = doc
-                                                .data() as Map<String, dynamic>;
-                                            return Staff(
-                                                name: data['name'],
-                                                position: data['role']);
-                                          }).toList();
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: staffList.length,
-                                            itemBuilder: (context, index) {
-                                              return ListTile(
-                                                onTap: () {
-                                                  //view details
-                                                },
-                                                title: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(staffList[index].name),
-                                                    const Text('-'),
-                                                    Text(staffList[index]
-                                                        .position)
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        } else {
-                                          return const CircularProgressIndicator();
-                                        }
-                                      },
-                                    )
+                                    Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              .3,
+                                      padding:
+                                          const EdgeInsets.all(defaultPadding),
+                                      child: StreamBuilder<QuerySnapshot>(
+                                        stream: _firestore
+                                            .collection('users')
+                                            .doc(currentUser!.uid)
+                                            .collection('staff')
+                                            .snapshots(),
+                                        builder: (context, staff) {
+                                          if (staff.hasData) {
+                                            List<Staff> staffList =
+                                                staff.data!.docs.map((doc) {
+                                              Map<String, dynamic> data =
+                                                  doc.data()
+                                                      as Map<String, dynamic>;
+                                              return Staff(
+                                                  name: data['name'],
+                                                  position: data['role']);
+                                            }).toList();
+                                            return ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: staffList.length,
+                                              itemBuilder: (context, index) {
+                                                return ListTile(
+                                                  onTap: () {
+                                                    //view details
+                                                  },
+                                                  title: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(staffList[index]
+                                                          .name),
+                                                      const Text('-'),
+                                                      Text(staffList[index]
+                                                          .position)
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          } else {
+                                            return const CircularProgressIndicator();
+                                          }
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )
                             : Container(),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) {
+                                        return const AnalyticsPage();
+                                      },
+                                    ));
+                                  },
+                                  child: const Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Analytics',
+                                        style: TextStyle(
+                                          color: kPrimaryColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Icon(Icons.bar_chart_outlined)
+                                    ],
+                                  )),
+                            ),
+                          ],
+                        )
                       ],
                     );
                   } else {
@@ -326,7 +366,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.symmetric(
           vertical: defaultPadding, horizontal: defaultPadding / 2),
-      height: 160,
+      height: 180,
       width: 150,
       decoration: const BoxDecoration(
           color: kPrimaryLightColor,
